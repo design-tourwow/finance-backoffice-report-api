@@ -132,22 +132,58 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="wholesale">Wholesale</label>
-                  <select id="wholesale" name="wholesale" aria-label="เลือก Wholesale">
-                    <option value="" disabled selected hidden>เลือก Wholesale (ทั้งหมด)</option>
-                    <option value="all">ทั้งหมด</option>
-                    <option value="ttn">TTN PLUS</option>
-                    <option value="zego">ZEGO TRAVEL CO.,LTD.</option>
-                  </select>
+                  <div class="multi-select-wrapper" id="wholesaleMultiSelect">
+                    <div class="multi-select-trigger placeholder" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                      <span class="selected-text">เลือก Wholesale</span>
+                      <svg class="arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                    <div class="multi-select-dropdown" role="listbox">
+                      <div class="multi-select-search">
+                        <input type="text" placeholder="ค้นหา..." aria-label="ค้นหา Wholesale">
+                        <div class="multi-select-actions">
+                          <button type="button" class="multi-select-action-btn select-all">เลือกทั้งหมด</button>
+                          <button type="button" class="multi-select-action-btn deselect-all">ล้างทั้งหมด</button>
+                        </div>
+                      </div>
+                      <div class="multi-select-options">
+                        <div class="multi-select-option" data-value="ttn">
+                          <input type="checkbox" id="wholesale-ttn" value="ttn">
+                          <label for="wholesale-ttn">TTN PLUS</label>
+                        </div>
+                        <div class="multi-select-option" data-value="zego">
+                          <input type="checkbox" id="wholesale-zego" value="zego">
+                          <label for="wholesale-zego">ZEGO TRAVEL CO.,LTD.</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <input type="hidden" id="wholesale" name="wholesale" value="">
                 </div>
                 <div class="form-group">
                   <label for="country">ประเทศ</label>
-                  <select id="country" name="country" aria-label="เลือกประเทศ">
-                    <option value="" disabled selected hidden>เลือกประเทศ (ทั้งหมด)</option>
-                    <option value="all">ทั้งหมด</option>
-                    <option value="jp">ญี่ปุ่น</option>
-                    <option value="kr">เกาหลี</option>
-                    <option value="th">ไทย</option>
-                  </select>
+                  <div class="multi-select-wrapper" id="countryMultiSelect">
+                    <div class="multi-select-trigger placeholder" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                      <span class="selected-text">เลือกประเทศ</span>
+                      <svg class="arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                    <div class="multi-select-dropdown" role="listbox">
+                      <div class="multi-select-search">
+                        <input type="text" placeholder="ค้นหา..." aria-label="ค้นหาประเทศ">
+                        <div class="multi-select-actions">
+                          <button type="button" class="multi-select-action-btn select-all">เลือกทั้งหมด</button>
+                          <button type="button" class="multi-select-action-btn deselect-all">ล้างทั้งหมด</button>
+                        </div>
+                      </div>
+                      <div class="multi-select-options" id="countryOptions">
+                        <!-- Options will be loaded dynamically -->
+                      </div>
+                    </div>
+                  </div>
+                  <input type="hidden" id="country" name="country" value="">
                 </div>
                 <div class="form-group">
                   <label for="tourCode">รหัสทัวร์</label>
@@ -209,6 +245,93 @@
           <section class="results-section" aria-label="ผลการค้นหา">
             <div class="results-header">
               <h2 id="resultsCount">ผลการค้นหาพบ : <span class="count">0</span> รูปภาพ</h2>
+              <div class="results-actions">
+                <div class="sort-dropdown">
+                  <button type="button" class="btn btn-secondary sort-btn" id="sortBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 6h18M7 12h10M11 18h2"/>
+                    </svg>
+                    เรียงลำดับ
+                    <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </button>
+                  <div class="sort-menu" id="sortMenu">
+                    <button type="button" class="sort-option" data-sort="date-desc">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                      </svg>
+                      วันที่อัปเดต (ใหม่-เก่า)
+                    </button>
+                    <button type="button" class="sort-option" data-sort="date-asc">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                      </svg>
+                      วันที่อัปเดต (เก่า-ใหม่)
+                    </button>
+                    <button type="button" class="sort-option" data-sort="usage-desc">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 20V10M12 20V4M6 20v-6"/>
+                      </svg>
+                      จำนวนการใช้งาน (มาก-น้อย)
+                    </button>
+                    <button type="button" class="sort-option" data-sort="usage-asc">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 20v-6M12 20V4M6 20V10"/>
+                      </svg>
+                      จำนวนการใช้งาน (น้อย-มาก)
+                    </button>
+                  </div>
+                </div>
+                <div class="export-dropdown">
+                  <button type="button" class="btn btn-secondary export-btn" id="exportBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                    </svg>
+                    Export
+                    <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </button>
+                  <div class="export-menu" id="exportMenu">
+                    <button type="button" class="export-option" data-format="csv">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                      </svg>
+                      Export เป็น CSV
+                    </button>
+                    <button type="button" class="export-option" data-format="excel">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="12" y1="18" x2="12" y2="12"/>
+                        <line x1="9" y1="15" x2="15" y2="15"/>
+                      </svg>
+                      Export เป็น Excel
+                    </button>
+                    <button type="button" class="export-option" data-format="pdf">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <line x1="10" y1="9" x2="8" y2="9"/>
+                      </svg>
+                      Export เป็น PDF Report
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Table -->
@@ -221,6 +344,7 @@
                   ข้อมูลการใช้รูปภาพ (เฉพาะโปรแกรมที่ Active)
                 </div>
                 <div class="th th-programs" role="columnheader">ข้อมูลโปรแกรมที่ใช้รูปนี้</div>
+                <div class="th th-usage" role="columnheader">ประวัติการใช้งาน</div>
               </div>
 
               <!-- Loading State (inside table, below header) -->
@@ -280,6 +404,126 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" id="modalCancel">ยกเลิก</button>
           <button type="button" class="btn btn-primary" id="modalConfirm">รีเซ็ต</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="imagePreviewModal" class="image-modal" style="display: none;">
+      <div class="image-modal-overlay"></div>
+      <div class="image-modal-content">
+        <!-- Header -->
+        <div class="image-modal-header">
+          <h3 class="image-modal-title" id="imageModalTitle">รายละเอียดรูปภาพ</h3>
+          <button type="button" class="image-modal-close" id="imageModalClose" aria-label="ปิด">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="image-modal-body">
+          <!-- Image Container -->
+          <div class="image-modal-image-container">
+            <img id="imageModalImage" src="" alt="" class="image-modal-image" />
+            
+            <!-- Zoom Controls -->
+            <div class="image-modal-zoom-controls">
+              <button type="button" class="zoom-btn" id="zoomOut" aria-label="ซูมออก">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="M21 21l-4.35-4.35M8 11h6"/>
+                </svg>
+              </button>
+              <span class="zoom-level" id="zoomLevel">100%</span>
+              <button type="button" class="zoom-btn" id="zoomIn" aria-label="ซูมเข้า">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="M21 21l-4.35-4.35M11 8v6M8 11h6"/>
+                </svg>
+              </button>
+              <button type="button" class="zoom-btn" id="zoomReset" aria-label="รีเซ็ตซูม">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 4v6h6M23 20v-6h-6"/>
+                  <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Navigation -->
+            <button type="button" class="image-nav-btn prev" id="imagePrev" aria-label="รูปก่อนหน้า">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+              </svg>
+            </button>
+            <button type="button" class="image-nav-btn next" id="imageNext" aria-label="รูปถัดไป">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Info Panel -->
+          <div class="image-modal-info">
+
+            <div class="info-section">
+              <h4>ข้อมูลรูปภาพ</h4>
+              <div class="info-item">
+                <span class="info-label">ชื่อไฟล์:</span>
+                <span class="info-value" id="infoImageName">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">ประเทศ:</span>
+                <span class="info-value" id="infoCountry">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Wholesale:</span>
+                <span class="info-value" id="infoWholesale">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">รหัสทัวร์:</span>
+                <span class="info-value" id="infoTourCode">-</span>
+              </div>
+            </div>
+
+            <div class="info-section">
+              <h4>การใช้งาน</h4>
+              <div class="info-item">
+                <span class="info-label">จำนวนรวมใช้ซ้ำ:</span>
+                <span class="info-value highlight" id="infoUsageCount">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">อัปเดตล่าสุด:</span>
+                <span class="info-value" id="infoLastUpdated">-</span>
+              </div>
+            </div>
+
+            <div class="info-section">
+              <h4>โปรแกรมที่ใช้รูปนี้</h4>
+              <div class="info-programs" id="infoPrograms">
+                <p class="text-muted">ไม่มีข้อมูล</p>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="image-modal-actions">
+              <a href="#" class="btn btn-secondary" id="downloadImage" download>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                </svg>
+                ดาวน์โหลด
+              </a>
+              <button type="button" class="btn btn-secondary" id="copyImageUrl">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                คัดลอก URL
+              </button>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>

@@ -44,3 +44,4 @@ simple-test.html
 # Temporary files
 *.tmp
 console_log.txt
+.vercel

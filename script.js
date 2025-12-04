@@ -18,10 +18,14 @@
   document.addEventListener('DOMContentLoaded', function () {
     initMobileMenu();
     initCustomDateRangePicker();
+    initMultiSelect();
     initFormHandler();
     initShowAllButtons();
     initAccessibility();
     initInfiniteScroll();
+    initImagePreviewModal();
+    initExportImport();
+    initSorting();
     loadInitialData();
   });
 
@@ -68,6 +72,181 @@
         const isExpanded = this.getAttribute('aria-expanded') === 'true';
         this.setAttribute('aria-expanded', !isExpanded);
       });
+    });
+  }
+
+  // Multi-Select Dropdown
+  function initMultiSelect() {
+    const multiSelects = document.querySelectorAll('.multi-select-wrapper');
+    
+    multiSelects.forEach((wrapper) => {
+      const trigger = wrapper.querySelector('.multi-select-trigger');
+      const dropdown = wrapper.querySelector('.multi-select-dropdown');
+      const searchInput = wrapper.querySelector('.multi-select-search input');
+      const selectAllBtn = wrapper.querySelector('.select-all');
+      const deselectAllBtn = wrapper.querySelector('.deselect-all');
+      const optionsContainer = wrapper.querySelector('.multi-select-options');
+      const hiddenInput = wrapper.nextElementSibling;
+      const selectedText = trigger.querySelector('.selected-text');
+      
+      let selectedValues = [];
+      
+      // Toggle dropdown
+      const toggleDropdown = () => {
+        const isOpen = dropdown.classList.contains('open');
+        
+        // Close all other dropdowns
+        document.querySelectorAll('.multi-select-dropdown.open').forEach(d => {
+          if (d !== dropdown) {
+            d.classList.remove('open');
+            d.previousElementSibling.classList.remove('open');
+            d.previousElementSibling.setAttribute('aria-expanded', 'false');
+          }
+        });
+        
+        if (isOpen) {
+          dropdown.classList.remove('open');
+          trigger.classList.remove('open');
+          trigger.setAttribute('aria-expanded', 'false');
+        } else {
+          dropdown.classList.add('open');
+          trigger.classList.add('open');
+          trigger.setAttribute('aria-expanded', 'true');
+          searchInput.focus();
+        }
+      };
+      
+      // Update selected text
+      const updateSelectedText = () => {
+        const checkboxes = optionsContainer.querySelectorAll('input[type="checkbox"]:checked');
+        const count = checkboxes.length;
+        
+        if (count === 0) {
+          selectedText.textContent = trigger.dataset.placeholder || 'เลือก';
+          trigger.classList.add('placeholder');
+        } else if (count === 1) {
+          const label = checkboxes[0].nextElementSibling.textContent;
+          selectedText.innerHTML = `${label}`;
+          trigger.classList.remove('placeholder');
+        } else {
+          selectedText.innerHTML = `เลือกแล้ว <span class="multi-select-count">${count}</span>`;
+          trigger.classList.remove('placeholder');
+        }
+        
+        // Update hidden input
+        selectedValues = Array.from(checkboxes).map(cb => cb.value);
+        hiddenInput.value = selectedValues.join(',');
+      };
+      
+      // Search functionality
+      const filterOptions = () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const options = optionsContainer.querySelectorAll('.multi-select-option');
+        let hasResults = false;
+        
+        options.forEach(option => {
+          const label = option.querySelector('label').textContent.toLowerCase();
+          if (label.includes(searchTerm)) {
+            option.style.display = 'flex';
+            hasResults = true;
+          } else {
+            option.style.display = 'none';
+          }
+        });
+        
+        // Show/hide no results message
+        let noResults = optionsContainer.querySelector('.multi-select-no-results');
+        if (!hasResults) {
+          if (!noResults) {
+            noResults = document.createElement('div');
+            noResults.className = 'multi-select-no-results';
+            noResults.textContent = 'ไม่พบผลลัพธ์';
+            optionsContainer.appendChild(noResults);
+          }
+          noResults.style.display = 'block';
+        } else if (noResults) {
+          noResults.style.display = 'none';
+        }
+      };
+      
+      // Select all
+      const selectAll = () => {
+        const visibleCheckboxes = Array.from(optionsContainer.querySelectorAll('.multi-select-option'))
+          .filter(opt => opt.style.display !== 'none')
+          .map(opt => opt.querySelector('input[type="checkbox"]'));
+        
+        visibleCheckboxes.forEach(cb => {
+          cb.checked = true;
+          cb.closest('.multi-select-option').classList.add('selected');
+        });
+        updateSelectedText();
+      };
+      
+      // Deselect all
+      const deselectAll = () => {
+        const visibleCheckboxes = Array.from(optionsContainer.querySelectorAll('.multi-select-option'))
+          .filter(opt => opt.style.display !== 'none')
+          .map(opt => opt.querySelector('input[type="checkbox"]'));
+        
+        visibleCheckboxes.forEach(cb => {
+          cb.checked = false;
+          cb.closest('.multi-select-option').classList.remove('selected');
+        });
+        updateSelectedText();
+      };
+      
+      // Event listeners
+      trigger.addEventListener('click', toggleDropdown);
+      trigger.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleDropdown();
+        }
+      });
+      
+      searchInput.addEventListener('input', filterOptions);
+      searchInput.addEventListener('click', (e) => e.stopPropagation());
+      
+      selectAllBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectAll();
+      });
+      
+      deselectAllBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deselectAll();
+      });
+      
+      // Handle option clicks
+      optionsContainer.addEventListener('click', (e) => {
+        const option = e.target.closest('.multi-select-option');
+        if (option) {
+          const checkbox = option.querySelector('input[type="checkbox"]');
+          if (e.target !== checkbox) {
+            checkbox.checked = !checkbox.checked;
+          }
+          
+          if (checkbox.checked) {
+            option.classList.add('selected');
+          } else {
+            option.classList.remove('selected');
+          }
+          
+          updateSelectedText();
+        }
+      });
+      
+      // Close on outside click
+      document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) {
+          dropdown.classList.remove('open');
+          trigger.classList.remove('open');
+          trigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+      
+      // Store placeholder
+      trigger.dataset.placeholder = selectedText.textContent;
     });
   }
 
@@ -600,6 +779,23 @@ function initFormHandler() {
           }
         });
         
+        // Reset multi-select dropdowns
+        document.querySelectorAll('.multi-select-wrapper').forEach(wrapper => {
+          const checkboxes = wrapper.querySelectorAll('input[type="checkbox"]');
+          checkboxes.forEach(cb => {
+            cb.checked = false;
+            cb.closest('.multi-select-option').classList.remove('selected');
+          });
+          
+          const trigger = wrapper.querySelector('.multi-select-trigger');
+          const selectedText = trigger.querySelector('.selected-text');
+          selectedText.textContent = trigger.dataset.placeholder || 'เลือก';
+          trigger.classList.add('placeholder');
+          
+          const hiddenInput = wrapper.nextElementSibling;
+          if (hiddenInput) hiddenInput.value = '';
+        });
+        
         console.log('✅ Form reset completed');
       });
     } else {
@@ -841,23 +1037,26 @@ function initShowAllButtons() {
     try {
       // Get unique countries from images
       const response = await ImageService.getAllImages(1, 100);
-      const countrySelect = document.getElementById('country');
+      const countryOptions = document.getElementById('countryOptions');
       
-      if (response && response.data && countrySelect) {
+      if (response && response.data && countryOptions) {
         // Get unique countries
         const uniqueCountries = [...new Set(response.data.map(img => img.country))].sort();
         
-        // Clear existing options except first two (placeholder and "ทั้งหมด")
-        while (countrySelect.options.length > 2) {
-          countrySelect.remove(2);
-        }
+        // Clear existing options
+        countryOptions.innerHTML = '';
         
         // Add countries from data
         uniqueCountries.forEach(country => {
-          const option = document.createElement('option');
-          option.value = country; // Use English name for API
-          option.textContent = countryTranslation[country] || country; // Display Thai name
-          countrySelect.appendChild(option);
+          const countryName = countryTranslation[country] || country;
+          const optionDiv = document.createElement('div');
+          optionDiv.className = 'multi-select-option';
+          optionDiv.dataset.value = country;
+          optionDiv.innerHTML = `
+            <input type="checkbox" id="country-${country}" value="${country}">
+            <label for="country-${country}">${countryName}</label>
+          `;
+          countryOptions.appendChild(optionDiv);
         });
         
         console.log('✅ Loaded countries:', uniqueCountries.length);
@@ -937,6 +1136,9 @@ function initShowAllButtons() {
     const existingRows = resultsTable.querySelectorAll('.table-row');
     existingRows.forEach(row => row.remove());
 
+    // Store formatted images for modal
+    window.currentImages = images.map(img => DataFormatter.formatImageData(img));
+
     // Render each image
     images.forEach((image, index) => {
       const formattedImage = DataFormatter.formatImageData(image);
@@ -946,6 +1148,17 @@ function initShowAllButtons() {
 
     // Re-initialize show all buttons
     initShowAllButtons();
+
+    // Add click handlers to images
+    const clickableImages = resultsTable.querySelectorAll('.clickable-image');
+    clickableImages.forEach((img) => {
+      img.addEventListener('click', function() {
+        const imageIndex = parseInt(this.dataset.imageIndex);
+        if (window.currentImages && window.currentImages[imageIndex]) {
+          window.openImagePreview(window.currentImages[imageIndex], imageIndex, window.currentImages);
+        }
+      });
+    });
   }
 
   // Country translation map
@@ -1000,6 +1213,34 @@ function initShowAllButtons() {
     return `https://picsum.photos/seed/${seed}/300/200`;
   }
 
+  // Generate recent users (Mock data)
+  function generateRecentUsers(count = 5) {
+    const names = [
+      'สมชาย ใจดี',
+      'สมหญิง รักสงบ',
+      'วิชัย มั่นคง',
+      'ประภา สว่างใจ',
+      'อนุชา เจริญ',
+      'สุดา ยิ้มแย้ม',
+      'ธนา พัฒนา',
+      'มานี สุขสันต์'
+    ];
+    
+    const users = [];
+    let remainingCount = 10; // Start with higher count for first user
+    
+    for (let i = 0; i < count; i++) {
+      const usageCount = Math.max(1, remainingCount - Math.floor(Math.random() * 3));
+      users.push({
+        name: names[Math.floor(Math.random() * names.length)],
+        count: usageCount
+      });
+      remainingCount = usageCount;
+    }
+    
+    return users;
+  }
+
   // Create image row HTML
   function createImageRow(image, index) {
     const updateDate = DataFormatter.formatDateThai(image.updatedAt);
@@ -1038,7 +1279,9 @@ function initShowAllButtons() {
             src="${getCountryImage(image.country, image.id, image.name)}"
             alt="${image.name} - ${image.country}"
             loading="lazy"
-            style="width: 100%; max-width: 300px; height: 200px; object-fit: cover; border-radius: 8px;"
+            class="clickable-image"
+            data-image-index="${index - 1}"
+            style="width: 100%; max-width: 300px; height: 200px; object-fit: cover; border-radius: 8px; cursor: pointer;"
           />
           <div class="image-name">${image.name}</div>
           ${updateDate ? `<div class="image-update-date">อัปเดต: ${updateDate}</div>` : ''}
@@ -1072,8 +1315,557 @@ function initShowAllButtons() {
             ${programsContent}
           </div>
         </div>
+        <div class="td td-usage" role="cell">
+          <div class="usage-users">
+            ${generateRecentUsers(5).map(user => `
+              <div class="user-item">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span class="user-name">${user.name} <span class="user-count">(${user.count})</span></span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
       </div>
     `;
+  }
+
+  // Sorting Functions
+  function initSorting() {
+    const sortBtn = document.getElementById('sortBtn');
+    const sortMenu = document.getElementById('sortMenu');
+    let currentSort = null;
+
+    if (!sortBtn || !sortMenu) return;
+
+    // Toggle sort menu
+    sortBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      sortBtn.classList.toggle('open');
+      sortMenu.classList.toggle('open');
+    });
+
+    // Close menu on outside click
+    document.addEventListener('click', () => {
+      sortBtn.classList.remove('open');
+      sortMenu.classList.remove('open');
+    });
+
+    // Sort options
+    sortMenu.addEventListener('click', (e) => {
+      const option = e.target.closest('.sort-option');
+      if (option) {
+        const sortType = option.dataset.sort;
+        
+        // Update active state
+        sortMenu.querySelectorAll('.sort-option').forEach(opt => {
+          opt.classList.remove('active');
+        });
+        option.classList.add('active');
+        
+        // Apply sort
+        currentSort = sortType;
+        applySorting(sortType);
+        
+        // Close menu
+        sortBtn.classList.remove('open');
+        sortMenu.classList.remove('open');
+      }
+    });
+
+    // Store current sort globally
+    window.currentSort = () => currentSort;
+  }
+
+  // Apply Sorting
+  function applySorting(sortType) {
+    const images = window.currentImages;
+    if (!images || images.length === 0) return;
+
+    let sortedImages = [...images];
+
+    switch (sortType) {
+      case 'date-desc':
+        sortedImages.sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+        break;
+      case 'date-asc':
+        sortedImages.sort((a, b) => new Date(a.updatedAt || 0) - new Date(b.updatedAt || 0));
+        break;
+      case 'usage-desc':
+        sortedImages.sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0));
+        break;
+      case 'usage-asc':
+        sortedImages.sort((a, b) => (a.usageCount || 0) - (b.usageCount || 0));
+        break;
+    }
+
+    // Update global images
+    window.currentImages = sortedImages;
+
+    // Re-render results
+    renderResults(sortedImages);
+
+    console.log(`✅ Sorted by: ${sortType}`);
+  }
+
+  // Export Functions
+  function initExportImport() {
+    const exportBtn = document.getElementById('exportBtn');
+    const exportMenu = document.getElementById('exportMenu');
+
+    if (!exportBtn || !exportMenu) return;
+
+    // Toggle export menu
+    exportBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      exportBtn.classList.toggle('open');
+      exportMenu.classList.toggle('open');
+    });
+
+    // Close menu on outside click
+    document.addEventListener('click', () => {
+      exportBtn.classList.remove('open');
+      exportMenu.classList.remove('open');
+    });
+
+    // Export options
+    exportMenu.addEventListener('click', (e) => {
+      const option = e.target.closest('.export-option');
+      if (option) {
+        const format = option.dataset.format;
+        handleExport(format);
+        exportBtn.classList.remove('open');
+        exportMenu.classList.remove('open');
+      }
+    });
+  }
+
+  // Handle Export
+  async function handleExport(format) {
+    try {
+      // Get current images data
+      const images = window.currentImages || [];
+      
+      if (images.length === 0) {
+        alert('ไม่มีข้อมูลให้ Export');
+        return;
+      }
+
+      console.log(`Exporting ${images.length} images as ${format}...`);
+
+      switch (format) {
+        case 'csv':
+          exportToCSV(images);
+          break;
+        case 'excel':
+          exportToExcel(images);
+          break;
+        case 'pdf':
+          exportToPDF(images);
+          break;
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('เกิดข้อผิดพลาดในการ Export');
+    }
+  }
+
+  // Export to CSV
+  function exportToCSV(images) {
+    const headers = ['ลำดับ', 'ชื่อรูป', 'ประเทศ', 'Wholesale', 'รหัสทัวร์', 'จำนวนใช้ซ้ำ', 'วันที่อัปเดต', 'ใช้ล่าสุด', 'จำนวนโปรแกรม', 'โปรแกรมทัวร์'];
+    
+    const rows = images.map((img, index) => {
+      const programs = img.programs.map(p => p.program_code || p.code).join('; ');
+      const lastUsed = DataFormatter.formatDateThai(img.updatedAt) || '-';
+      return [
+        index + 1,
+        img.name,
+        countryTranslation[img.country] || img.country,
+        img.wholesale || '-',
+        img.tourCode || '-',
+        img.usageCount,
+        DataFormatter.formatDateThai(img.updatedAt) || '-',
+        lastUsed,
+        img.programs.length,
+        programs || '-'
+      ];
+    });
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    // Add BOM for Excel UTF-8 support
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `tour-images-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    
+    console.log('✅ CSV exported successfully');
+  }
+
+  // Export to Excel (using SheetJS library)
+  function exportToExcel(images) {
+    // Simple Excel export without external library
+    // For full Excel support, you would need SheetJS (xlsx.js)
+    
+    const headers = ['ลำดับ', 'ชื่อรูป', 'ประเทศ', 'Wholesale', 'รหัสทัวร์', 'จำนวนใช้ซ้ำ', 'วันที่อัปเดต', 'ใช้ล่าสุด', 'จำนวนโปรแกรม', 'โปรแกรมทัวร์'];
+    
+    let html = '<table><thead><tr>';
+    headers.forEach(h => html += `<th>${h}</th>`);
+    html += '</tr></thead><tbody>';
+    
+    images.forEach((img, index) => {
+      const programs = img.programs.map(p => p.program_code || p.code).join(', ');
+      const lastUsed = DataFormatter.formatDateThai(img.updatedAt) || '-';
+      html += '<tr>';
+      html += `<td>${index + 1}</td>`;
+      html += `<td>${img.name}</td>`;
+      html += `<td>${countryTranslation[img.country] || img.country}</td>`;
+      html += `<td>${img.wholesale || '-'}</td>`;
+      html += `<td>${img.tourCode || '-'}</td>`;
+      html += `<td>${img.usageCount}</td>`;
+      html += `<td>${DataFormatter.formatDateThai(img.updatedAt) || '-'}</td>`;
+      html += `<td>${lastUsed}</td>`;
+      html += `<td>${img.programs.length}</td>`;
+      html += `<td>${programs || '-'}</td>`;
+      html += '</tr>';
+    });
+    
+    html += '</tbody></table>';
+    
+    const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `tour-images-${new Date().toISOString().split('T')[0]}.xls`;
+    link.click();
+    
+    console.log('✅ Excel exported successfully');
+  }
+
+  // Export to PDF
+  function exportToPDF(images) {
+    // Create printable HTML
+    const printWindow = window.open('', '_blank');
+    
+    let html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Tour Images Report</title>
+        <style>
+          body { font-family: 'Sarabun', Arial, sans-serif; padding: 20px; }
+          h1 { color: #4a7ba7; text-align: center; }
+          .meta { text-align: center; color: #666; margin-bottom: 30px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
+          th { background-color: #4a7ba7; color: white; font-weight: bold; }
+          tr:nth-child(even) { background-color: #f9fafb; }
+          .footer { margin-top: 30px; text-align: center; color: #999; font-size: 11px; }
+          @media print {
+            body { padding: 10px; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <h1>รายงานรูปภาพทัวร์</h1>
+        <div class="meta">
+          <p>วันที่: ${new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <p>จำนวนรูปภาพทั้งหมด: ${images.length} รูป</p>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>ชื่อรูป</th>
+              <th>ประเทศ</th>
+              <th>Wholesale</th>
+              <th>รหัสทัวร์</th>
+              <th>จำนวนใช้ซ้ำ</th>
+              <th>วันที่อัปเดต</th>
+              <th>ใช้ล่าสุด</th>
+              <th>จำนวนโปรแกรม</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    
+    images.forEach((img, index) => {
+      const lastUsed = DataFormatter.formatDateThai(img.updatedAt) || '-';
+      html += `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${img.name}</td>
+          <td>${countryTranslation[img.country] || img.country}</td>
+          <td>${img.wholesale || '-'}</td>
+          <td>${img.tourCode || '-'}</td>
+          <td>${img.usageCount}</td>
+          <td>${DataFormatter.formatDateThai(img.updatedAt) || '-'}</td>
+          <td>${lastUsed}</td>
+          <td>${img.programs.length}</td>
+        </tr>
+      `;
+    });
+    
+    html += `
+          </tbody>
+        </table>
+        <div class="footer">
+          <p>สร้างโดย Tour Image Manager - Tourwow</p>
+        </div>
+        <div class="no-print" style="margin-top: 20px; text-align: center;">
+          <button onclick="window.print()" style="padding: 10px 20px; background: #4a7ba7; color: white; border: none; border-radius: 4px; cursor: pointer;">พิมพ์ / บันทึกเป็น PDF</button>
+          <button onclick="window.close()" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">ปิด</button>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    printWindow.document.write(html);
+    printWindow.document.close();
+    
+    console.log('✅ PDF report opened');
+  }
+
+  // Image Preview Modal
+  function initImagePreviewModal() {
+    const modal = document.getElementById('imagePreviewModal');
+    if (!modal) return;
+
+    const overlay = modal.querySelector('.image-modal-overlay');
+    const closeBtn = document.getElementById('imageModalClose');
+    const modalImage = document.getElementById('imageModalImage');
+    const zoomInBtn = document.getElementById('zoomIn');
+    const zoomOutBtn = document.getElementById('zoomOut');
+    const zoomResetBtn = document.getElementById('zoomReset');
+    const zoomLevelSpan = document.getElementById('zoomLevel');
+    const prevBtn = document.getElementById('imagePrev');
+    const nextBtn = document.getElementById('imageNext');
+    const downloadBtn = document.getElementById('downloadImage');
+    const copyUrlBtn = document.getElementById('copyImageUrl');
+
+    let currentZoom = 1;
+    let currentImageIndex = 0;
+    let allImages = [];
+    let isDragging = false;
+    let startX, startY, translateX = 0, translateY = 0;
+
+    // Close modal
+    const closeModal = () => {
+      modal.style.display = 'none';
+      currentZoom = 1;
+      translateX = 0;
+      translateY = 0;
+      updateImageTransform();
+      document.body.style.overflow = '';
+    };
+
+    // Open modal
+    window.openImagePreview = (imageData, imageIndex, imagesArray) => {
+      currentImageIndex = imageIndex;
+      allImages = imagesArray;
+      
+      // Get image URL
+      const imageUrl = getCountryImage(imageData.country, imageData.id, imageData.name);
+      
+      // Update image
+      modalImage.src = imageUrl;
+      modalImage.alt = imageData.name;
+      
+      console.log('Opening image preview:', {
+        name: imageData.name,
+        url: imageUrl,
+        country: imageData.country
+      });
+      
+      // Update info
+      document.getElementById('imageModalTitle').textContent = imageData.name;
+      document.getElementById('infoImageName').textContent = imageData.name;
+      document.getElementById('infoCountry').textContent = countryTranslation[imageData.country] || imageData.country;
+      document.getElementById('infoWholesale').textContent = imageData.wholesale || '-';
+      document.getElementById('infoTourCode').textContent = imageData.tourCode || '-';
+      document.getElementById('infoUsageCount').textContent = `${imageData.usageCount} โปรแกรมทัวร์`;
+      document.getElementById('infoLastUpdated').textContent = DataFormatter.formatDateThai(imageData.updatedAt) || '-';
+      
+      // Update programs
+      const programsContainer = document.getElementById('infoPrograms');
+      if (imageData.programs && imageData.programs.length > 0) {
+        programsContainer.innerHTML = imageData.programs.map(program => {
+          const formattedProgram = DataFormatter.formatProgramData(program);
+          return `<a href="${formattedProgram.url}" class="info-program-link" target="_blank">${formattedProgram.code} - ${formattedProgram.name}</a>`;
+        }).join('');
+      } else {
+        programsContainer.innerHTML = '<p class="text-muted">ยังไม่มีโปรแกรมทัวร์ที่ใช้รูปนี้</p>';
+      }
+      
+
+      
+      // Update download link
+      downloadBtn.href = imageUrl;
+      downloadBtn.download = imageData.name;
+      
+      // Update navigation buttons
+      prevBtn.disabled = currentImageIndex === 0;
+      nextBtn.disabled = currentImageIndex === allImages.length - 1;
+      
+      // Show modal
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      
+      // Reset zoom
+      currentZoom = 1;
+      translateX = 0;
+      translateY = 0;
+      updateImageTransform();
+    };
+
+    // Update image transform
+    const updateImageTransform = () => {
+      modalImage.style.transform = `scale(${currentZoom}) translate(${translateX}px, ${translateY}px)`;
+      zoomLevelSpan.textContent = `${Math.round(currentZoom * 100)}%`;
+    };
+
+    // Zoom in
+    zoomInBtn.addEventListener('click', () => {
+      if (currentZoom < 3) {
+        currentZoom += 0.25;
+        updateImageTransform();
+      }
+    });
+
+    // Zoom out
+    zoomOutBtn.addEventListener('click', () => {
+      if (currentZoom > 0.5) {
+        currentZoom -= 0.25;
+        updateImageTransform();
+      }
+    });
+
+    // Reset zoom
+    zoomResetBtn.addEventListener('click', () => {
+      currentZoom = 1;
+      translateX = 0;
+      translateY = 0;
+      updateImageTransform();
+    });
+
+    // Mouse wheel zoom
+    modalImage.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (e.deltaY < 0) {
+        // Zoom in
+        if (currentZoom < 3) {
+          currentZoom += 0.1;
+          updateImageTransform();
+        }
+      } else {
+        // Zoom out
+        if (currentZoom > 0.5) {
+          currentZoom -= 0.1;
+          updateImageTransform();
+        }
+      }
+    });
+
+    // Drag to pan
+    modalImage.addEventListener('mousedown', (e) => {
+      if (currentZoom > 1) {
+        isDragging = true;
+        startX = e.clientX - translateX;
+        startY = e.clientY - translateY;
+        modalImage.style.cursor = 'grabbing';
+      }
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        translateX = e.clientX - startX;
+        translateY = e.clientY - startY;
+        updateImageTransform();
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+      modalImage.style.cursor = 'grab';
+    });
+
+    // Navigation
+    prevBtn.addEventListener('click', () => {
+      if (currentImageIndex > 0) {
+        currentImageIndex--;
+        window.openImagePreview(allImages[currentImageIndex], currentImageIndex, allImages);
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentImageIndex < allImages.length - 1) {
+        currentImageIndex++;
+        window.openImagePreview(allImages[currentImageIndex], currentImageIndex, allImages);
+      }
+    });
+
+    // Copy URL
+    copyUrlBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(modalImage.src);
+        copyUrlBtn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+          คัดลอกแล้ว!
+        `;
+        setTimeout(() => {
+          copyUrlBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            คัดลอก URL
+          `;
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    });
+
+    // Close handlers
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (modal.style.display === 'flex') {
+        switch(e.key) {
+          case 'Escape':
+            closeModal();
+            break;
+          case 'ArrowLeft':
+            if (!prevBtn.disabled) prevBtn.click();
+            break;
+          case 'ArrowRight':
+            if (!nextBtn.disabled) nextBtn.click();
+            break;
+          case '+':
+          case '=':
+            zoomInBtn.click();
+            break;
+          case '-':
+            zoomOutBtn.click();
+            break;
+          case '0':
+            zoomResetBtn.click();
+            break;
+        }
+      }
+    });
   }
 
 })();
