@@ -185,7 +185,13 @@
                 </div>
                 <div class="form-group">
                   <label for="tourCode">รหัสทัวร์</label>
-                  <input type="text" id="tourCode" name="tourCode" placeholder="กรอกรหัสทัวร์" aria-label="กรอกรหัสทัวร์" />
+                  <div class="autocomplete-wrapper">
+                    <input type="text" id="tourCode" name="tourCode" placeholder="กรอกรหัสทัวร์" aria-label="กรอกรหัสทัวร์" autocomplete="off" />
+                    <div class="autocomplete-spinner" style="display: none;">
+                      <div class="spinner"></div>
+                    </div>
+                    <div class="autocomplete-dropdown" id="tourCodeAutocomplete" style="display: none;"></div>
+                  </div>
                   <span class="error-message" role="alert"></span>
                 </div>
               </div>

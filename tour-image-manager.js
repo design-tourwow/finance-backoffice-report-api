@@ -27,6 +27,7 @@
     initExportImport();
     initSorting();
     initImageNameAutocomplete();
+    initTourCodeAutocomplete();
     loadInitialData();
   });
 
@@ -1124,6 +1125,161 @@ function initShowAllButtons() {
     // Input event
     input.addEventListener('input', (e) => {
       searchImages(e.target.value.trim());
+    });
+
+    // Keyboard navigation
+    input.addEventListener('keydown', (e) => {
+      const items = dropdown.querySelectorAll('.autocomplete-item');
+      
+      if (dropdown.style.display === 'none' || items.length === 0) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+        updateSelection(items);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedIndex = Math.max(selectedIndex - 1, -1);
+        updateSelection(items);
+      } else if (e.key === 'Enter' && selectedIndex >= 0) {
+        e.preventDefault();
+        items[selectedIndex].click();
+      } else if (e.key === 'Escape') {
+        dropdown.style.display = 'none';
+        selectedIndex = -1;
+      }
+    });
+
+    // Update selection highlight
+    function updateSelection(items) {
+      items.forEach((item, index) => {
+        if (index === selectedIndex) {
+          item.classList.add('active');
+          item.scrollIntoView({ block: 'nearest' });
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.style.display = 'none';
+        selectedIndex = -1;
+      }
+    });
+
+    // Focus event
+    input.addEventListener('focus', () => {
+      if (input.value.length >= 3 && dropdown.innerHTML) {
+        dropdown.style.display = 'block';
+      }
+    });
+  }
+
+  // Tour Code Autocomplete
+  function initTourCodeAutocomplete() {
+    const input = document.getElementById('tourCode');
+    const dropdown = document.getElementById('tourCodeAutocomplete');
+    const wrapper = input?.closest('.autocomplete-wrapper');
+    const spinner = wrapper?.querySelector('.autocomplete-spinner');
+    
+    if (!input || !dropdown || !spinner) return;
+
+    let currentRequest = null;
+    let selectedIndex = -1;
+
+    // Debounced search function
+    const searchTourCodes = debounce(async (query) => {
+      if (query.length < 3) {
+        dropdown.style.display = 'none';
+        spinner.style.display = 'none';
+        return;
+      }
+
+      // Show spinner
+      spinner.style.display = 'block';
+      dropdown.style.display = 'none';
+
+      try {
+        // Cancel previous request if exists
+        if (currentRequest) {
+          currentRequest = null;
+        }
+
+        // Wait 1 second before making request
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Call API without filter to get all data, then filter client-side
+        const response = await TourImageAPI.getPreProductFileReports({});
+        
+        console.log('🔍 Tour Code Autocomplete - Query:', query);
+        console.log('📦 API Response:', response);
+
+        // Hide spinner
+        spinner.style.display = 'none';
+
+        if (response && response.status === 'success' && response.data && response.data.length > 0) {
+          console.log('✅ Found', response.data.length, 'total items');
+          
+          // Extract unique tour codes from pre_product_files and filter by query
+          const tourCodes = new Set();
+          response.data.forEach(item => {
+            if (item.pre_product_files && Array.isArray(item.pre_product_files)) {
+              item.pre_product_files.forEach(file => {
+                const tourCode = file.pre_product?.product_tour_code;
+                // Filter by query (case-insensitive)
+                if (tourCode && tourCode.toLowerCase().includes(query.toLowerCase())) {
+                  tourCodes.add(tourCode);
+                  console.log('  ➕ Added tour code:', tourCode);
+                }
+              });
+            }
+          });
+          
+          console.log('📋 Filtered tour codes:', [...tourCodes]);
+
+          // Convert to array and sort
+          const sortedCodes = [...tourCodes].sort((a, b) => {
+            return a.localeCompare(b, ['en', 'th']);
+          });
+
+          if (sortedCodes.length > 0) {
+            // Show dropdown with results
+            dropdown.innerHTML = sortedCodes.map(code => 
+              `<div class="autocomplete-item" data-value="${code}">${code}</div>`
+            ).join('');
+            
+            dropdown.style.display = 'block';
+            selectedIndex = -1;
+
+            // Add click handlers
+            dropdown.querySelectorAll('.autocomplete-item').forEach((item, index) => {
+              item.addEventListener('click', () => {
+                input.value = item.dataset.value;
+                dropdown.style.display = 'none';
+                selectedIndex = -1;
+              });
+            });
+          } else {
+            dropdown.innerHTML = '<div class="autocomplete-no-results">ไม่พบผลลัพธ์</div>';
+            dropdown.style.display = 'block';
+          }
+        } else {
+          dropdown.innerHTML = '<div class="autocomplete-no-results">ไม่พบผลลัพธ์</div>';
+          dropdown.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Tour code autocomplete error:', error);
+        spinner.style.display = 'none';
+        dropdown.style.display = 'none';
+      }
+    }, 300);
+
+    // Input event
+    input.addEventListener('input', (e) => {
+      searchTourCodes(e.target.value.trim());
     });
 
     // Keyboard navigation
