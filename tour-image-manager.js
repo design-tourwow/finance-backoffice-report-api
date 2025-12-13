@@ -749,30 +749,50 @@ function initFormHandler() {
       const countElement = document.querySelector('.results-header .count');
       
       if (response && response.status === 'success' && response.data && response.data.length > 0) {
+        let filteredData = [...response.data];
+        
+        // Client-side filter by file_count if min_file_count is specified
+        if (usageCount && usageCount !== '') {
+          const minCount = parseInt(usageCount);
+          filteredData = filteredData.filter(item => {
+            const fileCount = item.file_count || 0;
+            return fileCount === minCount;
+          });
+          console.log(`🔍 Filtered by file_count = ${minCount}: ${filteredData.length} results`);
+        }
+        
         // Apply default sorting (date-desc) to results
-        const sortedData = [...response.data].sort((a, b) => {
+        const sortedData = filteredData.sort((a, b) => {
           const dateA = a.last_file_created_at ? new Date(a.last_file_created_at) : new Date(0);
           const dateB = b.last_file_created_at ? new Date(b.last_file_created_at) : new Date(0);
           return dateB - dateA;
         });
         
-        // Render results
-        renderResults(sortedData);
-        
-        if (resultsTable) resultsTable.style.display = 'flex';
-        if (emptyState) emptyState.style.display = 'none';
-        
-        // Update results count
-        if (countElement) {
-          countElement.textContent = sortedData.length;
+        // Check if we have results after filtering
+        if (sortedData.length === 0) {
+          if (emptyState) emptyState.style.display = 'flex';
+          if (resultsTable) resultsTable.style.display = 'none';
+          if (countElement) countElement.textContent = '0';
+          console.log('❌ No results after filtering');
+        } else {
+          // Render results
+          renderResults(sortedData);
+          
+          if (resultsTable) resultsTable.style.display = 'flex';
+          if (emptyState) emptyState.style.display = 'none';
+          
+          // Update results count
+          if (countElement) {
+            countElement.textContent = sortedData.length;
+          }
+          
+          // Reset infinite scroll with current filters and total
+          if (window.resetInfiniteScroll) {
+            window.resetInfiniteScroll(filters, sortedData.length);
+          }
+          
+          console.log('✅ Search results:', sortedData.length);
         }
-        
-        // Reset infinite scroll with current filters and total
-        if (window.resetInfiniteScroll) {
-          window.resetInfiniteScroll(filters, sortedData.length);
-        }
-        
-        console.log('✅ Search results:', sortedData.length);
       } else {
         if (emptyState) emptyState.style.display = 'flex';
         if (resultsTable) resultsTable.style.display = 'none';
@@ -1051,6 +1071,17 @@ function initShowAllButtons() {
     };
   }
 
+  // Highlight matching text in autocomplete suggestions
+  function highlightMatch(text, query) {
+    if (!query) return text;
+    
+    // Escape special regex characters
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedQuery})`, 'gi');
+    
+    return text.replace(regex, '<mark class="autocomplete-highlight">$1</mark>');
+  }
+
   // Image Name Autocomplete
   function initImageNameAutocomplete() {
     const input = document.getElementById('imageName');
@@ -1095,9 +1126,9 @@ function initShowAllButtons() {
             return a.localeCompare(b, ['en', 'th']);
           });
 
-          // Show dropdown with results
+          // Show dropdown with results (with highlighted query)
           dropdown.innerHTML = names.map(name => 
-            `<div class="autocomplete-item" data-value="${name}">${name}</div>`
+            `<div class="autocomplete-item" data-value="${name}">${highlightMatch(name, query)}</div>`
           ).join('');
           
           dropdown.style.display = 'block';
@@ -1246,9 +1277,9 @@ function initShowAllButtons() {
           });
 
           if (sortedCodes.length > 0) {
-            // Show dropdown with results
+            // Show dropdown with results (with highlighted query)
             dropdown.innerHTML = sortedCodes.map(code => 
-              `<div class="autocomplete-item" data-value="${code}">${code}</div>`
+              `<div class="autocomplete-item" data-value="${code}">${highlightMatch(code, query)}</div>`
             ).join('');
             
             dropdown.style.display = 'block';
