@@ -1086,7 +1086,8 @@ function initShowAllButtons() {
   function initImageNameAutocomplete() {
     const input = document.getElementById('imageName');
     const dropdown = document.getElementById('imageNameAutocomplete');
-    const spinner = document.querySelector('.autocomplete-spinner');
+    const wrapper = input?.closest('.autocomplete-wrapper');
+    const spinner = wrapper?.querySelector('.autocomplete-spinner');
     
     if (!input || !dropdown || !spinner) return;
 
