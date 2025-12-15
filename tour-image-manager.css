@@ -2531,18 +2531,16 @@ body {
 
 /* Highlight matched text in autocomplete */
 .autocomplete-highlight {
-  background: linear-gradient(180deg, transparent 60%, rgba(74, 123, 167, 0.3) 60%);
-  background-color: rgba(74, 123, 167, 0.15);
+  background-color: rgba(74, 123, 167, 0.2);
   color: #1f2937;
   font-weight: 600;
-  padding: 2px 0;
-  border-radius: 2px;
+  padding: 2px 4px;
+  border-radius: 3px;
 }
 
 .autocomplete-item:hover .autocomplete-highlight,
 .autocomplete-item.active .autocomplete-highlight {
-  background: linear-gradient(180deg, transparent 60%, rgba(74, 123, 167, 0.4) 60%);
-  background-color: rgba(74, 123, 167, 0.25);
+  background-color: rgba(74, 123, 167, 0.3);
 }
 
 .autocomplete-no-results {

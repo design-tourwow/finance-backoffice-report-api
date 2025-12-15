@@ -718,8 +718,9 @@ function initFormHandler() {
         const ids = country.split(',').map(id => parseInt(id));
         if (ids.length > 0) filters.country_id = ids[0]; // API accepts single ID
       }
-      if (tourCode && tourCode !== '') filters.product_tour_code = tourCode.trim();
-      if (imageName && imageName !== '') filters.name = imageName.trim();
+      // Note: tourCode and imageName will be filtered client-side for partial match
+      // if (tourCode && tourCode !== '') filters.product_tour_code = tourCode.trim();
+      // if (imageName && imageName !== '') filters.name = imageName.trim();
       if (usageCount && usageCount !== '') filters.min_file_count = parseInt(usageCount);
       if (dateRange && dateRange !== '') {
         // Parse date range (format: "DD/MM/YYYY ถึง DD/MM/YYYY")
@@ -750,6 +751,32 @@ function initFormHandler() {
       
       if (response && response.status === 'success' && response.data && response.data.length > 0) {
         let filteredData = [...response.data];
+        
+        // Client-side filter by image name (partial match)
+        if (imageName && imageName !== '') {
+          const searchName = imageName.trim().toLowerCase();
+          filteredData = filteredData.filter(item => {
+            const itemName = (item.name || '').toLowerCase();
+            return itemName.includes(searchName);
+          });
+          console.log(`🔍 Filtered by name contains "${imageName}": ${filteredData.length} results`);
+        }
+        
+        // Client-side filter by tour code (partial match)
+        if (tourCode && tourCode !== '') {
+          const searchCode = tourCode.trim().toLowerCase();
+          filteredData = filteredData.filter(item => {
+            // Check if any pre_product_file has matching tour code
+            if (item.pre_product_files && Array.isArray(item.pre_product_files)) {
+              return item.pre_product_files.some(file => {
+                const code = (file.pre_product?.product_tour_code || '').toLowerCase();
+                return code.includes(searchCode);
+              });
+            }
+            return false;
+          });
+          console.log(`🔍 Filtered by tour code contains "${tourCode}": ${filteredData.length} results`);
+        }
         
         // Client-side filter by file_count if min_file_count is specified
         if (usageCount && usageCount !== '') {
