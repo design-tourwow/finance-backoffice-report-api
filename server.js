@@ -53,7 +53,5 @@ server.listen(PORT, () => {
     console.log(`\n🚀 Server running at http://localhost:${PORT}\n`);
     console.log(`📄 Available routes:`);
     console.log(`   - http://localhost:${PORT}/`);
-    console.log(`   - http://localhost:${PORT}/tour-image-manager`);
-    console.log(`   - http://localhost:${PORT}/seed-data.html`);
-    console.log(`   - http://localhost:${PORT}/seed-database.html\n`);
+    console.log(`   - http://localhost:${PORT}/tour-image-manager\n`);
 });

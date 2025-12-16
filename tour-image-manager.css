@@ -584,7 +584,7 @@ body {
 .image-name-header {
   font-size: 15px;
   font-weight: 600;
-  color: #1f2937;
+  color: #4a7ba7;
   margin-bottom: 4px;
   line-height: 1.5;
   word-break: break-word;
@@ -711,7 +711,7 @@ body {
 }
 
 .program-link {
-  font-size: 12px;
+  font-size: 14px;
   color: #4a7ba7;
   text-decoration: none;
   padding: 5px 0;
@@ -1229,30 +1229,78 @@ body {
 /* Empty State */
 .empty-state {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
-  gap: 12px;
+  padding: 0;
+  background: white;
+  margin: 20px;
+  border-radius: 8px;
+}
+
+.empty-state-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
   text-align: center;
 }
 
+.empty-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .empty-icon {
-  width: 64px;
-  height: 64px;
-  opacity: 0.5;
+  width: 240px;
+  height: 240px;
+  object-fit: contain;
+}
+
+.empty-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .empty-state h3 {
   font-size: 18px;
   font-weight: 600;
-  color: #374151;
+  color: #1f2937;
+  margin: 0;
 }
 
 .empty-state p {
   font-size: 14px;
   color: #6b7280;
-  max-width: 400px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Responsive Empty State */
+@media (max-width: 768px) {
+  .empty-state {
+    padding: 40px 20px;
+  }
+  
+  .empty-icon-wrapper {
+    width: 72px;
+    height: 72px;
+  }
+  
+  .empty-icon {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .empty-state h3 {
+    font-size: 17px;
+  }
+  
+  .empty-state p {
+    font-size: 13px;
+  }
 }
 
 /* Button Loading State */

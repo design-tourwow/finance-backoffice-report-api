@@ -799,7 +799,6 @@ function initFormHandler() {
         // Check if we have results after filtering
         if (sortedData.length === 0) {
           if (emptyState) emptyState.style.display = 'flex';
-          if (resultsTable) resultsTable.style.display = 'none';
           if (countElement) countElement.textContent = '0';
           console.log('❌ No results after filtering');
         } else {
@@ -823,7 +822,6 @@ function initFormHandler() {
         }
       } else {
         if (emptyState) emptyState.style.display = 'flex';
-        if (resultsTable) resultsTable.style.display = 'none';
         if (countElement) {
           countElement.textContent = '0';
         }
@@ -1594,7 +1592,6 @@ function initShowAllButtons() {
         console.log(`✅ Loaded ${sortedData.length} images`);
       } else {
         if (emptyState) emptyState.style.display = 'flex';
-        if (resultsTable) resultsTable.style.display = 'none';
         if (countElement) {
           countElement.textContent = '0';
         }
@@ -1603,7 +1600,6 @@ function initShowAllButtons() {
       console.error('Failed to load images:', error);
       if (loadingState) loadingState.style.display = 'none';
       if (emptyState) emptyState.style.display = 'flex';
-      if (resultsTable) resultsTable.style.display = 'none';
       if (countElement) {
         countElement.textContent = '0';
       }
