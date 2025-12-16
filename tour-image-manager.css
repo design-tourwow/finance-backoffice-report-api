@@ -275,6 +275,8 @@ body {
   border-radius: 4px;
   padding: 20px;
   margin-bottom: 20px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .filter-section h2 {
@@ -295,6 +297,8 @@ body {
   grid-template-columns: repeat(3, 1fr);
   gap: 15px;
   align-items: end;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .form-row-actions {
@@ -306,6 +310,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .form-group label {
@@ -322,6 +328,9 @@ body {
   font-size: 14px;
   font-family: inherit;
   background: #fff;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .form-group select {
@@ -420,6 +429,8 @@ body {
   padding: 20px;
   overflow-x: hidden;
   max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .results-section h2 {
