@@ -1873,6 +1873,15 @@ function initShowAllButtons() {
     // Toggle sort menu
     sortBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      
+      // Close other dropdowns
+      const exportBtn = document.getElementById('exportBtn');
+      const exportMenu = document.getElementById('exportMenu');
+      if (exportBtn && exportMenu) {
+        exportBtn.classList.remove('open');
+        exportMenu.classList.remove('open');
+      }
+      
       sortBtn.classList.toggle('open');
       sortMenu.classList.toggle('open');
     });
@@ -1968,6 +1977,15 @@ function initShowAllButtons() {
     // Toggle export menu
     exportBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      
+      // Close other dropdowns
+      const sortBtn = document.getElementById('sortBtn');
+      const sortMenu = document.getElementById('sortMenu');
+      if (sortBtn && sortMenu) {
+        sortBtn.classList.remove('open');
+        sortMenu.classList.remove('open');
+      }
+      
       exportBtn.classList.toggle('open');
       exportMenu.classList.toggle('open');
     });

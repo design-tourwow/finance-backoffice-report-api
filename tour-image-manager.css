@@ -276,7 +276,7 @@ body {
   padding: 20px;
   margin-bottom: 20px;
   max-width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .filter-section h2 {
@@ -299,6 +299,7 @@ body {
   align-items: end;
   max-width: 100%;
   min-width: 0;
+  overflow: visible;
 }
 
 .form-row-actions {
@@ -312,6 +313,8 @@ body {
   gap: 5px;
   min-width: 0;
   max-width: 100%;
+  overflow: visible;
+  position: relative;
 }
 
 .form-group label {
@@ -1489,7 +1492,8 @@ body {
   transition: transform 0.2s;
 }
 
-.export-btn.open .dropdown-arrow {
+.export-btn.open .dropdown-arrow,
+.sort-btn.open .dropdown-arrow {
   transform: rotate(180deg);
 }
 
