@@ -67,6 +67,10 @@ finance-backoffice-report/
 
 ## 🔄 Development Workflow
 
+### 📊 Visual Workflow Diagram
+
+**[👉 เปิด Workflow Diagram แบบ Interactive](./workflow-diagram.html)**
+
 ### ขั้นตอนการทำงานแบบมาตรฐาน
 
 ```
