@@ -2007,6 +2007,20 @@ function initShowAllButtons() {
 
     let sortedImages = [...images];
 
+    // Helper function to get banner/detail value by type
+    function getBannerValue(image, type) {
+      switch(type) {
+        case 'banner1':
+          return image.first_banner_count || 0;
+        case 'banner2':
+          return image.after_first_banner_count || 0;
+        case 'detail':
+          return image.day_detail_count || 0;
+        default:
+          return 0;
+      }
+    }
+
     switch (sortType) {
       case 'date-desc':
         // Sort by last_file_created_at (newest first)
@@ -2031,6 +2045,84 @@ function initShowAllButtons() {
       case 'usage-asc':
         // Sort by file_count (least used first)
         sortedImages.sort((a, b) => (a.file_count || 0) - (b.file_count || 0));
+        break;
+      case 'banner1-desc':
+        // Sort by Banner ลำดับที่ 1 (มาก-น้อย)
+        sortedImages.sort((a, b) => {
+          const valA = getBannerValue(a, 'banner1');
+          const valB = getBannerValue(b, 'banner1');
+          // Primary sort by banner1
+          if (valB !== valA) {
+            return valB - valA;
+          }
+          // Secondary sort by file_count (มาก-น้อย)
+          return (b.file_count || 0) - (a.file_count || 0);
+        });
+        break;
+      case 'banner1-asc':
+        // Sort by Banner ลำดับที่ 1 (น้อย-มาก)
+        sortedImages.sort((a, b) => {
+          const valA = getBannerValue(a, 'banner1');
+          const valB = getBannerValue(b, 'banner1');
+          // Primary sort by banner1
+          if (valA !== valB) {
+            return valA - valB;
+          }
+          // Secondary sort by file_count (มาก-น้อย)
+          return (b.file_count || 0) - (a.file_count || 0);
+        });
+        break;
+      case 'banner2-desc':
+        // Sort by Banner ลำดับที่ 2 (มาก-น้อย)
+        sortedImages.sort((a, b) => {
+          const valA = getBannerValue(a, 'banner2');
+          const valB = getBannerValue(b, 'banner2');
+          // Primary sort by banner2
+          if (valB !== valA) {
+            return valB - valA;
+          }
+          // Secondary sort by file_count (มาก-น้อย)
+          return (b.file_count || 0) - (a.file_count || 0);
+        });
+        break;
+      case 'banner2-asc':
+        // Sort by Banner ลำดับที่ 2 (น้อย-มาก)
+        sortedImages.sort((a, b) => {
+          const valA = getBannerValue(a, 'banner2');
+          const valB = getBannerValue(b, 'banner2');
+          // Primary sort by banner2
+          if (valA !== valB) {
+            return valA - valB;
+          }
+          // Secondary sort by file_count (มาก-น้อย)
+          return (b.file_count || 0) - (a.file_count || 0);
+        });
+        break;
+      case 'detail-desc':
+        // Sort by รายละเอียดทัวร์ (มาก-น้อย)
+        sortedImages.sort((a, b) => {
+          const valA = getBannerValue(a, 'detail');
+          const valB = getBannerValue(b, 'detail');
+          // Primary sort by detail
+          if (valB !== valA) {
+            return valB - valA;
+          }
+          // Secondary sort by file_count (มาก-น้อย)
+          return (b.file_count || 0) - (a.file_count || 0);
+        });
+        break;
+      case 'detail-asc':
+        // Sort by รายละเอียดทัวร์ (น้อย-มาก)
+        sortedImages.sort((a, b) => {
+          const valA = getBannerValue(a, 'detail');
+          const valB = getBannerValue(b, 'detail');
+          // Primary sort by detail
+          if (valA !== valB) {
+            return valA - valB;
+          }
+          // Secondary sort by file_count (มาก-น้อย)
+          return (b.file_count || 0) - (a.file_count || 0);
+        });
         break;
     }
 

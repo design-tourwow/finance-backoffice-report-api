@@ -19,14 +19,16 @@ const mimeTypes = {
 const server = http.createServer((req, res) => {
     console.log(`Request: ${req.url}`);
     
-    let filePath = '.' + req.url;
+    // Remove query string from URL
+    const urlWithoutQuery = req.url.split('?')[0];
+    let filePath = '.' + urlWithoutQuery;
     
     // Route / to index.html
-    if (req.url === '/') {
+    if (urlWithoutQuery === '/') {
         filePath = './index.html';
     }
     // Route /tour-image-manager to tour-image-manager.html
-    else if (req.url === '/tour-image-manager') {
+    else if (urlWithoutQuery === '/tour-image-manager') {
         filePath = './tour-image-manager.html';
     }
     
