@@ -138,9 +138,17 @@
 
         if (token && token.trim() !== '') {
           try {
-            // Store token in localStorage
-            localStorage.setItem('authToken', token);
-            console.log('✅ Token stored successfully');
+            // Store token in sessionStorage (matching API expectations)
+            sessionStorage.setItem('authToken', token);
+            
+            // Verify token was stored
+            const storedToken = sessionStorage.getItem('authToken');
+            if (storedToken === token) {
+              console.log('✅ Token stored successfully in sessionStorage');
+              console.log('✅ Token length:', storedToken.length);
+            } else {
+              throw new Error('Token verification failed');
+            }
 
             // Detect environment from hostname
             const hostname = window.location.hostname;
@@ -151,16 +159,18 @@
             }
             
             console.log('🎯 Environment detected:', environment);
-            console.log('🔄 Redirecting to tour-image-manager.html...');
+            console.log('🔄 Redirecting to tour-image-manager...');
 
-            // Redirect to main page (clean URL)
+            // Redirect to main page (clean URL) - use full path
             setTimeout(() => {
-              window.location.replace('/tour-image-manager.html');
-            }, 500); // Small delay for better UX
+              const redirectUrl = window.location.origin + '/tour-image-manager';
+              console.log('🔗 Redirect URL:', redirectUrl);
+              window.location.replace(redirectUrl);
+            }, 800); // Increased delay to ensure storage completes
 
           } catch (error) {
             console.error('❌ Error storing token:', error);
-            showError('เกิดข้อผิดพลาดในการบันทึก Token');
+            showError('เกิดข้อผิดพลาดในการบันทึก Token: ' + error.message);
           }
         } else {
           console.error('❌ No token found in URL');
