@@ -1,0 +1,249 @@
+# 🚀 Deployment Workflow Guide
+
+## เป้าหมาย
+- ✅ Staging: Auto-deploy
+- ✅ Production: Manual deploy only
+- ✅ Git: `main` = `staging` (sync กันเสมอ)
+
+---
+
+## 📋 ขั้นตอนการตั้งค่าครั้งแรก
+
+### 1. ตั้งค่า Vercel Dashboard
+1. เข้า **Vercel Dashboard** → เลือก Project
+2. ไปที่ **Settings** → **Git**
+3. หาส่วน **Ignored Build Step**
+4. เลือก **"Only build pre-production"**
+5. กด **Save**
+
+**ผลลัพธ์:**
+- Push ไป `staging` → Auto-deploy ✅
+- Push ไป `main` → ไม่ auto-deploy ❌ (ต้อง manual)
+
+---
+
+## 🔄 Workflow การพัฒนาฟีเจอร์ใหม่
+
+### Step 1: พัฒนาที่ Localhost
+```bash
+# แก้ไข code ที่ localhost
+# ทดสอบที่ http://localhost:8080
+```
+
+### Step 2: Push ไป Staging
+```bash
+git checkout staging
+git add .
+git commit -m "feat: ชื่อฟีเจอร์ใหม่"
+git push origin staging
+```
+
+**ผลลัพธ์:** Vercel auto-deploy ไป Staging ✅
+
+### Step 3: ทดสอบที่ Staging
+- เปิด Staging URL ทดสอบ
+- ตรวจสอบฟีเจอร์ทำงานถูกต้อง
+- ถ้ามีปัญหา → แก้ไข → Push staging อีกครั้ง
+
+### Step 4: Merge & Push ไป Main (Git Sync)
+```bash
+git checkout main
+git merge staging
+git push origin main
+```
+
+**ผลลัพธ์:** Git `main` = `staging` (sync กัน) ✅
+
+**หมายเหตุ:** Vercel **ไม่ auto-deploy** Production (ตามที่ตั้งค่าไว้)
+
+### Step 5: สร้าง Version Tag (Backup)
+```bash
+# สร้าง tag ตาม Semantic Versioning (SemVer)
+# MAJOR.MINOR.PATCH (เช่น v1.0.0, v1.1.0, v2.0.0)
+
+# กรณี Bug Fix (เปลี่ยน PATCH)
+git tag -a v1.0.1 -m "fix: แก้ไข bug ..."
+
+# กรณี Feature ใหม่ (เปลี่ยน MINOR)
+git tag -a v1.1.0 -m "feat: เพิ่มฟีเจอร์ ..."
+
+# กรณี Breaking Change (เปลี่ยน MAJOR)
+git tag -a v2.0.0 -m "BREAKING CHANGE: เปลี่ยนแปลงใหญ่ ..."
+
+# Push tag ขึ้น GitHub
+git push origin v1.x.x
+```
+
+**ผลลัพธ์:** Version Tag สร้างและ backup บน GitHub แล้ว ✅
+
+**Semantic Versioning (SemVer):**
+- **MAJOR** (v2.0.0): Breaking changes ที่ไม่ backward compatible
+- **MINOR** (v1.1.0): เพิ่มฟีเจอร์ใหม่ แต่ backward compatible
+- **PATCH** (v1.0.1): Bug fixes เท่านั้น
+
+### Step 6: Deploy Production (Manual)
+1. เข้า **Vercel Dashboard** → **Deployments**
+2. หา deployment ล่าสุดจาก `staging` branch
+3. กดปุ่ม **"Promote to Production"**
+4. ยืนยัน → Production จะใช้ code เดียวกันกับ Staging
+
+**ผลลัพธ์:** Production deploy สำเร็จ ✅
+
+---
+
+## 📊 สรุป Workflow
+
+```
+┌─────────────┐
+│  Localhost  │
+│  (Develop)  │
+└──────┬──────┘
+       │ git push staging
+       ▼
+┌─────────────┐
+│   Staging   │ ← Auto-deploy ✅
+│   (Test)    │
+└──────┬──────┘
+       │ ทดสอบ OK
+       ▼
+┌─────────────┐
+│ Git Merge   │
+│ staging→main│
+└──────┬──────┘
+       │ git push main
+       ▼
+┌─────────────┐
+│ Create Tag  │ ← Backup Version (v1.x.x)
+│  (Backup)   │
+└──────┬──────┘
+       │ git push tag
+       ▼
+┌─────────────┐
+│ Main Branch │ ← ไม่ auto-deploy ❌
+│  (Ready)    │
+└──────┬──────┘
+       │ Promote manually
+       ▼
+┌─────────────┐
+│ Production  │ ← Manual deploy ✅
+│   (Live)    │
+└─────────────┘
+```
+
+---
+
+## 🔧 คำสั่ง Git ที่ใช้บ่อย
+
+### ตรวจสอบ Branch ปัจจุบัน
+```bash
+git branch
+git status
+```
+
+### ดู Commit Log
+```bash
+git log --oneline -5
+git log --all --graph --oneline -10
+```
+
+### ตรวจสอบว่า main = staging หรือไม่
+```bash
+git diff main staging
+# ถ้าไม่มี output = เท่ากัน ✅
+```
+
+### Switch Branch
+```bash
+git checkout staging
+git checkout main
+```
+
+### ดู Version Tags ทั้งหมด
+```bash
+git tag -l
+# แสดง tags ทั้งหมด เช่น v1.0.0, v1.1.0, v2.0.0
+```
+
+### ดูรายละเอียด Tag
+```bash
+git show v1.0.0
+# แสดง commit, message, และ changes ของ tag นั้น
+```
+
+### Roll Back ไปเวอร์ชั่นเก่า
+```bash
+# ดู code ของเวอร์ชั่นเก่า (ไม่เปลี่ยน branch)
+git checkout v1.0.0
+
+# Roll back และ deploy (ระวัง: จะลบ commits ใหม่)
+git checkout main
+git reset --hard v1.0.0
+git push origin main --force
+
+# แล้วไป Vercel Dashboard → Promote to Production
+```
+
+---
+
+## ⚠️ ข้อควรระวัง
+
+1. **ห้าม Push ตรงไป Production**
+   - ต้อง Push staging ก่อนเสมอ
+   - ทดสอบที่ Staging ให้เรียบร้อย
+
+2. **ต้อง Merge ก่อน Promote**
+   - Merge staging → main (Git sync)
+   - แล้วค่อย Promote (Vercel)
+
+3. **ตรวจสอบ Commit ก่อน Promote**
+   - ดูให้แน่ใจว่า Promote deployment ที่ถูกต้อง
+   - เช็ค commit message และเวลา
+
+---
+
+## 🆘 Troubleshooting
+
+### ถ้า Production Auto-deploy (ไม่ควรเกิด)
+- เช็คว่าตั้งค่า "Only build pre-production" แล้วหรือยัง
+- ไปที่ Vercel Settings → Git → Ignored Build Step
+
+### ถ้า Git main ≠ staging
+```bash
+# Reset main ให้เท่ากับ staging
+git checkout main
+git reset --hard staging
+git push origin main --force
+```
+
+### ถ้า Staging ไม่ Auto-deploy
+- เช็คว่า Push สำเร็จหรือไม่
+- ดู Vercel Dashboard → Deployments → เช็ค error log
+
+---
+
+## 📝 Checklist ก่อน Deploy Production
+
+- [ ] ทดสอบฟีเจอร์ที่ Staging แล้ว
+- [ ] ไม่มี Bug หรือ Error
+- [ ] Merge staging → main แล้ว
+- [ ] Push main ขึ้น GitHub แล้ว
+- [ ] Git `main` = `staging` (ตรวจสอบด้วย `git diff`)
+- [ ] **สร้าง Version Tag แล้ว** (เช่น v1.1.0)
+- [ ] **Push Tag ขึ้น GitHub แล้ว** (`git push origin v1.x.x`)
+- [ ] พร้อม Promote to Production
+
+---
+
+## 📦 Version History (ตัวอย่าง)
+
+| Version | Date | Description | Commit |
+|---------|------|-------------|--------|
+| v1.0.0 | 2025-12-25 | Add 6 new sorting options with secondary sort | bd84e75 |
+| v1.1.0 | TBD | เพิ่มฟีเจอร์ใหม่ | TBD |
+| v1.2.0 | TBD | เพิ่มฟีเจอร์ใหม่ | TBD |
+
+**หมายเหตุ:** อัปเดตตารางนี้ทุกครั้งที่สร้าง tag ใหม่
+
+---
+
+**อัปเดตล่าสุด:** 25 ธันวาคม 2025
