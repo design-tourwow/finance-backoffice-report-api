@@ -50,11 +50,19 @@ POST /api/reports
 
 ## Environment Variables
 
-คัดลอก `.env.example` เป็น `.env.local` และปรับแต่งค่าตามต้องการ
+สร้างไฟล์ `.env.local`:
 
 ```bash
 cp .env.example .env.local
 ```
+
+### ตัวแปรสำคัญ:
+
+- `REQUIRE_API_KEY` - เปิด/ปิดการใช้ API Key (`true`/`false`)
+- `API_KEY_1`, `API_KEY_2` - API Keys สำหรับควบคุมการเข้าถึง
+- `ALLOWED_ORIGINS` - Frontend URLs ที่อนุญาตให้เรียก API
+
+ดูรายละเอียดเพิ่มเติมใน [API_SECURITY.md](./API_SECURITY.md)
 
 ## Deployment
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { validateApiKey, unauthorizedResponse } from '@/lib/auth'
 
 // Mock data - ในอนาคตจะเชื่อมต่อกับ database
 const mockReports = [
@@ -19,6 +20,10 @@ const mockReports = [
 ]
 
 export async function GET(request: NextRequest) {
+  // ตรวจสอบ API Key (ถ้าเปิดใช้งาน)
+  if (!validateApiKey(request)) {
+    return unauthorizedResponse()
+  }
   const searchParams = request.nextUrl.searchParams
   const type = searchParams.get('type')
   
@@ -36,6 +41,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // ตรวจสอบ API Key (ถ้าเปิดใช้งาน)
+  if (!validateApiKey(request)) {
+    return unauthorizedResponse()
+  }
+  
   try {
     const body = await request.json()
     
