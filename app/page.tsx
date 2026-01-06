@@ -19,136 +19,203 @@ export default function Home() {
   return (
     <main style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: '1rem',
+      background: '#f5f7fa',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
     }}>
-      <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: '2rem 1rem'
+      {/* Top Navigation Bar */}
+      <nav style={{
+        background: '#ffffff',
+        borderBottom: '1px solid #e5e7eb',
+        padding: '1rem 2rem',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
       }}>
-        {/* Header with Glassmorphism */}
         <div style={{
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '24px',
-          padding: '2.5rem',
-          marginBottom: '2rem',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.18)'
+          maxWidth: '1400px',
+          margin: '0 auto',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{
-              width: '60px',
-              height: '60px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              borderRadius: '16px',
+              width: '40px',
+              height: '40px',
+              background: '#1e40af',
+              borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '2rem',
-              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)'
+              fontSize: '1.25rem'
             }}>
-              💼
+              🌐
             </div>
             <div>
-              <h1 style={{ 
-                margin: 0, 
-                fontSize: '2.5rem', 
-                fontWeight: '700',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}>
-                Finance Backoffice Report API
-              </h1>
-              <p style={{ margin: '0.5rem 0 0 0', color: '#666', fontSize: '1.1rem' }}>
-                Modern RESTful API Documentation & Dashboard
-              </p>
+              <div style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827' }}>
+                Finance Backoffice API
+              </div>
+              <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '2px' }}>
+                Enterprise API Platform
+              </div>
             </div>
           </div>
-
-          {/* Status Badge */}
           <div style={{
-            display: 'inline-flex',
+            display: 'flex',
             alignItems: 'center',
             gap: '0.75rem',
-            background: healthStatus?.status === 'ok' 
-              ? 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
-              : 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)',
-            color: 'white',
-            padding: '0.75rem 1.5rem',
-            borderRadius: '50px',
-            fontSize: '1rem',
-            fontWeight: '600',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
-            animation: loading ? 'pulse 2s infinite' : 'none'
+            background: healthStatus?.status === 'ok' ? '#ecfdf5' : '#fef2f2',
+            padding: '0.5rem 1rem',
+            borderRadius: '6px',
+            border: `1px solid ${healthStatus?.status === 'ok' ? '#d1fae5' : '#fecaca'}`
           }}>
-            <span style={{ fontSize: '1.25rem' }}>
-              {loading ? '⏳' : healthStatus?.status === 'ok' ? '✅' : '❌'}
-            </span>
-            <span>
-              {loading ? 'Checking Status...' : healthStatus?.status === 'ok' ? 'API Online' : 'API Offline'}
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: healthStatus?.status === 'ok' ? '#10b981' : '#ef4444',
+              animation: healthStatus?.status === 'ok' ? 'pulse 2s infinite' : 'none'
+            }} />
+            <span style={{
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              color: healthStatus?.status === 'ok' ? '#065f46' : '#991b1b'
+            }}>
+              {loading ? 'Checking...' : healthStatus?.status === 'ok' ? 'Operational' : 'Offline'}
             </span>
           </div>
+        </div>
+      </nav>
+
+      <div style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: '3rem 2rem'
+      }}>
+        {/* Hero Section */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '12px',
+          padding: '3rem',
+          marginBottom: '2rem',
+          border: '1px solid #e5e7eb',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+        }}>
+          <h1 style={{
+            margin: 0,
+            fontSize: '2.25rem',
+            fontWeight: '700',
+            color: '#111827',
+            marginBottom: '0.75rem'
+          }}>
+            API Documentation
+          </h1>
+          <p style={{
+            margin: 0,
+            fontSize: '1.125rem',
+            color: '#6b7280',
+            lineHeight: '1.75',
+            maxWidth: '800px'
+          }}>
+            Secure and reliable RESTful API for financial reporting and backoffice operations. 
+            Built for enterprise-grade performance and scalability.
+          </p>
           
           {healthStatus && (
-            <div style={{ 
-              marginTop: '1rem', 
-              fontSize: '0.9rem', 
-              color: '#888',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
+            <div style={{
+              marginTop: '1.5rem',
+              padding: '1rem',
+              background: '#f9fafb',
+              borderRadius: '8px',
+              border: '1px solid #e5e7eb',
+              display: 'inline-block'
             }}>
-              <span>🕐</span>
-              <span>Last checked: {new Date(healthStatus.timestamp).toLocaleString('th-TH')}</span>
+              <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                <strong style={{ color: '#374151' }}>Last Health Check:</strong>{' '}
+                {new Date(healthStatus.timestamp).toLocaleString('en-US', {
+                  dateStyle: 'medium',
+                  timeStyle: 'short'
+                })}
+              </div>
             </div>
           )}
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats Grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '1rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: '1.5rem',
           marginBottom: '2rem'
         }}>
-          <StatCard icon="📡" label="Endpoints" value="3" color="#667eea" />
-          <StatCard icon="⚡" label="Avg Response" value="<100ms" color="#38ef7d" />
-          <StatCard icon="🔒" label="Security" value="API Key" color="#f093fb" />
-          <StatCard icon="🌍" label="Region" value="Singapore" color="#4facfe" />
+          <MetricCard
+            label="Total Endpoints"
+            value="3"
+            icon="📊"
+            description="Available API routes"
+          />
+          <MetricCard
+            label="Response Time"
+            value="< 100ms"
+            icon="⚡"
+            description="Average latency"
+          />
+          <MetricCard
+            label="Security"
+            value="API Key"
+            icon="🔐"
+            description="Authentication method"
+          />
+          <MetricCard
+            label="Uptime"
+            value="99.9%"
+            icon="✓"
+            description="Service availability"
+          />
         </div>
 
-        {/* API Endpoints */}
+        {/* API Endpoints Section */}
         <div style={{
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '24px',
+          background: '#ffffff',
+          borderRadius: '12px',
           padding: '2.5rem',
           marginBottom: '2rem',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.18)'
+          border: '1px solid #e5e7eb',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
         }}>
-          <h2 style={{ 
-            fontSize: '1.75rem', 
-            marginBottom: '1.5rem', 
-            color: '#1a1a1a',
-            fontWeight: '700',
+          <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem'
+            gap: '0.75rem',
+            marginBottom: '2rem',
+            paddingBottom: '1.5rem',
+            borderBottom: '2px solid #f3f4f6'
           }}>
-            <span>📡</span> API Endpoints
-          </h2>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              background: '#eff6ff',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.25rem'
+            }}>
+              📡
+            </div>
+            <h2 style={{
+              margin: 0,
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              color: '#111827'
+            }}>
+              API Endpoints
+            </h2>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <EndpointCard
               method="GET"
               path="/api/health"
-              description="ตรวจสอบสถานะของ API server และ uptime"
+              description="Health check endpoint to monitor API status and availability"
               example="curl https://your-api.vercel.app/api/health"
               response={`{
   "status": "ok",
@@ -160,7 +227,7 @@ export default function Home() {
             <EndpointCard
               method="GET"
               path="/api/reports"
-              description="ดึงรายการ reports ทั้งหมด พร้อม filter ตาม type"
+              description="Retrieve all financial reports with optional filtering by type"
               example="curl https://your-api.vercel.app/api/reports?type=monthly"
               response={`{
   "success": true,
@@ -172,9 +239,10 @@ export default function Home() {
             <EndpointCard
               method="POST"
               path="/api/reports"
-              description="สร้าง report ใหม่ในระบบ"
+              description="Create a new financial report in the system"
               example={`curl -X POST https://your-api.vercel.app/api/reports \\
   -H "Content-Type: application/json" \\
+  -H "x-api-key: your-api-key" \\
   -d '{"title":"Monthly Report","type":"monthly"}'`}
               response={`{
   "success": true,
@@ -184,118 +252,180 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Features */}
+        {/* Features Section */}
         <div style={{
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '24px',
+          background: '#ffffff',
+          borderRadius: '12px',
           padding: '2.5rem',
           marginBottom: '2rem',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.18)'
+          border: '1px solid #e5e7eb',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
         }}>
-          <h2 style={{ 
-            fontSize: '1.75rem', 
-            marginBottom: '1.5rem', 
-            color: '#1a1a1a',
-            fontWeight: '700',
+          <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem'
+            gap: '0.75rem',
+            marginBottom: '2rem',
+            paddingBottom: '1.5rem',
+            borderBottom: '2px solid #f3f4f6'
           }}>
-            <span>✨</span> Features
-          </h2>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-            gap: '1.25rem' 
+            <div style={{
+              width: '36px',
+              height: '36px',
+              background: '#eff6ff',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.25rem'
+            }}>
+              ⚙️
+            </div>
+            <h2 style={{
+              margin: 0,
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              color: '#111827'
+            }}>
+              Platform Features
+            </h2>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '1.5rem'
           }}>
-            <FeatureCard 
-              icon="🔒" 
-              title="API Key Auth" 
-              description="ระบบ authentication ด้วย API Key"
-              gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+            <FeatureCard
+              icon="🔒"
+              title="API Key Authentication"
+              description="Secure access control with API key validation and authorization"
             />
-            <FeatureCard 
-              icon="⚡" 
-              title="Lightning Fast" 
-              description="Response time < 100ms"
-              gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+            <FeatureCard
+              icon="⚡"
+              title="High Performance"
+              description="Optimized for speed with sub-100ms response times"
             />
-            <FeatureCard 
-              icon="📊" 
-              title="RESTful API" 
-              description="Standard REST architecture"
-              gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+            <FeatureCard
+              icon="📊"
+              title="RESTful Architecture"
+              description="Industry-standard REST API design principles"
             />
-            <FeatureCard 
-              icon="🚀" 
-              title="Auto Deploy" 
-              description="CI/CD ผ่าน Vercel & GitHub"
-              gradient="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"
+            <FeatureCard
+              icon="🌐"
+              title="CORS Support"
+              description="Cross-origin resource sharing for web applications"
             />
-            <FeatureCard 
-              icon="🌐" 
-              title="CORS Ready" 
-              description="รองรับ cross-origin requests"
-              gradient="linear-gradient(135deg, #fa709a 0%, #fee140 100%)"
+            <FeatureCard
+              icon="🚀"
+              title="Continuous Deployment"
+              description="Automated CI/CD pipeline via Vercel and GitHub"
             />
-            <FeatureCard 
-              icon="📝" 
-              title="Full Docs" 
-              description="เอกสารครบถ้วน พร้อมตัวอย่าง"
-              gradient="linear-gradient(135deg, #30cfd0 0%, #330867 100%)"
+            <FeatureCard
+              icon="📝"
+              title="Complete Documentation"
+              description="Comprehensive guides and code examples"
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '24px',
-          padding: '1.5rem',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.18)',
-          textAlign: 'center',
-          color: '#666'
+        <footer style={{
+          background: '#ffffff',
+          borderRadius: '12px',
+          padding: '2rem',
+          border: '1px solid #e5e7eb',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+          textAlign: 'center'
         }}>
-          <div style={{ marginBottom: '0.75rem', fontSize: '0.95rem' }}>
-            <strong style={{ color: '#1a1a1a' }}>Environment:</strong> {process.env.NODE_ENV || 'production'} • 
-            <strong style={{ color: '#1a1a1a' }}> Version:</strong> 1.0.0 • 
-            <strong style={{ color: '#1a1a1a' }}> Framework:</strong> Next.js 14
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '2rem',
+            marginBottom: '1rem',
+            fontSize: '0.875rem',
+            color: '#6b7280',
+            flexWrap: 'wrap'
+          }}>
+            <div>
+              <strong style={{ color: '#374151' }}>Environment:</strong> {process.env.NODE_ENV || 'production'}
+            </div>
+            <div>
+              <strong style={{ color: '#374151' }}>Version:</strong> 1.0.0
+            </div>
+            <div>
+              <strong style={{ color: '#374151' }}>Framework:</strong> Next.js 14
+            </div>
+            <div>
+              <strong style={{ color: '#374151' }}>Region:</strong> Singapore (SIN1)
+            </div>
           </div>
-          <div style={{ fontSize: '0.875rem' }}>
-            Built with ❤️ by Design Tourwow Team
+          <div style={{
+            fontSize: '0.875rem',
+            color: '#9ca3af',
+            paddingTop: '1rem',
+            borderTop: '1px solid #e5e7eb'
+          }}>
+            © 2026 Design Tourwow. All rights reserved.
           </div>
-        </div>
+        </footer>
       </div>
 
       <style jsx>{`
         @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.7; }
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.5;
+          }
         }
       `}</style>
     </main>
   )
 }
 
-function StatCard({ icon, label, value, color }: any) {
+function MetricCard({ label, value, icon, description }: any) {
   return (
     <div style={{
-      background: 'rgba(255, 255, 255, 0.95)',
-      backdropFilter: 'blur(10px)',
-      borderRadius: '16px',
+      background: '#ffffff',
+      border: '1px solid #e5e7eb',
+      borderRadius: '12px',
       padding: '1.5rem',
-      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-      border: '1px solid rgba(255, 255, 255, 0.18)',
-      transition: 'transform 0.2s, box-shadow 0.2s',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+      transition: 'box-shadow 0.2s',
       cursor: 'default'
     }}>
-      <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{icon}</div>
-      <div style={{ fontSize: '0.875rem', color: '#888', marginBottom: '0.25rem' }}>{label}</div>
-      <div style={{ fontSize: '1.5rem', fontWeight: '700', color: color }}>{value}</div>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+        marginBottom: '0.75rem'
+      }}>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          background: '#eff6ff',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '1.25rem'
+        }}>
+          {icon}
+        </div>
+        <div>
+          <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '2px' }}>
+            {label}
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827' }}>
+            {value}
+          </div>
+        </div>
+      </div>
+      <div style={{ fontSize: '0.875rem', color: '#9ca3af' }}>
+        {description}
+      </div>
     </div>
   )
 }
@@ -303,15 +433,15 @@ function StatCard({ icon, label, value, color }: any) {
 function EndpointCard({ method, path, description, example, response }: any) {
   const [showExample, setShowExample] = useState(false)
   const [copied, setCopied] = useState(false)
-  
-  const methodColors: any = {
-    GET: { bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', text: '#fff' },
-    POST: { bg: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', text: '#fff' },
-    PUT: { bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', text: '#fff' },
-    DELETE: { bg: 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)', text: '#fff' }
+
+  const methodStyles: any = {
+    GET: { bg: '#dbeafe', text: '#1e40af', border: '#bfdbfe' },
+    POST: { bg: '#d1fae5', text: '#065f46', border: '#a7f3d0' },
+    PUT: { bg: '#fef3c7', text: '#92400e', border: '#fde68a' },
+    DELETE: { bg: '#fee2e2', text: '#991b1b', border: '#fecaca' }
   }
-  
-  const colors = methodColors[method] || methodColors.GET
+
+  const style = methodStyles[method] || methodStyles.GET
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
@@ -321,114 +451,130 @@ function EndpointCard({ method, path, description, example, response }: any) {
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
-      backdropFilter: 'blur(10px)',
-      border: '1px solid rgba(255, 255, 255, 0.3)',
-      borderRadius: '16px',
+      background: '#f9fafb',
+      border: '1px solid #e5e7eb',
+      borderRadius: '10px',
       padding: '1.5rem',
-      transition: 'transform 0.2s, box-shadow 0.2s',
-      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.05)'
+      transition: 'border-color 0.2s'
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem',
+        marginBottom: '1rem',
+        flexWrap: 'wrap'
+      }}>
         <span style={{
-          background: colors.bg,
-          color: colors.text,
-          padding: '0.4rem 1rem',
-          borderRadius: '8px',
-          fontWeight: '700',
+          background: style.bg,
+          color: style.text,
+          border: `1px solid ${style.border}`,
+          padding: '0.375rem 0.875rem',
+          borderRadius: '6px',
+          fontWeight: '600',
           fontSize: '0.875rem',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-          letterSpacing: '0.5px'
+          letterSpacing: '0.025em'
         }}>
           {method}
         </span>
-        <code style={{ 
-          fontSize: '1.05rem', 
-          color: '#333',
-          fontWeight: '600',
+        <code style={{
+          fontSize: '1rem',
+          color: '#111827',
+          fontWeight: '500',
           fontFamily: 'Monaco, Consolas, monospace'
         }}>
           {path}
         </code>
       </div>
-      <p style={{ margin: '0.75rem 0', color: '#555', fontSize: '0.95rem', lineHeight: '1.6' }}>
+
+      <p style={{
+        margin: '0 0 1rem 0',
+        color: '#4b5563',
+        fontSize: '0.9375rem',
+        lineHeight: '1.6'
+      }}>
         {description}
       </p>
+
       <button
         onClick={() => setShowExample(!showExample)}
         style={{
-          background: showExample 
-            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-            : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-          color: 'white',
-          border: 'none',
-          padding: '0.65rem 1.25rem',
-          borderRadius: '8px',
+          background: showExample ? '#f3f4f6' : '#1e40af',
+          color: showExample ? '#374151' : '#ffffff',
+          border: showExample ? '1px solid #d1d5db' : 'none',
+          padding: '0.625rem 1.25rem',
+          borderRadius: '6px',
           cursor: 'pointer',
-          fontSize: '0.9rem',
-          fontWeight: '600',
-          marginTop: '0.5rem',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+          fontSize: '0.875rem',
+          fontWeight: '500',
           transition: 'all 0.2s'
         }}
       >
-        {showExample ? '🔼 Hide Example' : '🔽 Show Example'}
+        {showExample ? '▲ Hide Example' : '▼ Show Example'}
       </button>
-      
+
       {showExample && (
-        <div style={{ marginTop: '1.25rem', animation: 'fadeIn 0.3s' }}>
-          <div style={{ marginBottom: '1.25rem' }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
+        <div style={{ marginTop: '1.5rem' }}>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: '0.5rem'
+              marginBottom: '0.75rem'
             }}>
-              <strong style={{ fontSize: '0.9rem', color: '#333' }}>📤 Request:</strong>
+              <strong style={{ fontSize: '0.875rem', color: '#374151', fontWeight: '600' }}>
+                Request
+              </strong>
               <button
                 onClick={() => copyToClipboard(example)}
                 style={{
-                  background: copied ? '#38ef7d' : '#667eea',
-                  color: 'white',
-                  border: 'none',
-                  padding: '0.4rem 0.8rem',
+                  background: copied ? '#d1fae5' : '#f3f4f6',
+                  color: copied ? '#065f46' : '#374151',
+                  border: `1px solid ${copied ? '#a7f3d0' : '#d1d5db'}`,
+                  padding: '0.375rem 0.75rem',
                   borderRadius: '6px',
                   cursor: 'pointer',
-                  fontSize: '0.8rem',
-                  fontWeight: '600',
+                  fontSize: '0.8125rem',
+                  fontWeight: '500',
                   transition: 'all 0.2s'
                 }}
               >
-                {copied ? '✓ Copied!' : '📋 Copy'}
+                {copied ? '✓ Copied' : '📋 Copy'}
               </button>
             </div>
             <pre style={{
-              background: '#1e1e1e',
-              color: '#d4d4d4',
+              background: '#1f2937',
+              color: '#e5e7eb',
               padding: '1.25rem',
-              borderRadius: '12px',
+              borderRadius: '8px',
               overflow: 'auto',
-              fontSize: '0.85rem',
+              fontSize: '0.8125rem',
               lineHeight: '1.6',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+              border: '1px solid #374151',
               fontFamily: 'Monaco, Consolas, monospace'
             }}>
               {example}
             </pre>
           </div>
+
           <div>
-            <strong style={{ fontSize: '0.9rem', color: '#333', display: 'block', marginBottom: '0.5rem' }}>
-              📥 Response:
+            <strong style={{
+              fontSize: '0.875rem',
+              color: '#374151',
+              fontWeight: '600',
+              display: 'block',
+              marginBottom: '0.75rem'
+            }}>
+              Response
             </strong>
             <pre style={{
-              background: '#1e1e1e',
-              color: '#d4d4d4',
+              background: '#1f2937',
+              color: '#e5e7eb',
               padding: '1.25rem',
-              borderRadius: '12px',
+              borderRadius: '8px',
               overflow: 'auto',
-              fontSize: '0.85rem',
+              fontSize: '0.8125rem',
               lineHeight: '1.6',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+              border: '1px solid #374151',
               fontFamily: 'Monaco, Consolas, monospace'
             }}>
               {response}
@@ -440,42 +586,44 @@ function EndpointCard({ method, path, description, example, response }: any) {
   )
 }
 
-function FeatureCard({ icon, title, description, gradient }: any) {
+function FeatureCard({ icon, title, description }: any) {
   return (
     <div style={{
-      background: 'rgba(255, 255, 255, 0.9)',
-      backdropFilter: 'blur(10px)',
-      border: '1px solid rgba(255, 255, 255, 0.3)',
-      borderRadius: '16px',
-      padding: '1.75rem',
-      textAlign: 'center',
-      transition: 'transform 0.2s, box-shadow 0.2s',
-      cursor: 'default',
-      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.05)'
+      background: '#f9fafb',
+      border: '1px solid #e5e7eb',
+      borderRadius: '10px',
+      padding: '1.5rem',
+      transition: 'border-color 0.2s, box-shadow 0.2s',
+      cursor: 'default'
     }}>
       <div style={{
-        width: '60px',
-        height: '60px',
-        margin: '0 auto 1rem',
-        background: gradient,
-        borderRadius: '16px',
+        width: '48px',
+        height: '48px',
+        background: '#eff6ff',
+        borderRadius: '10px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '1.75rem',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+        fontSize: '1.5rem',
+        marginBottom: '1rem',
+        border: '1px solid #dbeafe'
       }}>
         {icon}
       </div>
-      <h3 style={{ 
-        margin: '0 0 0.5rem 0', 
-        fontSize: '1.1rem', 
-        color: '#1a1a1a',
-        fontWeight: '700'
+      <h3 style={{
+        margin: '0 0 0.5rem 0',
+        fontSize: '1.0625rem',
+        color: '#111827',
+        fontWeight: '600'
       }}>
         {title}
       </h3>
-      <p style={{ margin: 0, fontSize: '0.9rem', color: '#666', lineHeight: '1.5' }}>
+      <p style={{
+        margin: 0,
+        fontSize: '0.875rem',
+        color: '#6b7280',
+        lineHeight: '1.6'
+      }}>
         {description}
       </p>
     </div>
