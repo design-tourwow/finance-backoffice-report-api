@@ -25,8 +25,16 @@ yarn-error.log*
 *.swo
 *~
 
-# Node modules (if using npm in future)
+# Dependencies
 node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+.next/
+out/
+build/
+dist/
 
 # Python
 __pycache__/
