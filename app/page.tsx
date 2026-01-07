@@ -384,6 +384,14 @@ export default function Home() {
             opacity: 0.5;
           }
         }
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
       `}</style>
     </main>
   )
@@ -611,18 +619,24 @@ function EndpointCard({ method, path, description, example, response, requiresAu
         <button
           onClick={() => setShowExample(!showExample)}
           style={{
-            background: showExample ? '#f3f4f6' : '#1e40af',
-            color: showExample ? '#374151' : '#ffffff',
-            border: showExample ? '1px solid #d1d5db' : 'none',
+            background: showExample ? '#f1f5f9' : '#475569',
+            color: showExample ? '#475569' : '#ffffff',
+            border: showExample ? '1px solid #cbd5e1' : 'none',
             padding: '0.625rem 1.25rem',
             borderRadius: '6px',
             cursor: 'pointer',
             fontSize: '0.875rem',
             fontWeight: '500',
-            transition: 'all 0.2s'
+            transition: 'all 0.2s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
           }}
         >
-          {showExample ? '▲ Hide Example' : '▼ Show Example'}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points={showExample ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}/>
+          </svg>
+          {showExample ? 'Hide Example' : 'Show Example'}
         </button>
 
         <button
@@ -634,7 +648,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
             }
           }}
           style={{
-            background: showTryIt ? '#1e3a8a' : '#2563eb',
+            background: showTryIt ? '#334155' : '#64748b',
             color: '#ffffff',
             border: 'none',
             padding: '0.625rem 1.25rem',
@@ -648,7 +662,9 @@ function EndpointCard({ method, path, description, example, response, requiresAu
             gap: '0.5rem'
           }}
         >
-          <span>🧪</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
           {showTryIt ? 'Close Try It' : 'Try It Out'}
         </button>
       </div>
@@ -668,18 +684,36 @@ function EndpointCard({ method, path, description, example, response, requiresAu
               <button
                 onClick={() => copyToClipboard(example)}
                 style={{
-                  background: copied ? '#d1fae5' : '#f3f4f6',
-                  color: copied ? '#065f46' : '#374151',
-                  border: `1px solid ${copied ? '#a7f3d0' : '#d1d5db'}`,
+                  background: copied ? '#d1fae5' : '#f1f5f9',
+                  color: copied ? '#065f46' : '#475569',
+                  border: `1px solid ${copied ? '#a7f3d0' : '#cbd5e1'}`,
                   padding: '0.375rem 0.75rem',
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontSize: '0.8125rem',
                   fontWeight: '500',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.375rem'
                 }}
               >
-                {copied ? '✓ Copied' : '📋 Copy'}
+                {copied ? (
+                  <>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                    </svg>
+                    Copy
+                  </>
+                )}
               </button>
             </div>
             <pre style={{
@@ -729,8 +763,8 @@ function EndpointCard({ method, path, description, example, response, requiresAu
         <div style={{
           marginTop: '1.5rem',
           padding: '1.5rem',
-          background: '#eff6ff',
-          border: '2px solid #bfdbfe',
+          background: '#f8fafc',
+          border: '1px solid #e2e8f0',
           borderRadius: '10px'
         }}>
           <div style={{
@@ -739,30 +773,39 @@ function EndpointCard({ method, path, description, example, response, requiresAu
             alignItems: 'center',
             marginBottom: '1.5rem',
             paddingBottom: '1rem',
-            borderBottom: '1px solid #dbeafe'
+            borderBottom: '1px solid #e2e8f0'
           }}>
             <h4 style={{
               margin: 0,
-              fontSize: '1rem',
+              fontSize: '0.9375rem',
               fontWeight: '600',
-              color: '#1e40af',
+              color: '#475569',
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem'
             }}>
-              <span>🧪</span> Interactive Testing
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              Interactive Testing
             </h4>
             {responseTime !== null && (
               <div style={{
                 padding: '0.375rem 0.75rem',
                 background: '#ffffff',
-                color: '#1e40af',
+                color: '#64748b',
                 borderRadius: '6px',
                 fontSize: '0.8125rem',
                 fontWeight: '500',
-                border: '1px solid #bfdbfe'
+                border: '1px solid #e2e8f0',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.375rem'
               }}>
-                ⚡ {responseTime}ms
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+                {responseTime}ms
               </div>
             )}
           </div>
@@ -774,7 +817,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                 display: 'block',
                 fontSize: '0.875rem',
                 fontWeight: '500',
-                color: '#1e40af',
+                color: '#475569',
                 marginBottom: '0.5rem'
               }}>
                 API Key <span style={{ color: '#dc2626' }}>*</span>
@@ -789,12 +832,13 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                     width: '100%',
                     padding: '0.625rem 0.875rem',
                     paddingRight: '120px',
-                    border: '1px solid #bfdbfe',
+                    border: '1px solid #e2e8f0',
                     borderRadius: '6px',
                     fontSize: '0.875rem',
                     fontFamily: 'Monaco, Consolas, monospace',
                     boxSizing: 'border-box',
-                    background: '#ffffff'
+                    background: '#ffffff',
+                    color: '#1e293b'
                   }}
                 />
                 <button
@@ -805,7 +849,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                     top: '50%',
                     transform: 'translateY(-50%)',
                     padding: '0.375rem 0.75rem',
-                    background: '#2563eb',
+                    background: '#64748b',
                     color: '#ffffff',
                     border: 'none',
                     borderRadius: '4px',
@@ -828,7 +872,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                 display: 'block',
                 fontSize: '0.875rem',
                 fontWeight: '500',
-                color: '#1e40af',
+                color: '#475569',
                 marginBottom: '0.5rem'
               }}>
                 Query Parameters (Optional)
@@ -841,12 +885,13 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                 style={{
                   width: '100%',
                   padding: '0.625rem 0.875rem',
-                  border: '1px solid #bfdbfe',
+                  border: '1px solid #e2e8f0',
                   borderRadius: '6px',
                   fontSize: '0.875rem',
                   fontFamily: 'Monaco, Consolas, monospace',
                   boxSizing: 'border-box',
-                  background: '#ffffff'
+                  background: '#ffffff',
+                  color: '#1e293b'
                 }}
               />
             </div>
@@ -859,7 +904,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                 display: 'block',
                 fontSize: '0.875rem',
                 fontWeight: '500',
-                color: '#1e40af',
+                color: '#475569',
                 marginBottom: '0.5rem'
               }}>
                 Request Body (JSON)
@@ -871,13 +916,14 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #bfdbfe',
+                  border: '1px solid #e2e8f0',
                   borderRadius: '6px',
                   fontSize: '0.8125rem',
                   fontFamily: 'Monaco, Consolas, monospace',
                   resize: 'vertical',
                   boxSizing: 'border-box',
-                  background: '#ffffff'
+                  background: '#ffffff',
+                  color: '#1e293b'
                 }}
               />
             </div>
@@ -890,7 +936,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
             style={{
               width: '100%',
               padding: '0.875rem',
-              background: loading ? '#9ca3af' : '#1e40af',
+              background: loading ? '#cbd5e1' : '#475569',
               color: '#ffffff',
               border: 'none',
               borderRadius: '8px',
@@ -898,24 +944,42 @@ function EndpointCard({ method, path, description, example, response, requiresAu
               fontWeight: '600',
               cursor: loading ? 'not-allowed' : 'pointer',
               transition: 'background 0.2s',
-              marginBottom: '1rem'
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem'
             }}
           >
-            {loading ? '⏳ Sending Request...' : '🚀 Send Request'}
+            {loading ? (
+              <>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}>
+                  <path d="M21 12a9 9 0 11-6.219-8.56"/>
+                </svg>
+                Sending Request...
+              </>
+            ) : (
+              <>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                </svg>
+                Send Request
+              </>
+            )}
           </button>
 
           {/* Response Display */}
           {apiResponse && (
             <div style={{
               background: '#ffffff',
-              border: '1px solid #bfdbfe',
+              border: '1px solid #e2e8f0',
               borderRadius: '8px',
               padding: '1rem'
             }}>
               <div style={{
                 fontSize: '0.875rem',
                 fontWeight: '600',
-                color: '#1e40af',
+                color: '#475569',
                 marginBottom: '0.75rem'
               }}>
                 Response:
