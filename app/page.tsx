@@ -770,92 +770,54 @@ function EndpointCard({ method, path, description, example, response, requiresAu
           {/* API Key Input */}
           {requiresAuth && (
             <div style={{ marginBottom: '1rem' }}>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
+              <label style={{
+                display: 'block',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: '#1e40af',
                 marginBottom: '0.5rem'
               }}>
-                <label style={{
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  color: '#1e40af'
-                }}>
-                  API Key <span style={{ color: '#dc2626' }}>*</span>
-                </label>
-                <button
-                  onClick={() => setShowApiKeyHint(!showApiKeyHint)}
+                API Key <span style={{ color: '#dc2626' }}>*</span>
+              </label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="sk_test_..."
                   style={{
-                    background: 'none',
+                    width: '100%',
+                    padding: '0.625rem 0.875rem',
+                    paddingRight: '120px',
+                    border: '1px solid #bfdbfe',
+                    borderRadius: '6px',
+                    fontSize: '0.875rem',
+                    fontFamily: 'Monaco, Consolas, monospace',
+                    boxSizing: 'border-box',
+                    background: '#ffffff'
+                  }}
+                />
+                <button
+                  onClick={() => setApiKey('sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e')}
+                  style={{
+                    position: 'absolute',
+                    right: '6px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    padding: '0.375rem 0.75rem',
+                    background: '#2563eb',
+                    color: '#ffffff',
                     border: 'none',
-                    color: '#2563eb',
-                    fontSize: '0.8125rem',
+                    borderRadius: '4px',
+                    fontSize: '0.75rem',
                     cursor: 'pointer',
-                    textDecoration: 'underline',
-                    fontWeight: '500'
+                    fontWeight: '500',
+                    whiteSpace: 'nowrap'
                   }}
                 >
-                  {showApiKeyHint ? 'Hide' : 'Show'} test key
+                  Use test key
                 </button>
               </div>
-              <input
-                type="text"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="sk_test_..."
-                style={{
-                  width: '100%',
-                  padding: '0.625rem 0.875rem',
-                  border: '1px solid #bfdbfe',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem',
-                  fontFamily: 'Monaco, Consolas, monospace',
-                  boxSizing: 'border-box',
-                  background: '#ffffff'
-                }}
-              />
-              {showApiKeyHint && (
-                <div style={{
-                  marginTop: '0.5rem',
-                  padding: '0.75rem',
-                  background: '#ffffff',
-                  border: '1px solid #bfdbfe',
-                  borderRadius: '6px',
-                  fontSize: '0.8125rem'
-                }}>
-                  <div style={{ color: '#1e40af', fontWeight: '500', marginBottom: '0.5rem' }}>
-                    💡 Test API Key:
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <code style={{
-                      flex: 1,
-                      background: '#eff6ff',
-                      padding: '0.375rem 0.5rem',
-                      borderRadius: '4px',
-                      fontSize: '0.75rem',
-                      color: '#1e40af',
-                      border: '1px solid #dbeafe'
-                    }}>
-                      sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e
-                    </code>
-                    <button
-                      onClick={() => setApiKey('sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e')}
-                      style={{
-                        padding: '0.25rem 0.5rem',
-                        background: '#1e40af',
-                        color: '#ffffff',
-                        border: 'none',
-                        borderRadius: '4px',
-                        fontSize: '0.75rem',
-                        cursor: 'pointer',
-                        fontWeight: '500'
-                      }}
-                    >
-                      Use
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           )}
 
