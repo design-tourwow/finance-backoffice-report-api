@@ -61,7 +61,13 @@ git push origin staging
 
 ### 6. Deploy ขึ้น Production
 
-เมื่อทดสอบเรียบร้อยแล้ว:
+⚠️ **สำคัญ: ต้องรอการอนุมัติก่อน Deploy Production**
+
+**ห้าม** merge จาก staging ไปยัง main โดยอัตโนมัติ ต้องทำตามขั้นตอนนี้:
+
+1. ทดสอบใน Staging ให้เรียบร้อย
+2. **รอการอนุมัติจากผู้รับผิดชอบโปรเจค**
+3. เมื่อได้รับอนุมัติแล้ว จึงทำการ merge:
 
 ```bash
 # กลับไปที่ main
@@ -77,11 +83,6 @@ git push origin main
 
 **Vercel จะ auto-deploy ไปที่ Production environment**
 - URL: https://finance-backoffice-report-api.vercel.app
-
-หรือใช้ CLI:
-```bash
-vercel --prod
-```
 
 ## Quick Commands
 
@@ -120,5 +121,19 @@ git log --oneline -5
 
 - ห้าม push ตรงไปที่ `main` โดยตรง (ยกเว้นกรณีฉุกเฉิน)
 - ทดสอบใน `staging` ก่อนเสมอ
+- **ต้องรอการอนุมัติก่อน deploy ขึ้น Production**
 - ใช้ commit message ที่ชัดเจน
 - ลบ feature branch หลังจาก merge เรียบร้อยแล้ว
+
+## Deployment Policy
+
+### Staging Deployment
+- Deploy ได้ทันทีหลังจาก merge เข้า `staging` branch
+- ใช้สำหรับทดสอบและ QA
+- Auto-deploy ผ่าน Vercel
+
+### Production Deployment
+- **ต้องได้รับการอนุมัติจากผู้รับผิดชอบโปรเจคก่อน**
+- ห้าม merge จาก `staging` ไปยัง `main` โดยอัตโนมัติ
+- ต้องแจ้งและรอคำสั่งก่อนทุกครั้ง
+- Auto-deploy ผ่าน Vercel หลังจาก push ไปยัง `main`

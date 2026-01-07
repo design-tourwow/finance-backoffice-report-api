@@ -258,13 +258,23 @@ export default function Home() {
             <EndpointCard
               method="GET"
               path="/api/reports"
-              description="Retrieve all financial reports with optional filtering by type"
-              example={`curl https://your-api.vercel.app/api/reports?type=monthly \\
+              description="Retrieve booking data from database with optional limit parameter"
+              example={`curl https://your-api.vercel.app/api/reports?limit=10 \\
   -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
               response={`{
   "success": true,
-  "data": [...],
-  "total": 2
+  "data": [
+    {
+      "id": 1,
+      "lead_id": 1,
+      "booking_code": "BK230600001",
+      "booking_status": "reject",
+      "customer_name": "chat_name_102",
+      "customer_phone_number": "0647193285",
+      ...
+    }
+  ],
+  "total": 10
 }`}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
@@ -274,14 +284,20 @@ export default function Home() {
             <EndpointCard
               method="POST"
               path="/api/reports"
-              description="Create a new financial report in the system"
+              description="Create a new booking record in the database"
               example={`curl -X POST https://your-api.vercel.app/api/reports \\
   -H "Content-Type: application/json" \\
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
-  -d '{"title":"Monthly Report","type":"monthly"}'`}
+  -d '{"title":"New Booking","type":"standard"}'`}
               response={`{
   "success": true,
-  "data": { "id": "3", ... }
+  "data": {
+    "id": 151,
+    "title": "New Booking",
+    "type": "standard",
+    "created_at": "2026-01-07T...",
+    "status": "pending"
+  }
 }`}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
