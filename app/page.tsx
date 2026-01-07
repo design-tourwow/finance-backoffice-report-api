@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 export default function Home() {
   const [healthStatus, setHealthStatus] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [activeTryItEndpoint, setActiveTryItEndpoint] = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/api/health')
@@ -250,6 +251,8 @@ export default function Home() {
   "service": "finance-backoffice-report-api"
 }`}
               requiresAuth={false}
+              activeTryItEndpoint={activeTryItEndpoint}
+              setActiveTryItEndpoint={setActiveTryItEndpoint}
             />
 
             <EndpointCard
@@ -264,6 +267,8 @@ export default function Home() {
   "total": 2
 }`}
               requiresAuth={true}
+              activeTryItEndpoint={activeTryItEndpoint}
+              setActiveTryItEndpoint={setActiveTryItEndpoint}
             />
 
             <EndpointCard
@@ -279,6 +284,8 @@ export default function Home() {
   "data": { "id": "3", ... }
 }`}
               requiresAuth={true}
+              activeTryItEndpoint={activeTryItEndpoint}
+              setActiveTryItEndpoint={setActiveTryItEndpoint}
             />
           </div>
         </div>
@@ -353,9 +360,8 @@ function MetricCard({ label, value, icon, description }: any) {
   )
 }
 
-function EndpointCard({ method, path, description, example, response, requiresAuth = true }: any) {
+function EndpointCard({ method, path, description, example, response, requiresAuth = true, activeTryItEndpoint, setActiveTryItEndpoint }: any) {
   const [showExample, setShowExample] = useState(false)
-  const [showTryIt, setShowTryIt] = useState(false)
   const [copied, setCopied] = useState(false)
   
   // Try It states
@@ -370,6 +376,9 @@ function EndpointCard({ method, path, description, example, response, requiresAu
   const [responseTime, setResponseTime] = useState<number | null>(null)
   const [showApiKeyHint, setShowApiKeyHint] = useState(false)
 
+  // Check if this endpoint's Try It is active
+  const showTryIt = activeTryItEndpoint === `${method}-${path}`
+
   const methodStyles: any = {
     GET: { bg: '#dbeafe', text: '#1e40af', border: '#bfdbfe' },
     POST: { bg: '#d1fae5', text: '#065f46', border: '#a7f3d0' },
@@ -383,6 +392,19 @@ function EndpointCard({ method, path, description, example, response, requiresAu
     navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const toggleTryIt = () => {
+    if (showTryIt) {
+      // Close if already open
+      setActiveTryItEndpoint(null)
+      setApiResponse(null)
+    } else {
+      // Open this one and close others
+      setActiveTryItEndpoint(`${method}-${path}`)
+      setShowExample(false)
+      setApiResponse(null)
+    }
   }
 
   const sendRequest = async () => {
@@ -507,13 +529,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
         </button>
 
         <button
-          onClick={() => {
-            setShowTryIt(!showTryIt)
-            if (!showTryIt) {
-              setShowExample(false)
-              setApiResponse(null)
-            }
-          }}
+          onClick={toggleTryIt}
           style={{
             background: showTryIt ? '#4f46e5' : '#6366f1',
             color: '#ffffff',
