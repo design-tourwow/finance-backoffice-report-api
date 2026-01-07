@@ -8,6 +8,13 @@ export default function Home() {
   const [activeTryItEndpoint, setActiveTryItEndpoint] = useState<string | null>(null)
   const [sampleData, setSampleData] = useState<any>(null)
 
+  // Detect current environment and set API URL
+  const apiUrl = typeof window !== 'undefined' 
+    ? window.location.origin 
+    : process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : 'http://localhost:3002'
+
   useEffect(() => {
     // Fetch health status
     fetch('/api/health')
@@ -260,7 +267,7 @@ export default function Home() {
               method="GET"
               path="/api/health"
               description="Health check endpoint to monitor API status and availability"
-              example="curl https://your-api.vercel.app/api/health"
+              example={`curl ${apiUrl}/api/health`}
               response={`{
   "status": "ok",
   "timestamp": "2026-01-06T...",
@@ -275,7 +282,7 @@ export default function Home() {
               method="GET"
               path="/api/bookings"
               description="Retrieve booking records from Xqc7k7_bookings table with optional limit parameter"
-              example={`curl https://your-api.vercel.app/api/bookings?limit=10 \\
+              example={`curl ${apiUrl}/api/bookings?limit=10 \\
   -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
               response={sampleData ? JSON.stringify({
                 success: true,
@@ -304,7 +311,7 @@ export default function Home() {
               method="POST"
               path="/api/bookings"
               description="Create a new booking record in Xqc7k7_bookings table"
-              example={`curl -X POST https://your-api.vercel.app/api/bookings \\
+              example={`curl -X POST ${apiUrl}/api/bookings \\
   -H "Content-Type: application/json" \\
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
   -d '{"title":"New Booking","type":"standard"}'`}

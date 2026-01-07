@@ -44,13 +44,13 @@ POST /api/bookings
 
 #### ตัวอย่าง Request with API Key
 ```bash
-curl https://your-api.vercel.app/api/bookings \
+curl https://staging-finance-backoffice-report-api.vercel.app/api/bookings \
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
 ```
 
 #### ตัวอย่าง POST Request
 ```bash
-curl -X POST https://your-api.vercel.app/api/bookings \
+curl -X POST https://staging-finance-backoffice-report-api.vercel.app/api/bookings \
   -H "Content-Type: application/json" \
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \
   -d '{
