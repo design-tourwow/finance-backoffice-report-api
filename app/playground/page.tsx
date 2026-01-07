@@ -12,6 +12,7 @@ export default function Playground() {
   const [response, setResponse] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [responseTime, setResponseTime] = useState<number | null>(null)
+  const [showApiKeyHint, setShowApiKeyHint] = useState(false)
 
   const endpoints = [
     { path: '/api/health', method: 'GET', description: 'Health check' },
@@ -256,20 +257,33 @@ export default function Playground() {
 
               {/* API Key */}
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '0.5rem'
-                }}>
-                  API Key (Optional)
-                </label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <label style={{
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    color: '#374151'
+                  }}>
+                    API Key {selectedEndpoint !== '/api/health' && '(Required)'}
+                  </label>
+                  <button
+                    onClick={() => setShowApiKeyHint(!showApiKeyHint)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#3b82f6',
+                      fontSize: '0.8125rem',
+                      cursor: 'pointer',
+                      textDecoration: 'underline'
+                    }}
+                  >
+                    {showApiKeyHint ? 'Hide' : 'Show'} test key
+                  </button>
+                </div>
                 <input
                   type="text"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="Enter your API key"
+                  placeholder="sk_test_..."
                   style={{
                     width: '100%',
                     padding: '0.625rem 0.875rem',
@@ -280,6 +294,51 @@ export default function Playground() {
                     boxSizing: 'border-box'
                   }}
                 />
+                {showApiKeyHint && (
+                  <div style={{
+                    marginTop: '0.5rem',
+                    padding: '0.75rem',
+                    background: '#eff6ff',
+                    border: '1px solid #dbeafe',
+                    borderRadius: '6px',
+                    fontSize: '0.8125rem'
+                  }}>
+                    <div style={{ color: '#1e40af', fontWeight: '500', marginBottom: '0.5rem' }}>
+                      💡 Test API Keys:
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <code style={{ 
+                          flex: 1, 
+                          background: '#ffffff', 
+                          padding: '0.375rem 0.5rem', 
+                          borderRadius: '4px',
+                          fontSize: '0.75rem',
+                          color: '#374151'
+                        }}>
+                          sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e
+                        </code>
+                        <button
+                          onClick={() => setApiKey('sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e')}
+                          style={{
+                            padding: '0.25rem 0.5rem',
+                            background: '#3b82f6',
+                            color: '#ffffff',
+                            border: 'none',
+                            borderRadius: '4px',
+                            fontSize: '0.75rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Use
+                        </button>
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                        ⚠️ For testing only. Do not use in production.
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Query Parameters */}
@@ -417,8 +476,112 @@ export default function Playground() {
                   <div style={{ fontSize: '1rem', fontWeight: '500' }}>
                     No response yet
                   </div>
-                  <div style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                  <div style={{ fontSize: '0.875rem', marginTop: '0.5rem', textAlign: 'center', maxWidth: '300px' }}>
                     Configure and send a request to see the response
+                  </div>
+                  
+                  {/* Example Responses */}
+                  <div style={{
+                    marginTop: '2rem',
+                    width: '100%',
+                    maxWidth: '500px',
+                    textAlign: 'left'
+                  }}>
+                    <div style={{
+                      fontSize: '0.875rem',
+                      fontWeight: '600',
+                      color: '#374151',
+                      marginBottom: '1rem'
+                    }}>
+                      💡 Example Responses:
+                    </div>
+                    
+                    {/* Success Response */}
+                    <details style={{ marginBottom: '0.75rem' }}>
+                      <summary style={{
+                        padding: '0.75rem',
+                        background: '#ecfdf5',
+                        border: '1px solid #d1fae5',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '0.8125rem',
+                        fontWeight: '500',
+                        color: '#065f46'
+                      }}>
+                        ✅ With Valid API Key
+                      </summary>
+                      <pre style={{
+                        marginTop: '0.5rem',
+                        padding: '0.75rem',
+                        background: '#1f2937',
+                        color: '#10b981',
+                        borderRadius: '6px',
+                        fontSize: '0.75rem',
+                        overflow: 'auto'
+                      }}>{`{
+  "success": true,
+  "data": [...],
+  "total": 2
+}`}</pre>
+                    </details>
+
+                    {/* No API Key */}
+                    <details style={{ marginBottom: '0.75rem' }}>
+                      <summary style={{
+                        padding: '0.75rem',
+                        background: '#fef3c7',
+                        border: '1px solid #fde68a',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '0.8125rem',
+                        fontWeight: '500',
+                        color: '#92400e'
+                      }}>
+                        ⚠️ Without API Key
+                      </summary>
+                      <pre style={{
+                        marginTop: '0.5rem',
+                        padding: '0.75rem',
+                        background: '#1f2937',
+                        color: '#fbbf24',
+                        borderRadius: '6px',
+                        fontSize: '0.75rem',
+                        overflow: 'auto'
+                      }}>{`{
+  "success": false,
+  "error": "Unauthorized",
+  "message": "Valid API key is required. Please include x-api-key header."
+}`}</pre>
+                    </details>
+
+                    {/* Invalid API Key */}
+                    <details>
+                      <summary style={{
+                        padding: '0.75rem',
+                        background: '#fee2e2',
+                        border: '1px solid #fecaca',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '0.8125rem',
+                        fontWeight: '500',
+                        color: '#991b1b'
+                      }}>
+                        ❌ With Invalid API Key
+                      </summary>
+                      <pre style={{
+                        marginTop: '0.5rem',
+                        padding: '0.75rem',
+                        background: '#1f2937',
+                        color: '#ef4444',
+                        borderRadius: '6px',
+                        fontSize: '0.75rem',
+                        overflow: 'auto'
+                      }}>{`{
+  "success": false,
+  "error": "Unauthorized",
+  "message": "Valid API key is required. Please include x-api-key header."
+}`}</pre>
+                    </details>
                   </div>
                 </div>
               )}

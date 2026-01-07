@@ -32,6 +32,7 @@ API จะรันที่ [http://localhost:3001](http://localhost:3001)
 ```
 GET /api/health
 ```
+No authentication required.
 
 ### Reports
 ```
@@ -39,14 +40,32 @@ GET /api/reports
 GET /api/reports?type=monthly
 POST /api/reports
 ```
+**Authentication required** - Include API key in header.
+
+#### ตัวอย่าง Request with API Key
+```bash
+curl https://your-api.vercel.app/api/reports \
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
+```
 
 #### ตัวอย่าง POST Request
-```json
-{
-  "title": "Monthly Report January 2026",
-  "type": "monthly"
-}
+```bash
+curl -X POST https://your-api.vercel.app/api/reports \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \
+  -d '{
+    "title": "Monthly Report January 2026",
+    "type": "monthly"
+  }'
 ```
+
+### Test API Keys
+
+สำหรับการทดสอบ (Development/Staging):
+- `sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e`
+- `sk_test_9a7b5c3d1e2f4a6b8c0d2e4f6a8b0c2d`
+
+⚠️ **หมายเหตุ:** API keys เหล่านี้ใช้สำหรับทดสอบเท่านั้น อย่านำไปใช้ใน production
 
 ## Environment Variables
 
