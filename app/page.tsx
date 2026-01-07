@@ -6,8 +6,10 @@ export default function Home() {
   const [healthStatus, setHealthStatus] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [activeTryItEndpoint, setActiveTryItEndpoint] = useState<string | null>(null)
+  const [sampleData, setSampleData] = useState<any>(null)
 
   useEffect(() => {
+    // Fetch health status
     fetch('/api/health')
       .then(res => res.json())
       .then(data => {
@@ -15,6 +17,20 @@ export default function Home() {
         setLoading(false)
       })
       .catch(() => setLoading(false))
+
+    // Fetch sample data from database
+    fetch('/api/reports?limit=2', {
+      headers: {
+        'x-api-key': 'sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data && data.data.length > 0) {
+          setSampleData(data.data[0])
+        }
+      })
+      .catch(err => console.error('Failed to fetch sample data:', err))
   }, [])
 
   return (
@@ -261,7 +277,11 @@ export default function Home() {
               description="Retrieve booking data from database with optional limit parameter"
               example={`curl https://your-api.vercel.app/api/reports?limit=10 \\
   -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
-              response={`{
+              response={sampleData ? JSON.stringify({
+                success: true,
+                data: [sampleData],
+                total: 1
+              }, null, 2) : `{
   "success": true,
   "data": [
     {
@@ -269,8 +289,7 @@ export default function Home() {
       "lead_id": 1,
       "booking_code": "BK230600001",
       "booking_status": "reject",
-      "customer_name": "chat_name_102",
-      "customer_phone_number": "0647193285",
+      "customer_name": "...",
       ...
     }
   ],
