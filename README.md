@@ -36,26 +36,26 @@ No authentication required.
 
 ### Reports
 ```
-GET /api/reports
-GET /api/reports?type=monthly
-POST /api/reports
+GET /api/bookings
+GET /api/bookings?limit=10
+POST /api/bookings
 ```
 **Authentication required** - Include API key in header.
 
 #### ตัวอย่าง Request with API Key
 ```bash
-curl https://your-api.vercel.app/api/reports \
+curl https://your-api.vercel.app/api/bookings \
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
 ```
 
 #### ตัวอย่าง POST Request
 ```bash
-curl -X POST https://your-api.vercel.app/api/reports \
+curl -X POST https://your-api.vercel.app/api/bookings \
   -H "Content-Type: application/json" \
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \
   -d '{
-    "title": "Monthly Report January 2026",
-    "type": "monthly"
+    "title": "New Booking",
+    "type": "standard"
   }'
 ```
 

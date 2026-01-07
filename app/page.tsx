@@ -19,7 +19,7 @@ export default function Home() {
       .catch(() => setLoading(false))
 
     // Fetch sample data from database
-    fetch('/api/reports?limit=2', {
+    fetch('/api/bookings?limit=2', {
       headers: {
         'x-api-key': 'sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'
       }
@@ -273,9 +273,9 @@ export default function Home() {
 
             <EndpointCard
               method="GET"
-              path="/api/reports"
-              description="Retrieve booking data from database with optional limit parameter"
-              example={`curl https://your-api.vercel.app/api/reports?limit=10 \\
+              path="/api/bookings"
+              description="Retrieve booking records from Xqc7k7_bookings table with optional limit parameter"
+              example={`curl https://your-api.vercel.app/api/bookings?limit=10 \\
   -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
               response={sampleData ? JSON.stringify({
                 success: true,
@@ -302,9 +302,9 @@ export default function Home() {
 
             <EndpointCard
               method="POST"
-              path="/api/reports"
-              description="Create a new booking record in the database"
-              example={`curl -X POST https://your-api.vercel.app/api/reports \\
+              path="/api/bookings"
+              description="Create a new booking record in Xqc7k7_bookings table"
+              example={`curl -X POST https://your-api.vercel.app/api/bookings \\
   -H "Content-Type: application/json" \\
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
   -d '{"title":"New Booking","type":"standard"}'`}
