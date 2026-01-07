@@ -36,27 +36,46 @@ export default function Home() {
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              background: '#1e40af',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.25rem'
-            }}>
-              🌐
-            </div>
-            <div>
-              <div style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827' }}>
-                Finance Backoffice API
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                background: '#1e40af',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.25rem'
+              }}>
+                🌐
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '2px' }}>
-                Enterprise API Platform
+              <div>
+                <div style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827' }}>
+                  Finance Backoffice API
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '2px' }}>
+                  Enterprise API Platform
+                </div>
               </div>
             </div>
+            <a
+              href="/playground"
+              style={{
+                padding: '0.5rem 1rem',
+                background: '#1e40af',
+                color: '#ffffff',
+                textDecoration: 'none',
+                borderRadius: '6px',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              🧪 Try API Playground
+            </a>
           </div>
           <div style={{
             display: 'flex',
