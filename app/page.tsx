@@ -682,9 +682,9 @@ function EndpointCard({ method, path, description, example, response, requiresAu
         <button
           onClick={() => setShowExample(!showExample)}
           style={{
-            background: showExample ? '#f1f5f9' : '#475569',
-            color: showExample ? '#475569' : '#ffffff',
-            border: showExample ? '1px solid #cbd5e1' : 'none',
+            background: showExample ? '#ffffff' : '#f8fafc',
+            color: '#64748b',
+            border: '1px solid #e2e8f0',
             padding: '0.625rem 1.25rem',
             borderRadius: '6px',
             cursor: 'pointer',
@@ -711,9 +711,9 @@ function EndpointCard({ method, path, description, example, response, requiresAu
             }
           }}
           style={{
-            background: showTryIt ? '#334155' : '#64748b',
-            color: '#ffffff',
-            border: 'none',
+            background: showTryIt ? '#ffffff' : '#f8fafc',
+            color: '#64748b',
+            border: '1px solid #e2e8f0',
             padding: '0.625rem 1.25rem',
             borderRadius: '6px',
             cursor: 'pointer',
@@ -826,7 +826,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
         <div style={{
           marginTop: '1.5rem',
           padding: '1.5rem',
-          background: '#f8fafc',
+          background: '#ffffff',
           border: '1px solid #e2e8f0',
           borderRadius: '10px'
         }}>
@@ -836,13 +836,13 @@ function EndpointCard({ method, path, description, example, response, requiresAu
             alignItems: 'center',
             marginBottom: '1.5rem',
             paddingBottom: '1rem',
-            borderBottom: '1px solid #e2e8f0'
+            borderBottom: '1px solid #f1f5f9'
           }}>
             <h4 style={{
               margin: 0,
               fontSize: '0.9375rem',
               fontWeight: '600',
-              color: '#475569',
+              color: '#64748b',
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem'
@@ -855,7 +855,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
             {responseTime !== null && (
               <div style={{
                 padding: '0.375rem 0.75rem',
-                background: '#ffffff',
+                background: '#f8fafc',
                 color: '#64748b',
                 borderRadius: '6px',
                 fontSize: '0.8125rem',
@@ -880,7 +880,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                 display: 'block',
                 fontSize: '0.875rem',
                 fontWeight: '500',
-                color: '#475569',
+                color: '#64748b',
                 marginBottom: '0.5rem'
               }}>
                 API Key <span style={{ color: '#dc2626' }}>*</span>
@@ -900,7 +900,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                     fontSize: '0.875rem',
                     fontFamily: 'Monaco, Consolas, monospace',
                     boxSizing: 'border-box',
-                    background: '#ffffff',
+                    background: '#f8fafc',
                     color: '#1e293b'
                   }}
                 />
@@ -912,7 +912,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                     top: '50%',
                     transform: 'translateY(-50%)',
                     padding: '0.375rem 0.75rem',
-                    background: '#64748b',
+                    background: '#94a3b8',
                     color: '#ffffff',
                     border: 'none',
                     borderRadius: '4px',
@@ -935,7 +935,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                 display: 'block',
                 fontSize: '0.875rem',
                 fontWeight: '500',
-                color: '#475569',
+                color: '#64748b',
                 marginBottom: '0.5rem'
               }}>
                 Query Parameters (Optional)
@@ -953,7 +953,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                   fontSize: '0.875rem',
                   fontFamily: 'Monaco, Consolas, monospace',
                   boxSizing: 'border-box',
-                  background: '#ffffff',
+                  background: '#f8fafc',
                   color: '#1e293b'
                 }}
               />
@@ -967,7 +967,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                 display: 'block',
                 fontSize: '0.875rem',
                 fontWeight: '500',
-                color: '#475569',
+                color: '#64748b',
                 marginBottom: '0.5rem'
               }}>
                 Request Body (JSON)
@@ -985,7 +985,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                   fontFamily: 'Monaco, Consolas, monospace',
                   resize: 'vertical',
                   boxSizing: 'border-box',
-                  background: '#ffffff',
+                  background: '#f8fafc',
                   color: '#1e293b'
                 }}
               />
@@ -999,7 +999,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
             style={{
               width: '100%',
               padding: '0.875rem',
-              background: loading ? '#cbd5e1' : '#475569',
+              background: loading ? '#cbd5e1' : '#94a3b8',
               color: '#ffffff',
               border: 'none',
               borderRadius: '8px',
@@ -1034,7 +1034,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
           {/* Response Display */}
           {apiResponse && (
             <div style={{
-              background: '#ffffff',
+              background: '#f8fafc',
               border: '1px solid #e2e8f0',
               borderRadius: '8px',
               padding: '1rem'
@@ -1042,7 +1042,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
               <div style={{
                 fontSize: '0.875rem',
                 fontWeight: '600',
-                color: '#475569',
+                color: '#64748b',
                 marginBottom: '0.75rem'
               }}>
                 Response:
