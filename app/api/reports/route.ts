@@ -1,47 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { validateApiKey, unauthorizedResponse } from '@/lib/auth'
-
-// Mock data - ในอนาคตจะเชื่อมต่อกับ database
-const mockReports = [
-  {
-    id: '1',
-    title: 'Monthly Financial Report',
-    type: 'monthly',
-    createdAt: '2026-01-01T00:00:00Z',
-    status: 'completed'
-  },
-  {
-    id: '2',
-    title: 'Quarterly Summary',
-    type: 'quarterly',
-    createdAt: '2026-01-05T00:00:00Z',
-    status: 'pending'
-  }
-]
+import pool from '@/lib/db'
+import { RowDataPacket } from 'mysql2'
 
 export async function GET(request: NextRequest) {
-  // ตรวจสอบ API Key (ถ้าเปิดใช้งาน)
+  // ตรวจสอบ API Key
   if (!validateApiKey(request)) {
     return unauthorizedResponse()
   }
-  const searchParams = request.nextUrl.searchParams
-  const type = searchParams.get('type')
-  
-  let filteredReports = mockReports
-  
-  if (type) {
-    filteredReports = mockReports.filter(report => report.type === type)
+
+  try {
+    const searchParams = request.nextUrl.searchParams
+    const limit = parseInt(searchParams.get('limit') || '100')
+    const type = searchParams.get('type')
+    
+    // Query ข้อมูลจาก Database
+    let query = 'SELECT * FROM Xqc7k7_bookings'
+    const params: any[] = []
+    
+    // ถ้ามีการ filter ตาม type
+    if (type) {
+      query += ' WHERE type = ?'
+      params.push(type)
+    }
+    
+    // LIMIT ต้องใส่โดยตรง ไม่สามารถใช้ prepared statement ได้
+    query += ` LIMIT ${limit}`
+    
+    const [rows] = await pool.execute<RowDataPacket[]>(query, params)
+    
+    return NextResponse.json({
+      success: true,
+      data: rows,
+      total: rows.length
+    })
+  } catch (error: any) {
+    console.error('Database query error:', error)
+    return NextResponse.json(
+      { 
+        success: false, 
+        error: 'Database query failed',
+        message: error.message 
+      },
+      { status: 500 }
+    )
   }
-  
-  return NextResponse.json({
-    success: true,
-    data: filteredReports,
-    total: filteredReports.length
-  })
 }
 
 export async function POST(request: NextRequest) {
-  // ตรวจสอบ API Key (ถ้าเปิดใช้งาน)
+  // ตรวจสอบ API Key
   if (!validateApiKey(request)) {
     return unauthorizedResponse()
   }
@@ -57,25 +64,34 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    const newReport = {
-      id: String(mockReports.length + 1),
-      title: body.title,
-      type: body.type,
-      createdAt: new Date().toISOString(),
-      status: 'pending'
-    }
+    // Insert ข้อมูลลง Database
+    const query = `
+      INSERT INTO Xqc7k7_bookings (title, type, created_at, status) 
+      VALUES (?, ?, NOW(), 'pending')
+    `
     
-    mockReports.push(newReport)
+    const [result]: any = await pool.execute(query, [body.title, body.type])
+    
+    // ดึงข้อมูลที่เพิ่งสร้างกลับมา
+    const [newRows] = await pool.execute<RowDataPacket[]>(
+      'SELECT * FROM Xqc7k7_bookings WHERE id = ?',
+      [result.insertId]
+    )
     
     return NextResponse.json({
       success: true,
-      data: newReport
+      data: newRows[0]
     }, { status: 201 })
     
-  } catch (error) {
+  } catch (error: any) {
+    console.error('Database insert error:', error)
     return NextResponse.json(
-      { success: false, error: 'Invalid request body' },
-      { status: 400 }
+      { 
+        success: false, 
+        error: 'Database insert failed',
+        message: error.message 
+      },
+      { status: 500 }
     )
   }
 }

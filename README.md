@@ -77,7 +77,19 @@ cp .env.example .env.local
 
 ### ตัวแปรสำคัญ:
 
+#### API Security
 - `REQUIRE_API_KEY` - เปิด/ปิดการใช้ API Key (`true`/`false`)
+- `API_KEY_1` - API Key สำหรับทดสอบ
+- `API_KEY_2` - API Key สำหรับทดสอบ
+
+#### Database Configuration (MySQL on AWS RDS)
+- `DB_HOST` - Database host (e.g., `xxx.rds.amazonaws.com`)
+- `DB_PORT` - Database port (default: `3306`)
+- `DB_NAME` - Database name
+- `DB_USER` - Database username
+- `DB_PASSWORD` - Database password
+
+**หมายเหตุ:** Database ใช้ SSL connection และมีสิทธิ์เข้าถึงเฉพาะตาราง `Xqc7k7_bookings` เท่านั้น
 - `API_KEY_1`, `API_KEY_2` - API Keys สำหรับควบคุมการเข้าถึง
 - `ALLOWED_ORIGINS` - Frontend URLs ที่อนุญาตให้เรียก API
 
