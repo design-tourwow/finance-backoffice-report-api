@@ -36,46 +36,27 @@ export default function Home() {
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                background: '#1e40af',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.25rem'
-              }}>
-                🌐
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              background: '#1e40af',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.25rem'
+            }}>
+              🌐
+            </div>
+            <div>
+              <div style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827' }}>
+                Finance Backoffice API
               </div>
-              <div>
-                <div style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827' }}>
-                  Finance Backoffice API
-                </div>
-                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '2px' }}>
-                  Enterprise API Platform
-                </div>
+              <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '2px' }}>
+                Enterprise API Platform
               </div>
             </div>
-            <a
-              href="/playground"
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#1e40af',
-                color: '#ffffff',
-                textDecoration: 'none',
-                borderRadius: '6px',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
-            >
-              🧪 Try API Playground
-            </a>
           </div>
           <div style={{
             display: 'flex',
@@ -241,18 +222,21 @@ export default function Home() {
   "timestamp": "2026-01-06T...",
   "service": "finance-backoffice-report-api"
 }`}
+              requiresAuth={false}
             />
 
             <EndpointCard
               method="GET"
               path="/api/reports"
               description="Retrieve all financial reports with optional filtering by type"
-              example="curl https://your-api.vercel.app/api/reports?type=monthly"
+              example={`curl https://your-api.vercel.app/api/reports?type=monthly \\
+  -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
               response={`{
   "success": true,
   "data": [...],
   "total": 2
 }`}
+              requiresAuth={true}
             />
 
             <EndpointCard
@@ -261,12 +245,13 @@ export default function Home() {
               description="Create a new financial report in the system"
               example={`curl -X POST https://your-api.vercel.app/api/reports \\
   -H "Content-Type: application/json" \\
-  -H "x-api-key: your-api-key" \\
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
   -d '{"title":"Monthly Report","type":"monthly"}'`}
               response={`{
   "success": true,
   "data": { "id": "3", ... }
 }`}
+              requiresAuth={true}
             />
           </div>
         </div>
@@ -449,9 +434,66 @@ function MetricCard({ label, value, icon, description }: any) {
   )
 }
 
-function EndpointCard({ method, path, description, example, response }: any) {
+function FeatureCard({ icon, title, description }: any) {
+  return (
+    <div style={{
+      background: '#f9fafb',
+      border: '1px solid #e5e7eb',
+      borderRadius: '10px',
+      padding: '1.5rem',
+      transition: 'border-color 0.2s, box-shadow 0.2s',
+      cursor: 'default'
+    }}>
+      <div style={{
+        width: '48px',
+        height: '48px',
+        background: '#eff6ff',
+        borderRadius: '10px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '1.5rem',
+        marginBottom: '1rem',
+        border: '1px solid #dbeafe'
+      }}>
+        {icon}
+      </div>
+      <h3 style={{
+        margin: '0 0 0.5rem 0',
+        fontSize: '1.0625rem',
+        color: '#111827',
+        fontWeight: '600'
+      }}>
+        {title}
+      </h3>
+      <p style={{
+        margin: 0,
+        fontSize: '0.875rem',
+        color: '#6b7280',
+        lineHeight: '1.6'
+      }}>
+        {description}
+      </p>
+    </div>
+  )
+}
+
+function EndpointCard({ method, path, description, example, response, requiresAuth = true }: any) {
   const [showExample, setShowExample] = useState(false)
+  const [showTryIt, setShowTryIt] = useState(false)
   const [copied, setCopied] = useState(false)
+  
+  // Try It states
+  const [apiKey, setApiKey] = useState('')
+  const [requestBody, setRequestBody] = useState(method === 'POST' ? JSON.stringify({
+    title: 'Monthly Financial Report',
+    type: 'monthly'
+  }, null, 2) : '')
+  const [queryParams, setQueryParams] = useState('')
+  const [apiResponse, setApiResponse] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+  const [responseTime, setResponseTime] = useState<number | null>(null)
+  const [showApiKeyHint, setShowApiKeyHint] = useState(false)
 
   const methodStyles: any = {
     GET: { bg: '#dbeafe', text: '#1e40af', border: '#bfdbfe' },
@@ -466,6 +508,57 @@ function EndpointCard({ method, path, description, example, response }: any) {
     navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const sendRequest = async () => {
+    setLoading(true)
+    setApiResponse(null)
+    setResponseTime(null)
+
+    try {
+      const startTime = performance.now()
+      
+      let url = path
+      if (queryParams) {
+        url += `?${queryParams}`
+      }
+
+      const headers: any = {
+        'Content-Type': 'application/json'
+      }
+
+      if (apiKey) {
+        headers['x-api-key'] = apiKey
+      }
+
+      const options: any = {
+        method,
+        headers
+      }
+
+      if (method !== 'GET' && requestBody) {
+        options.body = requestBody
+      }
+
+      const res = await fetch(url, options)
+      const endTime = performance.now()
+      
+      const data = await res.json()
+      
+      setApiResponse({
+        status: res.status,
+        statusText: res.statusText,
+        data
+      })
+      setResponseTime(Math.round(endTime - startTime))
+    } catch (error: any) {
+      setApiResponse({
+        error: true,
+        message: error.message
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -514,22 +607,51 @@ function EndpointCard({ method, path, description, example, response }: any) {
         {description}
       </p>
 
-      <button
-        onClick={() => setShowExample(!showExample)}
-        style={{
-          background: showExample ? '#f3f4f6' : '#1e40af',
-          color: showExample ? '#374151' : '#ffffff',
-          border: showExample ? '1px solid #d1d5db' : 'none',
-          padding: '0.625rem 1.25rem',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          fontSize: '0.875rem',
-          fontWeight: '500',
-          transition: 'all 0.2s'
-        }}
-      >
-        {showExample ? '▲ Hide Example' : '▼ Show Example'}
-      </button>
+      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <button
+          onClick={() => setShowExample(!showExample)}
+          style={{
+            background: showExample ? '#f3f4f6' : '#1e40af',
+            color: showExample ? '#374151' : '#ffffff',
+            border: showExample ? '1px solid #d1d5db' : 'none',
+            padding: '0.625rem 1.25rem',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            transition: 'all 0.2s'
+          }}
+        >
+          {showExample ? '▲ Hide Example' : '▼ Show Example'}
+        </button>
+
+        <button
+          onClick={() => {
+            setShowTryIt(!showTryIt)
+            if (!showTryIt) {
+              setShowExample(false)
+              setApiResponse(null)
+            }
+          }}
+          style={{
+            background: showTryIt ? '#065f46' : '#10b981',
+            color: '#ffffff',
+            border: 'none',
+            padding: '0.625rem 1.25rem',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            transition: 'all 0.2s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}
+        >
+          <span>🧪</span>
+          {showTryIt ? 'Close Try It' : 'Try It Out'}
+        </button>
+      </div>
 
       {showExample && (
         <div style={{ marginTop: '1.5rem' }}>
@@ -601,50 +723,284 @@ function EndpointCard({ method, path, description, example, response }: any) {
           </div>
         </div>
       )}
-    </div>
-  )
-}
 
-function FeatureCard({ icon, title, description }: any) {
-  return (
-    <div style={{
-      background: '#f9fafb',
-      border: '1px solid #e5e7eb',
-      borderRadius: '10px',
-      padding: '1.5rem',
-      transition: 'border-color 0.2s, box-shadow 0.2s',
-      cursor: 'default'
-    }}>
-      <div style={{
-        width: '48px',
-        height: '48px',
-        background: '#eff6ff',
-        borderRadius: '10px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '1.5rem',
-        marginBottom: '1rem',
-        border: '1px solid #dbeafe'
-      }}>
-        {icon}
-      </div>
-      <h3 style={{
-        margin: '0 0 0.5rem 0',
-        fontSize: '1.0625rem',
-        color: '#111827',
-        fontWeight: '600'
-      }}>
-        {title}
-      </h3>
-      <p style={{
-        margin: 0,
-        fontSize: '0.875rem',
-        color: '#6b7280',
-        lineHeight: '1.6'
-      }}>
-        {description}
-      </p>
+      {/* Try It Section */}
+      {showTryIt && (
+        <div style={{
+          marginTop: '1.5rem',
+          padding: '1.5rem',
+          background: '#f0fdf4',
+          border: '2px solid #86efac',
+          borderRadius: '10px'
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1.5rem',
+            paddingBottom: '1rem',
+            borderBottom: '1px solid #bbf7d0'
+          }}>
+            <h4 style={{
+              margin: 0,
+              fontSize: '1rem',
+              fontWeight: '600',
+              color: '#065f46',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <span>🧪</span> Interactive Testing
+            </h4>
+            {responseTime !== null && (
+              <div style={{
+                padding: '0.375rem 0.75rem',
+                background: '#ffffff',
+                color: '#065f46',
+                borderRadius: '6px',
+                fontSize: '0.8125rem',
+                fontWeight: '500',
+                border: '1px solid #86efac'
+              }}>
+                ⚡ {responseTime}ms
+              </div>
+            )}
+          </div>
+
+          {/* API Key Input */}
+          {requiresAuth && (
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '0.5rem'
+              }}>
+                <label style={{
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  color: '#065f46'
+                }}>
+                  API Key <span style={{ color: '#dc2626' }}>*</span>
+                </label>
+                <button
+                  onClick={() => setShowApiKeyHint(!showApiKeyHint)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#059669',
+                    fontSize: '0.8125rem',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    fontWeight: '500'
+                  }}
+                >
+                  {showApiKeyHint ? 'Hide' : 'Show'} test key
+                </button>
+              </div>
+              <input
+                type="text"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="sk_test_..."
+                style={{
+                  width: '100%',
+                  padding: '0.625rem 0.875rem',
+                  border: '1px solid #86efac',
+                  borderRadius: '6px',
+                  fontSize: '0.875rem',
+                  fontFamily: 'Monaco, Consolas, monospace',
+                  boxSizing: 'border-box',
+                  background: '#ffffff'
+                }}
+              />
+              {showApiKeyHint && (
+                <div style={{
+                  marginTop: '0.5rem',
+                  padding: '0.75rem',
+                  background: '#ffffff',
+                  border: '1px solid #86efac',
+                  borderRadius: '6px',
+                  fontSize: '0.8125rem'
+                }}>
+                  <div style={{ color: '#065f46', fontWeight: '500', marginBottom: '0.5rem' }}>
+                    💡 Test API Key:
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <code style={{
+                      flex: 1,
+                      background: '#f0fdf4',
+                      padding: '0.375rem 0.5rem',
+                      borderRadius: '4px',
+                      fontSize: '0.75rem',
+                      color: '#065f46',
+                      border: '1px solid #bbf7d0'
+                    }}>
+                      sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e
+                    </code>
+                    <button
+                      onClick={() => setApiKey('sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e')}
+                      style={{
+                        padding: '0.25rem 0.5rem',
+                        background: '#10b981',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '0.75rem',
+                        cursor: 'pointer',
+                        fontWeight: '500'
+                      }}
+                    >
+                      Use
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Query Parameters for GET */}
+          {method === 'GET' && path !== '/api/health' && (
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: '#065f46',
+                marginBottom: '0.5rem'
+              }}>
+                Query Parameters (Optional)
+              </label>
+              <input
+                type="text"
+                value={queryParams}
+                onChange={(e) => setQueryParams(e.target.value)}
+                placeholder="e.g., type=monthly"
+                style={{
+                  width: '100%',
+                  padding: '0.625rem 0.875rem',
+                  border: '1px solid #86efac',
+                  borderRadius: '6px',
+                  fontSize: '0.875rem',
+                  fontFamily: 'Monaco, Consolas, monospace',
+                  boxSizing: 'border-box',
+                  background: '#ffffff'
+                }}
+              />
+            </div>
+          )}
+
+          {/* Request Body for POST */}
+          {method === 'POST' && (
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: '#065f46',
+                marginBottom: '0.5rem'
+              }}>
+                Request Body (JSON)
+              </label>
+              <textarea
+                value={requestBody}
+                onChange={(e) => setRequestBody(e.target.value)}
+                rows={6}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #86efac',
+                  borderRadius: '6px',
+                  fontSize: '0.8125rem',
+                  fontFamily: 'Monaco, Consolas, monospace',
+                  resize: 'vertical',
+                  boxSizing: 'border-box',
+                  background: '#ffffff'
+                }}
+              />
+            </div>
+          )}
+
+          {/* Send Button */}
+          <button
+            onClick={sendRequest}
+            disabled={loading}
+            style={{
+              width: '100%',
+              padding: '0.875rem',
+              background: loading ? '#9ca3af' : '#10b981',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '0.9375rem',
+              fontWeight: '600',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'background 0.2s',
+              marginBottom: '1rem'
+            }}
+          >
+            {loading ? '⏳ Sending Request...' : '🚀 Send Request'}
+          </button>
+
+          {/* Response Display */}
+          {apiResponse && (
+            <div style={{
+              background: '#ffffff',
+              border: '1px solid #86efac',
+              borderRadius: '8px',
+              padding: '1rem'
+            }}>
+              <div style={{
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: '#065f46',
+                marginBottom: '0.75rem'
+              }}>
+                Response:
+              </div>
+
+              {!apiResponse.error && (
+                <div style={{ marginBottom: '1rem' }}>
+                  <div style={{
+                    padding: '0.5rem 0.75rem',
+                    background: apiResponse.status < 300 ? '#d1fae5' : '#fee2e2',
+                    border: `1px solid ${apiResponse.status < 300 ? '#a7f3d0' : '#fecaca'}`,
+                    borderRadius: '6px',
+                    display: 'inline-block'
+                  }}>
+                    <span style={{
+                      fontSize: '0.875rem',
+                      fontWeight: '600',
+                      color: apiResponse.status < 300 ? '#065f46' : '#991b1b'
+                    }}>
+                      {apiResponse.status} {apiResponse.statusText}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <pre style={{
+                background: '#1f2937',
+                color: apiResponse.error ? '#ef4444' : '#10b981',
+                padding: '1rem',
+                borderRadius: '6px',
+                overflow: 'auto',
+                fontSize: '0.8125rem',
+                lineHeight: '1.6',
+                border: '1px solid #374151',
+                fontFamily: 'Monaco, Consolas, monospace',
+                maxHeight: '300px',
+                margin: 0
+              }}>
+                {apiResponse.error 
+                  ? `Error: ${apiResponse.message}`
+                  : JSON.stringify(apiResponse.data, null, 2)
+                }
+              </pre>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
