@@ -283,159 +283,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Features Section */}
-        <div style={{
-          background: '#ffffff',
-          borderRadius: '12px',
-          padding: '2.5rem',
-          marginBottom: '2rem',
-          border: '1px solid #e5e7eb',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            marginBottom: '2rem',
-            paddingBottom: '1.5rem',
-            borderBottom: '2px solid #f3f4f6'
-          }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              background: '#eff6ff',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.25rem'
-            }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e40af" strokeWidth="2">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m0 6l4.2 4.2M23 12h-6m-6 0H1m18.2 5.2l-4.2-4.2m0-6l4.2-4.2"/>
-              </svg>
-            </div>
-            <h2 style={{
-              margin: 0,
-              fontSize: '1.5rem',
-              fontWeight: '700',
-              color: '#111827'
-            }}>
-              Platform Features
-            </h2>
-          </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '1.5rem'
-          }}>
-            <FeatureCard
-              icon={
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                  <path d="M7 11V7a5 5 0 0110 0v4"/>
-                </svg>
-              }
-              title="API Key Authentication"
-              description="Secure access control with API key validation and authorization"
-            />
-            <FeatureCard
-              icon={
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                </svg>
-              }
-              title="High Performance"
-              description="Optimized for speed with sub-100ms response times"
-            />
-            <FeatureCard
-              icon={
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="18" y1="20" x2="18" y2="10"/>
-                  <line x1="12" y1="20" x2="12" y2="4"/>
-                  <line x1="6" y1="20" x2="6" y2="14"/>
-                </svg>
-              }
-              title="RESTful Architecture"
-              description="Industry-standard REST API design principles"
-            />
-            <FeatureCard
-              icon={
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="2" y1="12" x2="22" y2="12"/>
-                  <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
-                </svg>
-              }
-              title="CORS Support"
-              description="Cross-origin resource sharing for web applications"
-            />
-            <FeatureCard
-              icon={
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-                </svg>
-              }
-              title="Continuous Deployment"
-              description="Automated CI/CD pipeline via Vercel and GitHub"
-            />
-            <FeatureCard
-              icon={
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                  <line x1="16" y1="13" x2="8" y2="13"/>
-                  <line x1="16" y1="17" x2="8" y2="17"/>
-                  <polyline points="10 9 9 9 8 9"/>
-                </svg>
-              }
-              title="Complete Documentation"
-              description="Comprehensive guides and code examples"
-            />
-          </div>
-        </div>
-
-        {/* Footer */}
-        <footer style={{
-          background: '#ffffff',
-          borderRadius: '12px',
-          padding: '2rem',
-          border: '1px solid #e5e7eb',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
-          textAlign: 'center'
-        }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '2rem',
-            marginBottom: '1rem',
-            fontSize: '0.875rem',
-            color: '#6b7280',
-            flexWrap: 'wrap'
-          }}>
-            <div>
-              <strong style={{ color: '#374151' }}>Environment:</strong> {process.env.NODE_ENV || 'production'}
-            </div>
-            <div>
-              <strong style={{ color: '#374151' }}>Version:</strong> 1.0.0
-            </div>
-            <div>
-              <strong style={{ color: '#374151' }}>Framework:</strong> Next.js 14
-            </div>
-            <div>
-              <strong style={{ color: '#374151' }}>Region:</strong> Singapore (SIN1)
-            </div>
-          </div>
-          <div style={{
-            fontSize: '0.875rem',
-            color: '#9ca3af',
-            paddingTop: '1rem',
-            borderTop: '1px solid #e5e7eb'
-          }}>
-            © 2026 Design Tourwow. All rights reserved.
-          </div>
-        </footer>
       </div>
 
       <style jsx>{`
@@ -501,50 +349,6 @@ function MetricCard({ label, value, icon, description }: any) {
       <div style={{ fontSize: '0.875rem', color: '#9ca3af' }}>
         {description}
       </div>
-    </div>
-  )
-}
-
-function FeatureCard({ icon, title, description }: any) {
-  return (
-    <div style={{
-      background: '#f9fafb',
-      border: '1px solid #e5e7eb',
-      borderRadius: '10px',
-      padding: '1.5rem',
-      transition: 'border-color 0.2s, box-shadow 0.2s',
-      cursor: 'default'
-    }}>
-      <div style={{
-        width: '48px',
-        height: '48px',
-        background: '#eff6ff',
-        borderRadius: '10px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: '1rem',
-        border: '1px solid #dbeafe',
-        color: '#1e40af'
-      }}>
-        {icon}
-      </div>
-      <h3 style={{
-        margin: '0 0 0.5rem 0',
-        fontSize: '1.0625rem',
-        color: '#111827',
-        fontWeight: '600'
-      }}>
-        {title}
-      </h3>
-      <p style={{
-        margin: 0,
-        fontSize: '0.875rem',
-        color: '#6b7280',
-        lineHeight: '1.6'
-      }}>
-        {description}
-      </p>
     </div>
   )
 }
@@ -682,9 +486,9 @@ function EndpointCard({ method, path, description, example, response, requiresAu
         <button
           onClick={() => setShowExample(!showExample)}
           style={{
-            background: showExample ? '#ffffff' : '#f8fafc',
-            color: '#64748b',
-            border: '1px solid #e2e8f0',
+            background: showExample ? '#e0e7ff' : '#ffffff',
+            color: '#4f46e5',
+            border: '1px solid #c7d2fe',
             padding: '0.625rem 1.25rem',
             borderRadius: '6px',
             cursor: 'pointer',
@@ -711,9 +515,9 @@ function EndpointCard({ method, path, description, example, response, requiresAu
             }
           }}
           style={{
-            background: showTryIt ? '#ffffff' : '#f8fafc',
-            color: '#64748b',
-            border: '1px solid #e2e8f0',
+            background: showTryIt ? '#4f46e5' : '#6366f1',
+            color: '#ffffff',
+            border: 'none',
             padding: '0.625rem 1.25rem',
             borderRadius: '6px',
             cursor: 'pointer',
@@ -912,7 +716,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                     top: '50%',
                     transform: 'translateY(-50%)',
                     padding: '0.375rem 0.75rem',
-                    background: '#94a3b8',
+                    background: '#6366f1',
                     color: '#ffffff',
                     border: 'none',
                     borderRadius: '4px',
@@ -999,7 +803,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
             style={{
               width: '100%',
               padding: '0.875rem',
-              background: loading ? '#cbd5e1' : '#94a3b8',
+              background: loading ? '#cbd5e1' : '#6366f1',
               color: '#ffffff',
               border: 'none',
               borderRadius: '8px',
@@ -1034,7 +838,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
           {/* Response Display */}
           {apiResponse && (
             <div style={{
-              background: '#f8fafc',
+              background: '#ffffff',
               border: '1px solid #e2e8f0',
               borderRadius: '8px',
               padding: '1rem'
@@ -1069,14 +873,24 @@ function EndpointCard({ method, path, description, example, response, requiresAu
               )}
 
               <pre style={{
-                background: '#1f2937',
-                color: apiResponse.error ? '#ef4444' : '#10b981',
+                background: '#f8fafc',
+                color: apiResponse.error 
+                  ? '#dc2626' 
+                  : apiResponse.status === 401 
+                    ? '#ea580c' 
+                    : '#059669',
                 padding: '1rem',
                 borderRadius: '6px',
                 overflow: 'auto',
                 fontSize: '0.8125rem',
                 lineHeight: '1.6',
-                border: '1px solid #374151',
+                border: `1px solid ${
+                  apiResponse.error 
+                    ? '#fecaca' 
+                    : apiResponse.status === 401 
+                      ? '#fed7aa' 
+                      : '#d1fae5'
+                }`,
                 fontFamily: 'Monaco, Consolas, monospace',
                 maxHeight: '300px',
                 margin: 0
@@ -1086,6 +900,31 @@ function EndpointCard({ method, path, description, example, response, requiresAu
                   : JSON.stringify(apiResponse.data, null, 2)
                 }
               </pre>
+              
+              {apiResponse.status === 401 && (
+                <div style={{
+                  marginTop: '0.75rem',
+                  padding: '0.75rem',
+                  background: '#fff7ed',
+                  border: '1px solid #fed7aa',
+                  borderRadius: '6px',
+                  fontSize: '0.8125rem',
+                  color: '#9a3412',
+                  display: 'flex',
+                  alignItems: 'start',
+                  gap: '0.5rem'
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: '2px' }}>
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  <div>
+                    <strong>Authentication Required:</strong> This endpoint requires a valid API key. 
+                    Click "Use test key" button above to populate a test API key.
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
