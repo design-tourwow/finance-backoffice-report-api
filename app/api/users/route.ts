@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       query = query.eq('user_ns', userNs)
     }
 
-    query = query.limit(limit).order('last_interaction', { ascending: false })
+    query = query.limit(limit).order('id', { ascending: true })
 
     const { data, error } = await query
 
