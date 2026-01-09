@@ -7,10 +7,11 @@ function checkApiKey(request: NextRequest) {
   const validKeys = [
     process.env.API_KEY_1,
     process.env.API_KEY_2
-  ]
+  ].filter(Boolean)
 
-  if (process.env.REQUIRE_API_KEY === 'true' && !validKeys.includes(apiKey)) {
-    return false
+  if (process.env.REQUIRE_API_KEY === 'true') {
+    if (!apiKey) return false
+    return validKeys.includes(apiKey)
   }
   return true
 }
