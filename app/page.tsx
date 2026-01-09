@@ -660,7 +660,7 @@ export default function Home() {
             <EndpointCard
               method="PUT"
               path="/api/users"
-              description="Update an existing user record in users table. Requires user_id in request body"
+              description="Update an existing user record in users table. Requires user_id in request body. Only send fields you want to update"
               example={`curl -X PUT ${apiUrl}/api/users \\
   -H "Content-Type: application/json" \\
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
@@ -669,9 +669,10 @@ export default function Home() {
     "first_name": "Somchai",
     "last_name": "Jaidee",
     "name": "Somchai Jaidee",
-    "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
+    "profile_pic": "https://profile.line-scdn.net/0h9876fedcba_updated",
     "subscribed": "2026-01-09T10:30:00+00:00",
-    "last_interaction": "2026-01-09T10:30:00+00:00"
+    "last_interaction": "2026-01-09T10:30:00+00:00",
+    "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์", "You: อัปเดตข้อมูล"]
   }'`}
               response={`{
   "success": true,
@@ -682,10 +683,10 @@ export default function Home() {
     "first_name": "Somchai",
     "last_name": "Jaidee",
     "name": "Somchai Jaidee",
-    "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
+    "profile_pic": "https://profile.line-scdn.net/0h9876fedcba_updated",
     "subscribed": "2026-01-09T10:30:00+00:00",
     "last_interaction": "2026-01-09T10:30:00+00:00",
-    "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์"],
+    "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์", "You: อัปเดตข้อมูล"],
     "created_at": "2026-01-01T08:00:00.123456+00:00",
     "updated_at": "2026-01-09T10:30:00.456789+00:00"
   }
@@ -695,9 +696,10 @@ export default function Home() {
                 first_name: "Somchai",
                 last_name: "Jaidee",
                 name: "Somchai Jaidee",
-                profile_pic: "https://profile.line-scdn.net/0h9876fedcba",
+                profile_pic: "https://profile.line-scdn.net/0h9876fedcba_updated",
                 subscribed: "2026-01-09T10:30:00+00:00",
-                last_interaction: "2026-01-09T10:30:00+00:00"
+                last_interaction: "2026-01-09T10:30:00+00:00",
+                chat_history: ["You: สวัสดีครับ", "You: ต้องการจองทัวร์", "You: อัปเดตข้อมูล"]
               }, null, 2)}
               responseExamples={[
                 {
@@ -712,10 +714,10 @@ export default function Home() {
     "first_name": "Somchai",
     "last_name": "Jaidee",
     "name": "Somchai Jaidee",
-    "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
+    "profile_pic": "https://profile.line-scdn.net/0h9876fedcba_updated",
     "subscribed": "2026-01-09T10:30:00+00:00",
     "last_interaction": "2026-01-09T10:30:00+00:00",
-    "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์"],
+    "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์", "You: อัปเดตข้อมูล"],
     "created_at": "2026-01-01T08:00:00.123456+00:00",
     "updated_at": "2026-01-09T10:30:00.456789+00:00"
   }
