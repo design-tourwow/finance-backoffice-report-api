@@ -415,6 +415,41 @@ export default function Home() {
   ],
   "total": 1
 }`}
+              responseExamples={[
+                {
+                  status: 200,
+                  label: 'OK',
+                  example: `{
+  "success": true,
+  "data": [...],
+  "total": 10
+}`
+                },
+                {
+                  status: 401,
+                  label: 'Unauthorized',
+                  example: `{
+  "success": false,
+  "error": "Unauthorized - Invalid API key"
+}`
+                },
+                {
+                  status: 500,
+                  label: 'Internal Server Error',
+                  example: `{
+  "success": false,
+  "error": "Database query failed"
+}`
+                },
+                {
+                  status: 503,
+                  label: 'Service Unavailable',
+                  example: `{
+  "success": false,
+  "error": "Supabase not configured"
+}`
+                }
+              ]}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
               setActiveTryItEndpoint={setActiveTryItEndpoint}
@@ -638,7 +673,7 @@ function MetricCard({ label, value, icon, description }: any) {
   )
 }
 
-function EndpointCard({ method, path, description, example, response, requiresAuth = true, activeTryItEndpoint, setActiveTryItEndpoint, defaultBody }: any) {
+function EndpointCard({ method, path, description, example, response, requiresAuth = true, activeTryItEndpoint, setActiveTryItEndpoint, defaultBody, responseExamples }: any) {
   const [showExample, setShowExample] = useState(false)
   const [copied, setCopied] = useState(false)
   
@@ -901,7 +936,7 @@ function EndpointCard({ method, path, description, example, response, requiresAu
               display: 'block',
               marginBottom: '0.75rem'
             }}>
-              Response
+              Response (Success)
             </strong>
             <pre style={{
               background: '#1f2937',
@@ -917,6 +952,81 @@ function EndpointCard({ method, path, description, example, response, requiresAu
               {response}
             </pre>
           </div>
+
+          {/* Response Examples for Different Status Codes */}
+          {responseExamples && (
+            <div style={{ marginTop: '1.5rem' }}>
+              <strong style={{
+                fontSize: '0.875rem',
+                color: '#374151',
+                fontWeight: '600',
+                display: 'block',
+                marginBottom: '1rem'
+              }}>
+                Response Examples
+              </strong>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {responseExamples.map((ex: any, idx: number) => (
+                  <div key={idx} style={{
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.75rem 1rem',
+                      background: ex.status < 300 ? '#f0fdf4' : ex.status < 400 ? '#fef3c7' : ex.status < 500 ? '#fee2e2' : '#fef2f2',
+                      borderBottom: `1px solid ${ex.status < 300 ? '#bbf7d0' : ex.status < 400 ? '#fde68a' : ex.status < 500 ? '#fecaca' : '#fecaca'}`
+                    }}>
+                      {ex.status < 300 ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                      ) : ex.status < 400 ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="12" y1="8" x2="12" y2="12"/>
+                          <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                      ) : ex.status < 500 ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                          <path d="M7 11V7a5 5 0 0110 0v4"/>
+                        </svg>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="15" y1="9" x2="9" y2="15"/>
+                          <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                      )}
+                      <span style={{
+                        fontWeight: '600',
+                        fontSize: '0.875rem',
+                        color: ex.status < 300 ? '#166534' : ex.status < 400 ? '#92400e' : '#991b1b'
+                      }}>
+                        {ex.status} {ex.label}
+                      </span>
+                    </div>
+                    <pre style={{
+                      background: '#f9fafb',
+                      color: '#374151',
+                      padding: '1rem',
+                      margin: 0,
+                      fontSize: '0.8125rem',
+                      lineHeight: '1.6',
+                      fontFamily: 'Monaco, Consolas, monospace',
+                      overflow: 'auto'
+                    }}>
+                      {ex.example}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
