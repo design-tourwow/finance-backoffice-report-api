@@ -25,6 +25,13 @@ export async function GET(request: NextRequest) {
     )
   }
 
+  if (!supabase) {
+    return NextResponse.json(
+      { success: false, error: 'Supabase not configured' },
+      { status: 503 }
+    )
+  }
+
   try {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('user_id')
@@ -74,6 +81,13 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  if (!supabase) {
+    return NextResponse.json(
+      { success: false, error: 'Supabase not configured' },
+      { status: 503 }
+    )
+  }
+
   try {
     const body = await request.json()
 
@@ -112,6 +126,13 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(
       { success: false, error: 'Unauthorized - Invalid API key' },
       { status: 401 }
+    )
+  }
+
+  if (!supabase) {
+    return NextResponse.json(
+      { success: false, error: 'Supabase not configured' },
+      { status: 503 }
     )
   }
 
