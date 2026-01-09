@@ -273,6 +273,17 @@ export default function Home() {
   "timestamp": "2026-01-06T...",
   "service": "finance-backoffice-report-api"
 }`}
+              responseExamples={[
+                {
+                  status: 200,
+                  label: 'OK',
+                  example: `{
+  "status": "ok",
+  "timestamp": "2026-01-09T12:00:00Z",
+  "service": "finance-backoffice-report-api"
+}`
+                }
+              ]}
               requiresAuth={false}
               activeTryItEndpoint={activeTryItEndpoint}
               setActiveTryItEndpoint={setActiveTryItEndpoint}
@@ -302,6 +313,34 @@ export default function Home() {
   ],
   "total": 10
 }`}
+              responseExamples={[
+                {
+                  status: 200,
+                  label: 'OK',
+                  example: `{
+  "success": true,
+  "data": [...],
+  "total": 10
+}`
+                },
+                {
+                  status: 401,
+                  label: 'Unauthorized',
+                  example: `{
+  "success": false,
+  "error": "Unauthorized - Invalid API key"
+}`
+                },
+                {
+                  status: 500,
+                  label: 'Internal Server Error',
+                  example: `{
+  "success": false,
+  "error": "Database query failed",
+  "message": "Connection timeout"
+}`
+                }
+              ]}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
               setActiveTryItEndpoint={setActiveTryItEndpoint}
@@ -329,6 +368,47 @@ export default function Home() {
                 title: "New Booking",
                 type: "standard"
               }, null, 2)}
+              responseExamples={[
+                {
+                  status: 201,
+                  label: 'Created',
+                  example: `{
+  "success": true,
+  "data": {
+    "id": 151,
+    "title": "New Booking",
+    "type": "standard",
+    "created_at": "2026-01-09T...",
+    "status": "pending"
+  }
+}`
+                },
+                {
+                  status: 400,
+                  label: 'Bad Request',
+                  example: `{
+  "success": false,
+  "error": "Title and type are required"
+}`
+                },
+                {
+                  status: 401,
+                  label: 'Unauthorized',
+                  example: `{
+  "success": false,
+  "error": "Unauthorized - Invalid API key"
+}`
+                },
+                {
+                  status: 500,
+                  label: 'Internal Server Error',
+                  example: `{
+  "success": false,
+  "error": "Database insert failed",
+  "message": "Duplicate entry"
+}`
+                }
+              ]}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
               setActiveTryItEndpoint={setActiveTryItEndpoint}
@@ -493,6 +573,48 @@ export default function Home() {
                 last_name: "Smith",
                 name: "Jane Smith"
               }, null, 2)}
+              responseExamples={[
+                {
+                  status: 201,
+                  label: 'Created',
+                  example: `{
+  "success": true,
+  "data": {
+    "id": 2,
+    "user_ns": "telegram",
+    "user_id": "987654321",
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "name": "Jane Smith",
+    "created_at": "2026-01-09T..."
+  }
+}`
+                },
+                {
+                  status: 401,
+                  label: 'Unauthorized',
+                  example: `{
+  "success": false,
+  "error": "Unauthorized - Invalid API key"
+}`
+                },
+                {
+                  status: 500,
+                  label: 'Internal Server Error',
+                  example: `{
+  "success": false,
+  "error": "Duplicate key value violates unique constraint"
+}`
+                },
+                {
+                  status: 503,
+                  label: 'Service Unavailable',
+                  example: `{
+  "success": false,
+  "error": "Supabase not configured"
+}`
+                }
+              ]}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
               setActiveTryItEndpoint={setActiveTryItEndpoint}
@@ -525,6 +647,54 @@ export default function Home() {
                 first_name: "John",
                 last_name: "Doe"
               }, null, 2)}
+              responseExamples={[
+                {
+                  status: 200,
+                  label: 'OK',
+                  example: `{
+  "success": true,
+  "data": {
+    "id": 1,
+    "user_id": "123456789",
+    "first_name": "John",
+    "last_name": "Doe",
+    "updated_at": "2026-01-09T..."
+  }
+}`
+                },
+                {
+                  status: 400,
+                  label: 'Bad Request',
+                  example: `{
+  "success": false,
+  "error": "user_id is required"
+}`
+                },
+                {
+                  status: 401,
+                  label: 'Unauthorized',
+                  example: `{
+  "success": false,
+  "error": "Unauthorized - Invalid API key"
+}`
+                },
+                {
+                  status: 500,
+                  label: 'Internal Server Error',
+                  example: `{
+  "success": false,
+  "error": "Update failed"
+}`
+                },
+                {
+                  status: 503,
+                  label: 'Service Unavailable',
+                  example: `{
+  "success": false,
+  "error": "Supabase not configured"
+}`
+                }
+              ]}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
               setActiveTryItEndpoint={setActiveTryItEndpoint}
@@ -547,6 +717,51 @@ export default function Home() {
   ],
   "total": 3
 }`}
+              responseExamples={[
+                {
+                  status: 200,
+                  label: 'OK',
+                  example: `{
+  "success": true,
+  "user_id": "123456789",
+  "name": "John Doe",
+  "chat_history": ["You: Hello", "You: How are you?"],
+  "total": 2
+}`
+                },
+                {
+                  status: 400,
+                  label: 'Bad Request',
+                  example: `{
+  "success": false,
+  "error": "user_id required"
+}`
+                },
+                {
+                  status: 401,
+                  label: 'Unauthorized',
+                  example: `{
+  "success": false,
+  "error": "Unauthorized"
+}`
+                },
+                {
+                  status: 500,
+                  label: 'Internal Server Error',
+                  example: `{
+  "success": false,
+  "error": "Database error"
+}`
+                },
+                {
+                  status: 503,
+                  label: 'Service Unavailable',
+                  example: `{
+  "success": false,
+  "error": "Supabase not configured"
+}`
+                }
+              ]}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
               setActiveTryItEndpoint={setActiveTryItEndpoint}
@@ -581,6 +796,53 @@ export default function Home() {
                 user_id: "123456789",
                 message: "You: What are my booking options?"
               }, null, 2)}
+              responseExamples={[
+                {
+                  status: 201,
+                  label: 'Created',
+                  example: `{
+  "success": true,
+  "data": {
+    "id": 1,
+    "user_id": "123456789",
+    "chat_history": [...],
+    "last_interaction": "2026-01-09T..."
+  }
+}`
+                },
+                {
+                  status: 400,
+                  label: 'Bad Request',
+                  example: `{
+  "success": false,
+  "error": "user_id and message required"
+}`
+                },
+                {
+                  status: 401,
+                  label: 'Unauthorized',
+                  example: `{
+  "success": false,
+  "error": "Unauthorized"
+}`
+                },
+                {
+                  status: 500,
+                  label: 'Internal Server Error',
+                  example: `{
+  "success": false,
+  "error": "Update failed"
+}`
+                },
+                {
+                  status: 503,
+                  label: 'Service Unavailable',
+                  example: `{
+  "success": false,
+  "error": "Supabase not configured"
+}`
+                }
+              ]}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
               setActiveTryItEndpoint={setActiveTryItEndpoint}
@@ -596,6 +858,48 @@ export default function Home() {
   "success": true,
   "message": "Chat history cleared"
 }`}
+              responseExamples={[
+                {
+                  status: 200,
+                  label: 'OK',
+                  example: `{
+  "success": true,
+  "message": "Chat history cleared"
+}`
+                },
+                {
+                  status: 400,
+                  label: 'Bad Request',
+                  example: `{
+  "success": false,
+  "error": "user_id required"
+}`
+                },
+                {
+                  status: 401,
+                  label: 'Unauthorized',
+                  example: `{
+  "success": false,
+  "error": "Unauthorized"
+}`
+                },
+                {
+                  status: 500,
+                  label: 'Internal Server Error',
+                  example: `{
+  "success": false,
+  "error": "Database error"
+}`
+                },
+                {
+                  status: 503,
+                  label: 'Service Unavailable',
+                  example: `{
+  "success": false,
+  "error": "Supabase not configured"
+}`
+                }
+              ]}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
               setActiveTryItEndpoint={setActiveTryItEndpoint}
