@@ -60,13 +60,14 @@ mysqlPool.getConnection()
 
 // Test Supabase connection on initialization
 if (supabaseUrl && supabaseKey) {
-  supabase.from('_health_check').select('count').limit(1)
-    .then(() => {
+  (async () => {
+    try {
+      await supabase.from('_health_check').select('count').limit(1)
       console.log('✅ Supabase connected successfully')
-    })
-    .catch(err => {
+    } catch (err: any) {
       console.log('⚠️ Supabase connection check skipped (table may not exist yet):', err.message)
-    })
+    }
+  })()
 }
 
 export default mysqlPool
