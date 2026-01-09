@@ -481,11 +481,11 @@ export default function Home() {
   "data": [
     {
       "id": 1,
-      "user_ns": "telegram",
-      "user_id": "123456789",
-      "first_name": "John",
-      "last_name": "Doe",
-      "name": "John Doe",
+      "user_ns": "line",
+      "user_id": "U1234567890abcdef",
+      "first_name": "Somchai",
+      "last_name": "Jaidee",
+      "name": "Somchai Jaidee",
       "profile_pic": "https://...",
       "subscribed": true,
       "last_interaction": "2026-01-09T...",
@@ -543,22 +543,22 @@ export default function Home() {
   -H "Content-Type: application/json" \\
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
   -d '{
-    "user_ns": "telegram",
-    "user_id": "987654321",
-    "first_name": "Jane",
-    "last_name": "Smith",
-    "name": "Jane Smith",
+    "user_ns": "line",
+    "user_id": "U9876543210fedcba",
+    "first_name": "Somying",
+    "last_name": "Raksanuk",
+    "name": "Somying Raksanuk",
     "subscribed": false
   }'`}
               response={`{
   "success": true,
   "data": {
     "id": 2,
-    "user_ns": "telegram",
-    "user_id": "987654321",
-    "first_name": "Jane",
-    "last_name": "Smith",
-    "name": "Jane Smith",
+    "user_ns": "line",
+    "user_id": "U9876543210fedcba",
+    "first_name": "Somying",
+    "last_name": "Raksanuk",
+    "name": "Somying Raksanuk",
     "profile_pic": null,
     "subscribed": false,
     "last_interaction": null,
@@ -567,11 +567,11 @@ export default function Home() {
   }
 }`}
               defaultBody={JSON.stringify({
-                user_ns: "telegram",
-                user_id: "987654321",
-                first_name: "Jane",
-                last_name: "Smith",
-                name: "Jane Smith"
+                user_ns: "line",
+                user_id: "U9876543210fedcba",
+                first_name: "Somying",
+                last_name: "Raksanuk",
+                name: "Somying Raksanuk"
               }, null, 2)}
               responseExamples={[
                 {
@@ -581,11 +581,11 @@ export default function Home() {
   "success": true,
   "data": {
     "id": 2,
-    "user_ns": "telegram",
-    "user_id": "987654321",
-    "first_name": "Jane",
-    "last_name": "Smith",
-    "name": "Jane Smith",
+    "user_ns": "line",
+    "user_id": "U9876543210fedcba",
+    "first_name": "Somying",
+    "last_name": "Raksanuk",
+    "name": "Somying Raksanuk",
     "created_at": "2026-01-09T..."
   }
 }`
@@ -628,7 +628,7 @@ export default function Home() {
   -H "Content-Type: application/json" \\
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
   -d '{
-    "user_id": "123456789",
+    "user_id": "U1234567890abcdef",
     "subscribed": true,
     "last_interaction": "2026-01-09T10:30:00Z"
   }'`}
@@ -636,16 +636,16 @@ export default function Home() {
   "success": true,
   "data": {
     "id": 1,
-    "user_id": "123456789",
+    "user_id": "U1234567890abcdef",
     "subscribed": true,
     "last_interaction": "2026-01-09T10:30:00Z",
     "updated_at": "2026-01-09T..."
   }
 }`}
               defaultBody={JSON.stringify({
-                user_id: "123456789",
-                first_name: "John",
-                last_name: "Doe"
+                user_id: "U1234567890abcdef",
+                first_name: "Somchai",
+                last_name: "Jaidee"
               }, null, 2)}
               responseExamples={[
                 {
@@ -655,9 +655,9 @@ export default function Home() {
   "success": true,
   "data": {
     "id": 1,
-    "user_id": "123456789",
-    "first_name": "John",
-    "last_name": "Doe",
+    "user_id": "U1234567890abcdef",
+    "first_name": "Somchai",
+    "last_name": "Jaidee",
     "updated_at": "2026-01-09T..."
   }
 }`
@@ -704,12 +704,12 @@ export default function Home() {
               method="GET"
               path="/api/chat-history"
               description="Retrieve chat history for a specific user. Requires user_id parameter"
-              example={`curl ${apiUrl}/api/chat-history?user_id=123456789 \\
+              example={`curl ${apiUrl}/api/chat-history?user_id=U1234567890abcdef \\
   -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
               response={`{
   "success": true,
-  "user_id": "123456789",
-  "name": "John Doe",
+  "user_id": "U1234567890abcdef",
+  "name": "Somchai Jaidee",
   "chat_history": [
     "You: ลูกนำ้ช่วยเช็ค1-6เมยยังว่างมั้ยคะ5ที่",
     "You: ที่ถามพี่เดินทางตลอดแต่สุดท้ายไปกับคนที่ใจเย็น",
@@ -723,9 +723,9 @@ export default function Home() {
                   label: 'OK',
                   example: `{
   "success": true,
-  "user_id": "123456789",
-  "name": "John Doe",
-  "chat_history": ["You: Hello", "You: How are you?"],
+  "user_id": "U1234567890abcdef",
+  "name": "Somchai Jaidee",
+  "chat_history": ["You: สวัสดีครับ", "You: สบายดีไหมครับ"],
   "total": 2
 }`
                 },
@@ -775,26 +775,26 @@ export default function Home() {
   -H "Content-Type: application/json" \\
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
   -d '{
-    "user_id": "123456789",
-    "message": "You: What are my booking options?"
+    "user_id": "U1234567890abcdef",
+    "message": "You: ต้องการจองทัวร์ครับ"
   }'`}
               response={`{
   "success": true,
   "data": {
     "id": 1,
-    "user_id": "123456789",
-    "name": "John Doe",
+    "user_id": "U1234567890abcdef",
+    "name": "Somchai Jaidee",
     "chat_history": [
       "You: ลูกนำ้ช่วยเช็ค1-6เมยยังว่างมั้ยคะ5ที่",
-      "You: What are my booking options?"
+      "You: ต้องการจองทัวร์ครับ"
     ],
     "last_interaction": "2026-01-09T12:30:00Z",
     "updated_at": "2026-01-09T12:30:00Z"
   }
 }`}
               defaultBody={JSON.stringify({
-                user_id: "123456789",
-                message: "You: What are my booking options?"
+                user_id: "U1234567890abcdef",
+                message: "You: ต้องการจองทัวร์ครับ"
               }, null, 2)}
               responseExamples={[
                 {
@@ -804,7 +804,7 @@ export default function Home() {
   "success": true,
   "data": {
     "id": 1,
-    "user_id": "123456789",
+    "user_id": "U1234567890abcdef",
     "chat_history": [...],
     "last_interaction": "2026-01-09T..."
   }
