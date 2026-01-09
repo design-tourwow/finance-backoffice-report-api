@@ -325,6 +325,10 @@ export default function Home() {
     "status": "pending"
   }
 }`}
+              defaultBody={JSON.stringify({
+                title: "New Booking",
+                type: "standard"
+              }, null, 2)}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
               setActiveTryItEndpoint={setActiveTryItEndpoint}
@@ -447,6 +451,13 @@ export default function Home() {
     "updated_at": "2026-01-09T..."
   }
 }`}
+              defaultBody={JSON.stringify({
+                user_ns: "telegram",
+                user_id: "987654321",
+                first_name: "Jane",
+                last_name: "Smith",
+                name: "Jane Smith"
+              }, null, 2)}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
               setActiveTryItEndpoint={setActiveTryItEndpoint}
@@ -474,6 +485,11 @@ export default function Home() {
     "updated_at": "2026-01-09T..."
   }
 }`}
+              defaultBody={JSON.stringify({
+                user_id: "123456789",
+                first_name: "John",
+                last_name: "Doe"
+              }, null, 2)}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
               setActiveTryItEndpoint={setActiveTryItEndpoint}
@@ -526,6 +542,10 @@ export default function Home() {
     "updated_at": "2026-01-09T12:30:00Z"
   }
 }`}
+              defaultBody={JSON.stringify({
+                user_id: "123456789",
+                message: "You: What are my booking options?"
+              }, null, 2)}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
               setActiveTryItEndpoint={setActiveTryItEndpoint}
@@ -618,16 +638,17 @@ function MetricCard({ label, value, icon, description }: any) {
   )
 }
 
-function EndpointCard({ method, path, description, example, response, requiresAuth = true, activeTryItEndpoint, setActiveTryItEndpoint }: any) {
+function EndpointCard({ method, path, description, example, response, requiresAuth = true, activeTryItEndpoint, setActiveTryItEndpoint, defaultBody }: any) {
   const [showExample, setShowExample] = useState(false)
   const [copied, setCopied] = useState(false)
   
   // Try It states
   const [apiKey, setApiKey] = useState('')
-  const [requestBody, setRequestBody] = useState(method === 'POST' ? JSON.stringify({
-    title: 'Monthly Financial Report',
-    type: 'monthly'
-  }, null, 2) : '')
+  const [requestBody, setRequestBody] = useState(
+    method === 'POST' || method === 'PUT' 
+      ? (defaultBody || JSON.stringify({ title: 'Example', type: 'standard' }, null, 2))
+      : ''
+  )
   const [queryParams, setQueryParams] = useState('')
   const [apiResponse, setApiResponse] = useState<any>(null)
   const [loading, setLoading] = useState(false)
