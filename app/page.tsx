@@ -473,7 +473,7 @@ export default function Home() {
             <EndpointCard
               method="GET"
               path="/api/users"
-              description="Retrieve user records from Supabase. Optional filters: user_id, user_ns, limit"
+              description="Retrieve user records from Supabase users table. Optional filters: user_id, user_ns, limit"
               example={`curl ${apiUrl}/api/users?limit=10 \\
   -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
               response={`{
@@ -487,11 +487,11 @@ export default function Home() {
       "last_name": "Jaidee",
       "name": "Somchai Jaidee",
       "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
-      "subscribed": "2024-12-06T08:29:36Z",
-      "last_interaction": "2024-12-06T08:31:02Z",
+      "subscribed": "2024-12-06T08:29:36+00:00",
+      "last_interaction": "2024-12-06T08:31:02+00:00",
       "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์"],
-      "created_at": "2026-01-01T08:00:00.123Z",
-      "updated_at": "2026-01-09T10:00:00.456Z"
+      "created_at": "2026-01-01T08:00:00.123456+00:00",
+      "updated_at": "2026-01-09T10:00:00.456789+00:00"
     }
   ],
   "total": 1
@@ -511,11 +511,11 @@ export default function Home() {
       "last_name": "Jaidee",
       "name": "Somchai Jaidee",
       "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
-      "subscribed": "2024-12-06T08:29:36Z",
-      "last_interaction": "2024-12-06T08:31:02Z",
+      "subscribed": "2024-12-06T08:29:36+00:00",
+      "last_interaction": "2024-12-06T08:31:02+00:00",
       "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์"],
-      "created_at": "2026-01-01T08:00:00.123Z",
-      "updated_at": "2026-01-09T10:00:00.456Z"
+      "created_at": "2026-01-01T08:00:00.123456+00:00",
+      "updated_at": "2026-01-09T10:00:00.456789+00:00"
     }
   ],
   "total": 1
@@ -554,7 +554,7 @@ export default function Home() {
             <EndpointCard
               method="POST"
               path="/api/users"
-              description="Create a new user record in Supabase"
+              description="Create a new user record in Supabase users table"
               example={`curl -X POST ${apiUrl}/api/users \\
   -H "Content-Type: application/json" \\
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
@@ -565,8 +565,8 @@ export default function Home() {
     "last_name": "Raksanuk",
     "name": "Somying Raksanuk",
     "profile_pic": "https://profile.line-scdn.net/0h1234abcdef",
-    "subscribed": "2026-01-09T10:00:00Z",
-    "last_interaction": "2026-01-09T10:00:00Z",
+    "subscribed": "2026-01-09T10:00:00+00:00",
+    "last_interaction": "2026-01-09T10:00:00+00:00",
     "chat_history": ["You: สวัสดีครับ"]
   }'`}
               response={`{
@@ -579,11 +579,11 @@ export default function Home() {
     "last_name": "Raksanuk",
     "name": "Somying Raksanuk",
     "profile_pic": "https://profile.line-scdn.net/0h1234abcdef",
-    "subscribed": "2026-01-09T10:00:00Z",
-    "last_interaction": "2026-01-09T10:00:00Z",
+    "subscribed": "2026-01-09T10:00:00+00:00",
+    "last_interaction": "2026-01-09T10:00:00+00:00",
     "chat_history": ["You: สวัสดีครับ"],
-    "created_at": "2026-01-09T10:00:00.123Z",
-    "updated_at": "2026-01-09T10:00:00.123Z"
+    "created_at": "2026-01-09T10:00:00.123456+00:00",
+    "updated_at": "2026-01-09T10:00:00.123456+00:00"
   }
 }`}
               defaultBody={JSON.stringify({
@@ -593,8 +593,8 @@ export default function Home() {
                 last_name: "Raksanuk",
                 name: "Somying Raksanuk",
                 profile_pic: "https://profile.line-scdn.net/0h1234abcdef",
-                subscribed: "2026-01-09T10:00:00Z",
-                last_interaction: "2026-01-09T10:00:00Z",
+                subscribed: "2026-01-09T10:00:00+00:00",
+                last_interaction: "2026-01-09T10:00:00+00:00",
                 chat_history: ["You: สวัสดีครับ"]
               }, null, 2)}
               responseExamples={[
@@ -611,11 +611,11 @@ export default function Home() {
     "last_name": "Raksanuk",
     "name": "Somying Raksanuk",
     "profile_pic": "https://profile.line-scdn.net/0h1234abcdef",
-    "subscribed": "2026-01-09T10:00:00Z",
-    "last_interaction": "2026-01-09T10:00:00Z",
+    "subscribed": "2026-01-09T10:00:00+00:00",
+    "last_interaction": "2026-01-09T10:00:00+00:00",
     "chat_history": ["You: สวัสดีครับ"],
-    "created_at": "2026-01-09T10:00:00.123Z",
-    "updated_at": "2026-01-09T10:00:00.123Z"
+    "created_at": "2026-01-09T10:00:00.123456+00:00",
+    "updated_at": "2026-01-09T10:00:00.123456+00:00"
   }
 }`
                 },
@@ -660,7 +660,7 @@ export default function Home() {
             <EndpointCard
               method="PUT"
               path="/api/users"
-              description="Update an existing user record. Requires user_id in request body"
+              description="Update an existing user record in users table. Requires user_id in request body"
               example={`curl -X PUT ${apiUrl}/api/users \\
   -H "Content-Type: application/json" \\
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
@@ -670,8 +670,8 @@ export default function Home() {
     "last_name": "Jaidee",
     "name": "Somchai Jaidee",
     "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
-    "subscribed": "2026-01-09T10:30:00Z",
-    "last_interaction": "2026-01-09T10:30:00Z"
+    "subscribed": "2026-01-09T10:30:00+00:00",
+    "last_interaction": "2026-01-09T10:30:00+00:00"
   }'`}
               response={`{
   "success": true,
@@ -683,11 +683,11 @@ export default function Home() {
     "last_name": "Jaidee",
     "name": "Somchai Jaidee",
     "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
-    "subscribed": "2026-01-09T10:30:00Z",
-    "last_interaction": "2026-01-09T10:30:00Z",
+    "subscribed": "2026-01-09T10:30:00+00:00",
+    "last_interaction": "2026-01-09T10:30:00+00:00",
     "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์"],
-    "created_at": "2026-01-01T08:00:00.123Z",
-    "updated_at": "2026-01-09T10:30:00.456Z"
+    "created_at": "2026-01-01T08:00:00.123456+00:00",
+    "updated_at": "2026-01-09T10:30:00.456789+00:00"
   }
 }`}
               defaultBody={JSON.stringify({
@@ -696,8 +696,8 @@ export default function Home() {
                 last_name: "Jaidee",
                 name: "Somchai Jaidee",
                 profile_pic: "https://profile.line-scdn.net/0h9876fedcba",
-                subscribed: "2026-01-09T10:30:00Z",
-                last_interaction: "2026-01-09T10:30:00Z"
+                subscribed: "2026-01-09T10:30:00+00:00",
+                last_interaction: "2026-01-09T10:30:00+00:00"
               }, null, 2)}
               responseExamples={[
                 {
@@ -713,11 +713,11 @@ export default function Home() {
     "last_name": "Jaidee",
     "name": "Somchai Jaidee",
     "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
-    "subscribed": "2026-01-09T10:30:00Z",
-    "last_interaction": "2026-01-09T10:30:00Z",
+    "subscribed": "2026-01-09T10:30:00+00:00",
+    "last_interaction": "2026-01-09T10:30:00+00:00",
     "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์"],
-    "created_at": "2026-01-01T08:00:00.123Z",
-    "updated_at": "2026-01-09T10:30:00.456Z"
+    "created_at": "2026-01-01T08:00:00.123456+00:00",
+    "updated_at": "2026-01-09T10:30:00.456789+00:00"
   }
 }`
                 },
@@ -762,7 +762,7 @@ export default function Home() {
             <EndpointCard
               method="GET"
               path="/api/chat-history"
-              description="Retrieve chat history for a specific user. Requires user_id parameter"
+              description="Retrieve chat_history column from users table for a specific user. Requires user_id parameter"
               example={`curl ${apiUrl}/api/chat-history?user_id=U1234567890abcdef \\
   -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
               response={`{
@@ -833,7 +833,7 @@ export default function Home() {
             <EndpointCard
               method="POST"
               path="/api/chat-history"
-              description="Add a new message to user's chat history"
+              description="Add a new message to chat_history column in users table and update last_interaction"
               example={`curl -X POST ${apiUrl}/api/chat-history \\
   -H "Content-Type: application/json" \\
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
@@ -851,14 +851,14 @@ export default function Home() {
     "last_name": "Jaidee",
     "name": "Somchai Jaidee",
     "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
-    "subscribed": "2024-12-06T08:29:36Z",
-    "last_interaction": "2026-01-09T12:30:00Z",
+    "subscribed": "2024-12-06T08:29:36+00:00",
+    "last_interaction": "2026-01-09T12:30:00+00:00",
     "chat_history": [
       "You: สวัสดีครับ",
       "You: ต้องการจองทัวร์ครับ"
     ],
-    "created_at": "2026-01-01T08:00:00.123Z",
-    "updated_at": "2026-01-09T12:30:00.456Z"
+    "created_at": "2026-01-01T08:00:00.123456+00:00",
+    "updated_at": "2026-01-09T12:30:00.456789+00:00"
   }
 }`}
               defaultBody={JSON.stringify({
@@ -879,11 +879,11 @@ export default function Home() {
     "last_name": "Jaidee",
     "name": "Somchai Jaidee",
     "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
-    "subscribed": "2024-12-06T08:29:36Z",
-    "last_interaction": "2026-01-09T12:30:00Z",
+    "subscribed": "2024-12-06T08:29:36+00:00",
+    "last_interaction": "2026-01-09T12:30:00+00:00",
     "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์ครับ"],
-    "created_at": "2026-01-01T08:00:00.123Z",
-    "updated_at": "2026-01-09T12:30:00.456Z"
+    "created_at": "2026-01-01T08:00:00.123456+00:00",
+    "updated_at": "2026-01-09T12:30:00.456789+00:00"
   }
 }`
                 },
@@ -928,7 +928,7 @@ export default function Home() {
             <EndpointCard
               method="DELETE"
               path="/api/chat-history"
-              description="Clear all chat history for a specific user"
+              description="Clear chat_history column (set to empty array) in users table for a specific user"
               example={`curl -X DELETE ${apiUrl}/api/chat-history?user_id=U1234567890abcdef \\
   -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
               response={`{
