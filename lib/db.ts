@@ -23,30 +23,34 @@ const supabaseUrl = process.env.SUPABASE_URL || ''
 // Use service_role key for backend (bypasses RLS), fallback to anon key
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || ''
 
-export const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-  },
-  db: {
-    schema: 'public'
-  }
-})
+export const supabase = supabaseUrl && supabaseKey 
+  ? createClient(supabaseUrl, supabaseKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+      db: {
+        schema: 'public'
+      }
+    })
+  : null
 
 // Client for user-authenticated requests (uses anon key + user JWT)
-export const supabaseClient = createClient(
-  supabaseUrl, 
-  process.env.SUPABASE_ANON_KEY || '',
-  {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-    db: {
-      schema: 'public'
-    }
-  }
-)
+export const supabaseClient = supabaseUrl && process.env.SUPABASE_ANON_KEY
+  ? createClient(
+      supabaseUrl, 
+      process.env.SUPABASE_ANON_KEY,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+        db: {
+          schema: 'public'
+        }
+      }
+    )
+  : null
 
 // Test MySQL connection on initialization
 mysqlPool.getConnection()
@@ -59,7 +63,7 @@ mysqlPool.getConnection()
   })
 
 // Test Supabase connection on initialization
-if (supabaseUrl && supabaseKey) {
+if (supabase && supabaseUrl && supabaseKey) {
   (async () => {
     try {
       await supabase.from('_health_check').select('count').limit(1)
