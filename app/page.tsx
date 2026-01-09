@@ -473,7 +473,7 @@ export default function Home() {
             <EndpointCard
               method="GET"
               path="/api/users"
-              description="Retrieve user records from Supabase. Optional filters: user_id, limit"
+              description="Retrieve user records from Supabase. Optional filters: user_id, user_ns, limit"
               example={`curl ${apiUrl}/api/users?limit=10 \\
   -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
               response={`{
@@ -486,11 +486,12 @@ export default function Home() {
       "first_name": "Somchai",
       "last_name": "Jaidee",
       "name": "Somchai Jaidee",
-      "profile_pic": "https://...",
-      "subscribed": true,
-      "last_interaction": "2026-01-09T...",
-      "created_at": "2026-01-01T...",
-      "updated_at": "2026-01-09T..."
+      "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
+      "subscribed": "2024-12-06T08:29:36Z",
+      "last_interaction": "2024-12-06T08:31:02Z",
+      "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์"],
+      "created_at": "2026-01-01T08:00:00.123Z",
+      "updated_at": "2026-01-09T10:00:00.456Z"
     }
   ],
   "total": 1
@@ -501,8 +502,23 @@ export default function Home() {
                   label: 'OK',
                   example: `{
   "success": true,
-  "data": [...],
-  "total": 10
+  "data": [
+    {
+      "id": 1,
+      "user_ns": "line",
+      "user_id": "U1234567890abcdef",
+      "first_name": "Somchai",
+      "last_name": "Jaidee",
+      "name": "Somchai Jaidee",
+      "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
+      "subscribed": "2024-12-06T08:29:36Z",
+      "last_interaction": "2024-12-06T08:31:02Z",
+      "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์"],
+      "created_at": "2026-01-01T08:00:00.123Z",
+      "updated_at": "2026-01-09T10:00:00.456Z"
+    }
+  ],
+  "total": 1
 }`
                 },
                 {
@@ -548,7 +564,10 @@ export default function Home() {
     "first_name": "Somying",
     "last_name": "Raksanuk",
     "name": "Somying Raksanuk",
-    "subscribed": false
+    "profile_pic": "https://profile.line-scdn.net/0h1234abcdef",
+    "subscribed": "2026-01-09T10:00:00Z",
+    "last_interaction": "2026-01-09T10:00:00Z",
+    "chat_history": ["You: สวัสดีครับ"]
   }'`}
               response={`{
   "success": true,
@@ -559,11 +578,12 @@ export default function Home() {
     "first_name": "Somying",
     "last_name": "Raksanuk",
     "name": "Somying Raksanuk",
-    "profile_pic": null,
-    "subscribed": false,
-    "last_interaction": null,
-    "created_at": "2026-01-09T...",
-    "updated_at": "2026-01-09T..."
+    "profile_pic": "https://profile.line-scdn.net/0h1234abcdef",
+    "subscribed": "2026-01-09T10:00:00Z",
+    "last_interaction": "2026-01-09T10:00:00Z",
+    "chat_history": ["You: สวัสดีครับ"],
+    "created_at": "2026-01-09T10:00:00.123Z",
+    "updated_at": "2026-01-09T10:00:00.123Z"
   }
 }`}
               defaultBody={JSON.stringify({
@@ -571,7 +591,11 @@ export default function Home() {
                 user_id: "U9876543210fedcba",
                 first_name: "Somying",
                 last_name: "Raksanuk",
-                name: "Somying Raksanuk"
+                name: "Somying Raksanuk",
+                profile_pic: "https://profile.line-scdn.net/0h1234abcdef",
+                subscribed: "2026-01-09T10:00:00Z",
+                last_interaction: "2026-01-09T10:00:00Z",
+                chat_history: ["You: สวัสดีครับ"]
               }, null, 2)}
               responseExamples={[
                 {
@@ -586,8 +610,21 @@ export default function Home() {
     "first_name": "Somying",
     "last_name": "Raksanuk",
     "name": "Somying Raksanuk",
-    "created_at": "2026-01-09T..."
+    "profile_pic": "https://profile.line-scdn.net/0h1234abcdef",
+    "subscribed": "2026-01-09T10:00:00Z",
+    "last_interaction": "2026-01-09T10:00:00Z",
+    "chat_history": ["You: สวัสดีครับ"],
+    "created_at": "2026-01-09T10:00:00.123Z",
+    "updated_at": "2026-01-09T10:00:00.123Z"
   }
+}`
+                },
+                {
+                  status: 400,
+                  label: 'Bad Request',
+                  example: `{
+  "success": false,
+  "error": "user_ns and user_id are required"
 }`
                 },
                 {
@@ -603,7 +640,7 @@ export default function Home() {
                   label: 'Internal Server Error',
                   example: `{
   "success": false,
-  "error": "Duplicate key value violates unique constraint"
+  "error": "duplicate key value violates unique constraint"
 }`
                 },
                 {
@@ -629,23 +666,38 @@ export default function Home() {
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
   -d '{
     "user_id": "U1234567890abcdef",
-    "subscribed": true,
+    "first_name": "Somchai",
+    "last_name": "Jaidee",
+    "name": "Somchai Jaidee",
+    "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
+    "subscribed": "2026-01-09T10:30:00Z",
     "last_interaction": "2026-01-09T10:30:00Z"
   }'`}
               response={`{
   "success": true,
   "data": {
     "id": 1,
+    "user_ns": "line",
     "user_id": "U1234567890abcdef",
-    "subscribed": true,
+    "first_name": "Somchai",
+    "last_name": "Jaidee",
+    "name": "Somchai Jaidee",
+    "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
+    "subscribed": "2026-01-09T10:30:00Z",
     "last_interaction": "2026-01-09T10:30:00Z",
-    "updated_at": "2026-01-09T..."
+    "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์"],
+    "created_at": "2026-01-01T08:00:00.123Z",
+    "updated_at": "2026-01-09T10:30:00.456Z"
   }
 }`}
               defaultBody={JSON.stringify({
                 user_id: "U1234567890abcdef",
                 first_name: "Somchai",
-                last_name: "Jaidee"
+                last_name: "Jaidee",
+                name: "Somchai Jaidee",
+                profile_pic: "https://profile.line-scdn.net/0h9876fedcba",
+                subscribed: "2026-01-09T10:30:00Z",
+                last_interaction: "2026-01-09T10:30:00Z"
               }, null, 2)}
               responseExamples={[
                 {
@@ -655,10 +707,17 @@ export default function Home() {
   "success": true,
   "data": {
     "id": 1,
+    "user_ns": "line",
     "user_id": "U1234567890abcdef",
     "first_name": "Somchai",
     "last_name": "Jaidee",
-    "updated_at": "2026-01-09T..."
+    "name": "Somchai Jaidee",
+    "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
+    "subscribed": "2026-01-09T10:30:00Z",
+    "last_interaction": "2026-01-09T10:30:00Z",
+    "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์"],
+    "created_at": "2026-01-01T08:00:00.123Z",
+    "updated_at": "2026-01-09T10:30:00.456Z"
   }
 }`
                 },
@@ -711,9 +770,9 @@ export default function Home() {
   "user_id": "U1234567890abcdef",
   "name": "Somchai Jaidee",
   "chat_history": [
-    "You: ลูกนำ้ช่วยเช็ค1-6เมยยังว่างมั้ยคะ5ที่",
-    "You: ที่ถามพี่เดินทางตลอดแต่สุดท้ายไปกับคนที่ใจเย็น",
-    "You: พี่ไปกับคนที่เค้าหาให้ได้และพูดแบบใจเย็น"
+    "You: สวัสดีครับ",
+    "You: ต้องการจองทัวร์",
+    "You: วันที่ 1-6 เมษายน ว่างไหมครับ"
   ],
   "total": 3
 }`}
@@ -725,8 +784,12 @@ export default function Home() {
   "success": true,
   "user_id": "U1234567890abcdef",
   "name": "Somchai Jaidee",
-  "chat_history": ["You: สวัสดีครับ", "You: สบายดีไหมครับ"],
-  "total": 2
+  "chat_history": [
+    "You: สวัสดีครับ",
+    "You: ต้องการจองทัวร์",
+    "You: วันที่ 1-6 เมษายน ว่างไหมครับ"
+  ],
+  "total": 3
 }`
                 },
                 {
@@ -742,7 +805,7 @@ export default function Home() {
                   label: 'Unauthorized',
                   example: `{
   "success": false,
-  "error": "Unauthorized"
+  "error": "Unauthorized - Invalid API key"
 }`
                 },
                 {
@@ -782,14 +845,20 @@ export default function Home() {
   "success": true,
   "data": {
     "id": 1,
+    "user_ns": "line",
     "user_id": "U1234567890abcdef",
+    "first_name": "Somchai",
+    "last_name": "Jaidee",
     "name": "Somchai Jaidee",
+    "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
+    "subscribed": "2024-12-06T08:29:36Z",
+    "last_interaction": "2026-01-09T12:30:00Z",
     "chat_history": [
-      "You: ลูกนำ้ช่วยเช็ค1-6เมยยังว่างมั้ยคะ5ที่",
+      "You: สวัสดีครับ",
       "You: ต้องการจองทัวร์ครับ"
     ],
-    "last_interaction": "2026-01-09T12:30:00Z",
-    "updated_at": "2026-01-09T12:30:00Z"
+    "created_at": "2026-01-01T08:00:00.123Z",
+    "updated_at": "2026-01-09T12:30:00.456Z"
   }
 }`}
               defaultBody={JSON.stringify({
@@ -804,9 +873,17 @@ export default function Home() {
   "success": true,
   "data": {
     "id": 1,
+    "user_ns": "line",
     "user_id": "U1234567890abcdef",
-    "chat_history": [...],
-    "last_interaction": "2026-01-09T..."
+    "first_name": "Somchai",
+    "last_name": "Jaidee",
+    "name": "Somchai Jaidee",
+    "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
+    "subscribed": "2024-12-06T08:29:36Z",
+    "last_interaction": "2026-01-09T12:30:00Z",
+    "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์ครับ"],
+    "created_at": "2026-01-01T08:00:00.123Z",
+    "updated_at": "2026-01-09T12:30:00.456Z"
   }
 }`
                 },
@@ -823,7 +900,7 @@ export default function Home() {
                   label: 'Unauthorized',
                   example: `{
   "success": false,
-  "error": "Unauthorized"
+  "error": "Unauthorized - Invalid API key"
 }`
                 },
                 {
@@ -852,7 +929,7 @@ export default function Home() {
               method="DELETE"
               path="/api/chat-history"
               description="Clear all chat history for a specific user"
-              example={`curl -X DELETE ${apiUrl}/api/chat-history?user_id=123456789 \\
+              example={`curl -X DELETE ${apiUrl}/api/chat-history?user_id=U1234567890abcdef \\
   -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
               response={`{
   "success": true,
@@ -880,7 +957,7 @@ export default function Home() {
                   label: 'Unauthorized',
                   example: `{
   "success": false,
-  "error": "Unauthorized"
+  "error": "Unauthorized - Invalid API key"
 }`
                 },
                 {
