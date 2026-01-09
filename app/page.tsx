@@ -176,7 +176,7 @@ export default function Home() {
         }}>
           <MetricCard
             label="Total Endpoints"
-            value="3"
+            value="8"
             icon={
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="18" y1="20" x2="18" y2="10"/>
@@ -324,6 +324,232 @@ export default function Home() {
     "created_at": "2026-01-07T...",
     "status": "pending"
   }
+}`}
+              requiresAuth={true}
+              activeTryItEndpoint={activeTryItEndpoint}
+              setActiveTryItEndpoint={setActiveTryItEndpoint}
+            />
+          </div>
+        </div>
+
+        {/* Supabase API Endpoints Section */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '12px',
+          padding: '2.5rem',
+          marginBottom: '2rem',
+          border: '1px solid #e5e7eb',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            marginBottom: '2rem',
+            paddingBottom: '1.5rem',
+            borderBottom: '2px solid #f3f4f6'
+          }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              background: '#dcfce7',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.25rem'
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                <path d="M16 3.13a4 4 0 010 7.75"/>
+              </svg>
+            </div>
+            <div>
+              <h2 style={{
+                margin: 0,
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: '#111827'
+              }}>
+                Supabase API Endpoints
+              </h2>
+              <p style={{
+                margin: '0.25rem 0 0 0',
+                fontSize: '0.875rem',
+                color: '#6b7280'
+              }}>
+                User management and chat history endpoints
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <EndpointCard
+              method="GET"
+              path="/api/users"
+              description="Retrieve user records from Supabase. Optional filters: user_id, limit"
+              example={`curl ${apiUrl}/api/users?limit=10 \\
+  -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
+              response={`{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "user_ns": "telegram",
+      "user_id": "123456789",
+      "first_name": "John",
+      "last_name": "Doe",
+      "name": "John Doe",
+      "profile_pic": "https://...",
+      "subscribed": true,
+      "last_interaction": "2026-01-09T...",
+      "created_at": "2026-01-01T...",
+      "updated_at": "2026-01-09T..."
+    }
+  ],
+  "total": 1
+}`}
+              requiresAuth={true}
+              activeTryItEndpoint={activeTryItEndpoint}
+              setActiveTryItEndpoint={setActiveTryItEndpoint}
+            />
+
+            <EndpointCard
+              method="POST"
+              path="/api/users"
+              description="Create a new user record in Supabase"
+              example={`curl -X POST ${apiUrl}/api/users \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
+  -d '{
+    "user_ns": "telegram",
+    "user_id": "987654321",
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "name": "Jane Smith",
+    "subscribed": false
+  }'`}
+              response={`{
+  "success": true,
+  "data": {
+    "id": 2,
+    "user_ns": "telegram",
+    "user_id": "987654321",
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "name": "Jane Smith",
+    "profile_pic": null,
+    "subscribed": false,
+    "last_interaction": null,
+    "created_at": "2026-01-09T...",
+    "updated_at": "2026-01-09T..."
+  }
+}`}
+              requiresAuth={true}
+              activeTryItEndpoint={activeTryItEndpoint}
+              setActiveTryItEndpoint={setActiveTryItEndpoint}
+            />
+
+            <EndpointCard
+              method="PUT"
+              path="/api/users"
+              description="Update an existing user record. Requires user_id in request body"
+              example={`curl -X PUT ${apiUrl}/api/users \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
+  -d '{
+    "user_id": "123456789",
+    "subscribed": true,
+    "last_interaction": "2026-01-09T10:30:00Z"
+  }'`}
+              response={`{
+  "success": true,
+  "data": {
+    "id": 1,
+    "user_id": "123456789",
+    "subscribed": true,
+    "last_interaction": "2026-01-09T10:30:00Z",
+    "updated_at": "2026-01-09T..."
+  }
+}`}
+              requiresAuth={true}
+              activeTryItEndpoint={activeTryItEndpoint}
+              setActiveTryItEndpoint={setActiveTryItEndpoint}
+            />
+
+            <EndpointCard
+              method="GET"
+              path="/api/chat-history"
+              description="Retrieve chat history for a specific user. Requires user_id parameter"
+              example={`curl ${apiUrl}/api/chat-history?user_id=123456789&limit=20 \\
+  -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
+              response={`{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "user_id": "123456789",
+      "message": "Hello, how can I help you?",
+      "role": "assistant",
+      "timestamp": "2026-01-09T10:30:00Z",
+      "metadata": {}
+    },
+    {
+      "id": 2,
+      "user_id": "123456789",
+      "message": "I need help with my booking",
+      "role": "user",
+      "timestamp": "2026-01-09T10:29:00Z",
+      "metadata": {}
+    }
+  ],
+  "total": 2
+}`}
+              requiresAuth={true}
+              activeTryItEndpoint={activeTryItEndpoint}
+              setActiveTryItEndpoint={setActiveTryItEndpoint}
+            />
+
+            <EndpointCard
+              method="POST"
+              path="/api/chat-history"
+              description="Create a new chat message record"
+              example={`curl -X POST ${apiUrl}/api/chat-history \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
+  -d '{
+    "user_id": "123456789",
+    "message": "What are my booking options?",
+    "role": "user",
+    "metadata": {"source": "telegram"}
+  }'`}
+              response={`{
+  "success": true,
+  "data": {
+    "id": 3,
+    "user_id": "123456789",
+    "message": "What are my booking options?",
+    "role": "user",
+    "timestamp": "2026-01-09T...",
+    "metadata": {"source": "telegram"}
+  }
+}`}
+              requiresAuth={true}
+              activeTryItEndpoint={activeTryItEndpoint}
+              setActiveTryItEndpoint={setActiveTryItEndpoint}
+            />
+
+            <EndpointCard
+              method="DELETE"
+              path="/api/chat-history"
+              description="Delete a specific chat history record by ID"
+              example={`curl -X DELETE ${apiUrl}/api/chat-history?id=3 \\
+  -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
+              response={`{
+  "success": true,
+  "message": "Chat history deleted successfully"
 }`}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
