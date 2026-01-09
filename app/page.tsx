@@ -483,29 +483,18 @@ export default function Home() {
               method="GET"
               path="/api/chat-history"
               description="Retrieve chat history for a specific user. Requires user_id parameter"
-              example={`curl ${apiUrl}/api/chat-history?user_id=123456789&limit=20 \\
+              example={`curl ${apiUrl}/api/chat-history?user_id=123456789 \\
   -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
               response={`{
   "success": true,
-  "data": [
-    {
-      "id": 1,
-      "user_id": "123456789",
-      "message": "Hello, how can I help you?",
-      "role": "assistant",
-      "timestamp": "2026-01-09T10:30:00Z",
-      "metadata": {}
-    },
-    {
-      "id": 2,
-      "user_id": "123456789",
-      "message": "I need help with my booking",
-      "role": "user",
-      "timestamp": "2026-01-09T10:29:00Z",
-      "metadata": {}
-    }
+  "user_id": "123456789",
+  "name": "John Doe",
+  "chat_history": [
+    "You: ลูกนำ้ช่วยเช็ค1-6เมยยังว่างมั้ยคะ5ที่",
+    "You: ที่ถามพี่เดินทางตลอดแต่สุดท้ายไปกับคนที่ใจเย็น",
+    "You: พี่ไปกับคนที่เค้าหาให้ได้และพูดแบบใจเย็น"
   ],
-  "total": 2
+  "total": 3
 }`}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
@@ -515,25 +504,26 @@ export default function Home() {
             <EndpointCard
               method="POST"
               path="/api/chat-history"
-              description="Create a new chat message record"
+              description="Add a new message to user's chat history"
               example={`curl -X POST ${apiUrl}/api/chat-history \\
   -H "Content-Type: application/json" \\
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e" \\
   -d '{
     "user_id": "123456789",
-    "message": "What are my booking options?",
-    "role": "user",
-    "metadata": {"source": "telegram"}
+    "message": "You: What are my booking options?"
   }'`}
               response={`{
   "success": true,
   "data": {
-    "id": 3,
+    "id": 1,
     "user_id": "123456789",
-    "message": "What are my booking options?",
-    "role": "user",
-    "timestamp": "2026-01-09T...",
-    "metadata": {"source": "telegram"}
+    "name": "John Doe",
+    "chat_history": [
+      "You: ลูกนำ้ช่วยเช็ค1-6เมยยังว่างมั้ยคะ5ที่",
+      "You: What are my booking options?"
+    ],
+    "last_interaction": "2026-01-09T12:30:00Z",
+    "updated_at": "2026-01-09T12:30:00Z"
   }
 }`}
               requiresAuth={true}
@@ -544,12 +534,12 @@ export default function Home() {
             <EndpointCard
               method="DELETE"
               path="/api/chat-history"
-              description="Delete a specific chat history record by ID"
-              example={`curl -X DELETE ${apiUrl}/api/chat-history?id=3 \\
+              description="Clear all chat history for a specific user"
+              example={`curl -X DELETE ${apiUrl}/api/chat-history?user_id=123456789 \\
   -H 'x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e'`}
               response={`{
   "success": true,
-  "message": "Chat history deleted successfully"
+  "message": "Chat history cleared"
 }`}
               requiresAuth={true}
               activeTryItEndpoint={activeTryItEndpoint}
