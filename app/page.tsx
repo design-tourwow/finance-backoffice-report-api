@@ -5,12 +5,286 @@ import { useState, useEffect } from 'react'
 export default function Home() {
   const [healthStatus, setHealthStatus] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [selectedEndpoint, setSelectedEndpoint] = useState('GET-/api/health')
 
   const apiUrl = typeof window !== 'undefined' 
     ? window.location.origin 
     : process.env.VERCEL_URL 
       ? `https://${process.env.VERCEL_URL}` 
       : 'http://localhost:3002'
+
+  // Define all endpoints
+  const endpoints = [
+    {
+      id: 'GET-/api/health',
+      method: 'GET',
+      path: '/api/health',
+      description: 'Health check endpoint to monitor API status',
+      requiresAuth: false,
+      curl: `curl ${apiUrl}/api/health`,
+      response: `{
+  "status": "ok",
+  "timestamp": "2026-01-10T12:00:00Z",
+  "service": "finance-backoffice-report-api"
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' }
+      ]
+    },
+    {
+      id: 'GET-/api/bookings',
+      method: 'GET',
+      path: '/api/bookings',
+      description: 'Retrieve booking records from MySQL database',
+      requiresAuth: true,
+      parameters: [
+        { name: 'limit', type: 'integer', description: 'Max records to return' }
+      ],
+      curl: `curl "${apiUrl}/api/bookings?limit=10" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [...],
+  "total": 10
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 401, description: 'Invalid API key' }
+      ]
+    },
+    {
+      id: 'POST-/api/bookings',
+      method: 'POST',
+      path: '/api/bookings',
+      description: 'Create a new booking record',
+      requiresAuth: true,
+      requestBody: {
+        title: { type: 'string', required: true, description: 'Booking title' },
+        type: { type: 'string', required: true, description: 'Booking type' }
+      },
+      curl: `curl -X POST "${apiUrl}/api/bookings" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{"title":"New Booking","type":"standard"}'`,
+      response: `{
+  "success": true,
+  "data": {
+    "id": 151,
+    "title": "New Booking",
+    "type": "standard",
+    "created_at": "2026-01-10T..."
+  }
+}`,
+      responses: [
+        { status: 201, description: 'Created successfully' },
+        { status: 400, description: 'Missing required fields' },
+        { status: 401, description: 'Invalid API key' }
+      ]
+    },
+    {
+      id: 'GET-/api/users',
+      method: 'GET',
+      path: '/api/users',
+      description: 'Retrieve user records from Supabase',
+      requiresAuth: true,
+      parameters: [
+        { name: 'user_id', type: 'string', description: 'Filter by user ID' },
+        { name: 'user_ns', type: 'string', description: 'Filter by namespace' },
+        { name: 'name', type: 'string', description: 'Search by name' },
+        { name: 'limit', type: 'integer', description: 'Max records (default: 100, max: 1000)' },
+        { name: 'offset', type: 'integer', description: 'Skip records (default: 0)' },
+        { name: 'sort_by', type: 'string', description: 'Sort field (id, name, created_at, etc.)' },
+        { name: 'sort_order', type: 'string', description: 'Sort direction (asc/desc)' }
+      ],
+      curl: `curl "${apiUrl}/api/users?limit=10" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [{
+    "id": 1,
+    "user_ns": "line",
+    "user_id": "U1234567890abcdef",
+    "first_name": "Somchai",
+    "last_name": "Jaidee",
+    "name": "Somchai Jaidee",
+    "profile_pic": "https://...",
+    "subscribed": "2024-12-06T08:29:36+00:00",
+    "last_interaction": "2024-12-06T08:31:02+00:00",
+    "chat_history": ["You: สวัสดีครับ"],
+    "created_at": "2026-01-01T...",
+    "updated_at": "2026-01-09T..."
+  }],
+  "pagination": {
+    "total": 1,
+    "limit": 10,
+    "offset": 0,
+    "returned": 1
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 400, description: 'Invalid parameters' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 503, description: 'Supabase not configured' }
+      ]
+    },
+    {
+      id: 'POST-/api/users',
+      method: 'POST',
+      path: '/api/users',
+      description: 'Create a new user. Only user_id is required.',
+      requiresAuth: true,
+      requestBody: {
+        user_id: { type: 'string', required: true, description: 'Unique user identifier' },
+        user_ns: { type: 'string', required: false, description: 'Namespace (e.g., "line")' },
+        first_name: { type: 'string', required: false, description: 'First name' },
+        last_name: { type: 'string', required: false, description: 'Last name' },
+        name: { type: 'string', required: false, description: 'Full name' },
+        profile_pic: { type: 'string', required: false, description: 'Profile picture URL' },
+        subscribed: { type: 'timestamp', required: false, description: 'Subscription timestamp' },
+        last_interaction: { type: 'timestamp', required: false, description: 'Last interaction' },
+        chat_history: { type: 'array', required: false, description: 'Chat messages array' }
+      },
+      curl: `curl -X POST "${apiUrl}/api/users" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "user_ns": "line",
+    "user_id": "U9876543210fedcba",
+    "first_name": "Somying",
+    "last_name": "Raksanuk",
+    "name": "Somying Raksanuk"
+  }'`,
+      response: `{
+  "success": true,
+  "data": {
+    "id": 2,
+    "user_ns": "line",
+    "user_id": "U9876543210fedcba",
+    "first_name": "Somying",
+    "last_name": "Raksanuk",
+    "name": "Somying Raksanuk",
+    "created_at": "2026-01-09T...",
+    "updated_at": "2026-01-09T..."
+  }
+}`,
+      responses: [
+        { status: 201, description: 'User created' },
+        { status: 400, description: 'Missing user_id or invalid format' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 409, description: 'User already exists' }
+      ]
+    },
+    {
+      id: 'PUT-/api/users',
+      method: 'PUT',
+      path: '/api/users',
+      description: 'Update user. Requires user_id, send only fields to update.',
+      requiresAuth: true,
+      requestBody: {
+        user_id: { type: 'string', required: true, description: 'User ID to update' },
+        first_name: { type: 'string', required: false, description: 'Updated first name' },
+        last_name: { type: 'string', required: false, description: 'Updated last name' }
+      },
+      curl: `curl -X PUT "${apiUrl}/api/users" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "user_id": "U1234567890abcdef",
+    "first_name": "Somchai Updated"
+  }'`,
+      response: `{
+  "success": true,
+  "data": {
+    "id": 1,
+    "user_id": "U1234567890abcdef",
+    "first_name": "Somchai Updated",
+    "updated_at": "2026-01-09T..."
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Updated successfully' },
+        { status: 400, description: 'Missing user_id' },
+        { status: 404, description: 'User not found' }
+      ]
+    },
+    {
+      id: 'GET-/api/chat-history',
+      method: 'GET',
+      path: '/api/chat-history',
+      description: 'Get chat_history for a user',
+      requiresAuth: true,
+      parameters: [
+        { name: 'user_id', type: 'string', description: 'User ID (required)' }
+      ],
+      curl: `curl "${apiUrl}/api/chat-history?user_id=U1234567890abcdef" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "user_id": "U1234567890abcdef",
+  "name": "Somchai Jaidee",
+  "chat_history": ["You: สวัสดีครับ"],
+  "total": 1
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 400, description: 'Missing user_id' }
+      ]
+    },
+    {
+      id: 'POST-/api/chat-history',
+      method: 'POST',
+      path: '/api/chat-history',
+      description: 'Add message to chat_history',
+      requiresAuth: true,
+      requestBody: {
+        user_id: { type: 'string', required: true, description: 'User ID' },
+        message: { type: 'string', required: true, description: 'Chat message' }
+      },
+      curl: `curl -X POST "${apiUrl}/api/chat-history" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "user_id": "U1234567890abcdef",
+    "message": "You: ต้องการจองทัวร์"
+  }'`,
+      response: `{
+  "success": true,
+  "data": {
+    "id": 1,
+    "user_id": "U1234567890abcdef",
+    "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์"],
+    "last_interaction": "2026-01-10T..."
+  }
+}`,
+      responses: [
+        { status: 201, description: 'Message added' },
+        { status: 400, description: 'Missing required fields' }
+      ]
+    },
+    {
+      id: 'DELETE-/api/chat-history',
+      method: 'DELETE',
+      path: '/api/chat-history',
+      description: 'Clear chat_history for a user',
+      requiresAuth: true,
+      parameters: [
+        { name: 'user_id', type: 'string', description: 'User ID (required)' }
+      ],
+      curl: `curl -X DELETE "${apiUrl}/api/chat-history?user_id=U1234567890abcdef" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "message": "Chat history cleared"
+}`,
+      responses: [
+        { status: 200, description: 'Cleared successfully' },
+        { status: 400, description: 'Missing user_id' }
+      ]
+    }
+  ]
+
+  const selectedEndpointData = endpoints.find(e => e.id === selectedEndpoint) || endpoints[0]
 
   useEffect(() => {
     fetch('/api/health')
@@ -101,134 +375,123 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Endpoints */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-          <EndpointSection
-            method="GET"
-            path="/api/health"
-            description="Health check endpoint to monitor API status and availability"
-            curl={`curl ${apiUrl}/api/health`}
-            response={`{
-  "status": "ok",
-  "timestamp": "2026-01-10T12:00:00Z",
-  "service": "finance-backoffice-report-api"
-}`}
-            responses={[
-              { status: 200, description: 'Successful response' }
-            ]}
-          />
-
-          <EndpointSection
-            method="GET"
-            path="/api/users"
-            description="Retrieve user records from Supabase users table"
-            requiresAuth
-            parameters={[
-              { name: 'user_id', type: 'string', description: 'Filter by specific user ID' },
-              { name: 'user_ns', type: 'string', description: 'Filter by namespace (e.g., "line")' },
-              { name: 'name', type: 'string', description: 'Search by name (case-insensitive)' },
-              { name: 'limit', type: 'integer', description: 'Max records to return (default: 100, max: 1000)' },
-              { name: 'offset', type: 'integer', description: 'Number of records to skip (default: 0)' },
-              { name: 'sort_by', type: 'string', description: 'Field to sort by (id, name, created_at, etc.)' },
-              { name: 'sort_order', type: 'string', description: 'Sort direction: asc or desc' }
-            ]}
-            curl={`curl "${apiUrl}/api/users?limit=10" \\
-  -H "x-api-key: YOUR_API_KEY"`}
-            response={`{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "user_ns": "line",
-      "user_id": "U1234567890abcdef",
-      "first_name": "Somchai",
-      "last_name": "Jaidee",
-      "name": "Somchai Jaidee",
-      "profile_pic": "https://...",
-      "subscribed": "2024-12-06T08:29:36+00:00",
-      "last_interaction": "2024-12-06T08:31:02+00:00",
-      "chat_history": ["You: สวัสดีครับ"],
-      "created_at": "2026-01-01T08:00:00.123456+00:00",
-      "updated_at": "2026-01-09T10:00:00.456789+00:00"
-    }
-  ],
-  "pagination": {
-    "total": 1,
-    "limit": 10,
-    "offset": 0,
-    "returned": 1
-  }
-}`}
-            responses={[
-              { status: 200, description: 'Successful response with user data' },
-              { status: 400, description: 'Invalid parameters (e.g., limit > 1000)' },
-              { status: 401, description: 'Invalid or missing API key' },
-              { status: 503, description: 'Supabase not configured' }
-            ]}
-          />
-
-          <EndpointSection
-            method="POST"
-            path="/api/users"
-            description="Create a new user record. Only user_id is required, all other fields are optional."
-            requiresAuth
-            requestBody={{
-              user_id: { type: 'string', required: true, description: 'Unique user identifier' },
-              user_ns: { type: 'string', required: false, description: 'Namespace (e.g., "line")' },
-              first_name: { type: 'string', required: false, description: 'User first name' },
-              last_name: { type: 'string', required: false, description: 'User last name' },
-              name: { type: 'string', required: false, description: 'Full name' },
-              profile_pic: { type: 'string', required: false, description: 'Profile picture URL' },
-              subscribed: { type: 'timestamp', required: false, description: 'Subscription timestamp' },
-              last_interaction: { type: 'timestamp', required: false, description: 'Last interaction timestamp' },
-              chat_history: { type: 'array', required: false, description: 'Array of chat messages' }
-            }}
-            curl={`curl -X POST "${apiUrl}/api/users" \\
-  -H "Content-Type: application/json" \\
-  -H "x-api-key: YOUR_API_KEY" \\
-  -d '{
-    "user_ns": "line",
-    "user_id": "U9876543210fedcba",
-    "first_name": "Somying",
-    "last_name": "Raksanuk",
-    "name": "Somying Raksanuk",
-    "profile_pic": "https://...",
-    "subscribed": "2026-01-09T10:00:00+00:00",
-    "last_interaction": "2026-01-09T10:00:00+00:00",
-    "chat_history": ["You: สวัสดีครับ"]
-  }'`}
-            response={`{
-  "success": true,
-  "data": {
-    "id": 2,
-    "user_ns": "line",
-    "user_id": "U9876543210fedcba",
-    "first_name": "Somying",
-    "last_name": "Raksanuk",
-    "name": "Somying Raksanuk",
-    "profile_pic": "https://...",
-    "subscribed": "2026-01-09T10:00:00+00:00",
-    "last_interaction": "2026-01-09T10:00:00+00:00",
-    "chat_history": ["You: สวัสดีครับ"],
-    "created_at": "2026-01-09T10:00:00.123456+00:00",
-    "updated_at": "2026-01-09T10:00:00.123456+00:00"
-  }
-}`}
-            responses={[
-              { status: 201, description: 'User created successfully' },
-              { status: 400, description: 'Missing user_id or invalid data format' },
-              { status: 401, description: 'Invalid or missing API key' },
-              { status: 409, description: 'User with this user_id already exists' },
-              { status: 503, description: 'Supabase not configured' }
-            ]}
-          />
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '320px 1fr',
+        gap: 0,
+        minHeight: 'calc(100vh - 4rem)'
+      }}>
+        {/* Left Sidebar - Endpoints List */}
+        <div style={{
+          background: '#ffffff',
+          borderRight: '1px solid #e5e7eb',
+          overflowY: 'auto',
+          height: 'calc(100vh - 4rem)',
+          position: 'sticky',
+          top: '4rem'
+        }}>
+          <div style={{ padding: '1.5rem 1rem' }}>
+            <h2 style={{
+              margin: '0 0 1rem 0',
+              fontSize: '0.875rem',
+              fontWeight: '600',
+              color: '#6b7280',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              padding: '0 0.5rem'
+            }}>
+              Endpoints
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              {endpoints.map((endpoint) => (
+                <EndpointListItem
+                  key={endpoint.id}
+                  endpoint={endpoint}
+                  isSelected={selectedEndpoint === endpoint.id}
+                  onClick={() => setSelectedEndpoint(endpoint.id)}
+                />
+              ))}
+            </div>
+          </div>
         </div>
+
+        {/* Right Content - Selected Endpoint Detail */}
+        <div style={{
+          background: '#fafafa',
+          overflowY: 'auto',
+          height: 'calc(100vh - 4rem)'
+        }}>
+          <EndpointDetail endpoint={selectedEndpointData} />
+        </div>
+      </div>
       </div>
     </main>
   )
 }
 
-function EndpointSection({ method, path, description, requiresAuth, parameters, requestBody, curl, response, responses }: any) {
+function EndpointListItem({ endpoint, isSelected, onClick }: any) {
+  const methodColors: any = {
+    GET: { bg: '#dbeafe', text: '#1e40af' },
+    POST: { bg: '#d1fae5', text: '#065f46' },
+    PUT: { bg: '#fef3c7', text: '#92400e' },
+    DELETE: { bg: '#fee2e2', text: '#991b1b' }
+  }
+
+  const color = methodColors[endpoint.method] || methodColors.GET
+
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+        padding: '0.75rem 0.5rem',
+        background: isSelected ? '#f3f4f6' : 'transparent',
+        border: 'none',
+        borderLeft: isSelected ? '3px solid #4f46e5' : '3px solid transparent',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        textAlign: 'left',
+        transition: 'all 0.15s',
+        width: '100%'
+      }}
+      onMouseEnter={(e) => {
+        if (!isSelected) e.currentTarget.style.background = '#f9fafb'
+      }}
+      onMouseLeave={(e) => {
+        if (!isSelected) e.currentTarget.style.background = 'transparent'
+      }}
+    >
+      <span style={{
+        background: color.bg,
+        color: color.text,
+        padding: '0.25rem 0.5rem',
+        borderRadius: '4px',
+        fontWeight: '700',
+        fontSize: '0.75rem',
+        letterSpacing: '0.3px',
+        minWidth: '3.5rem',
+        textAlign: 'center'
+      }}>
+        {endpoint.method}
+      </span>
+      <code style={{
+        fontSize: '0.8125rem',
+        fontWeight: isSelected ? '600' : '500',
+        color: isSelected ? '#111827' : '#4b5563',
+        fontFamily: 'Monaco, Consolas, monospace',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap'
+      }}>
+        {endpoint.path}
+      </code>
+    </button>
+  )
+}
+
+function EndpointDetail({ endpoint }: any) {
   const [copied, setCopied] = useState(false)
 
   const methodColors: any = {
@@ -238,7 +501,7 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
     DELETE: { bg: '#fee2e2', text: '#991b1b' }
   }
 
-  const color = methodColors[method] || methodColors.GET
+  const color = methodColors[endpoint.method] || methodColors.GET
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
@@ -251,43 +514,43 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
       display: 'grid',
       gridTemplateColumns: '1fr 1fr',
       gap: '2rem',
-      padding: '2rem 0',
-      borderBottom: '1px solid #e5e7eb'
+      padding: '2rem',
+      minHeight: '100%'
     }}>
-      {/* Left Column - Documentation */}
+      {/* Left - Documentation */}
       <div>
-        <div style={{ marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+        <div style={{ marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
             <span style={{
               background: color.bg,
               color: color.text,
-              padding: '0.25rem 0.75rem',
+              padding: '0.375rem 0.875rem',
               borderRadius: '6px',
               fontWeight: '700',
               fontSize: '0.875rem',
               letterSpacing: '0.5px'
             }}>
-              {method}
+              {endpoint.method}
             </span>
             <code style={{
-              fontSize: '1.125rem',
+              fontSize: '1.25rem',
               fontWeight: '600',
               color: '#111827',
               fontFamily: 'Monaco, Consolas, monospace'
             }}>
-              {path}
+              {endpoint.path}
             </code>
           </div>
-          {requiresAuth && (
+          {endpoint.requiresAuth && (
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.375rem',
               fontSize: '0.8125rem',
               color: '#6b7280',
-              background: '#f9fafb',
-              padding: '0.25rem 0.625rem',
-              borderRadius: '4px',
+              background: '#ffffff',
+              padding: '0.375rem 0.75rem',
+              borderRadius: '6px',
               border: '1px solid #e5e7eb'
             }}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -300,19 +563,19 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
         </div>
 
         <p style={{
-          margin: '0 0 1.5rem 0',
-          fontSize: '0.9375rem',
+          margin: '0 0 2rem 0',
+          fontSize: '1rem',
           color: '#4b5563',
           lineHeight: '1.6'
         }}>
-          {description}
+          {endpoint.description}
         </p>
 
         {/* Parameters */}
-        {parameters && parameters.length > 0 && (
-          <div style={{ marginBottom: '1.5rem' }}>
+        {endpoint.parameters && endpoint.parameters.length > 0 && (
+          <div style={{ marginBottom: '2rem' }}>
             <h3 style={{
-              margin: '0 0 0.75rem 0',
+              margin: '0 0 1rem 0',
               fontSize: '0.875rem',
               fontWeight: '600',
               color: '#111827',
@@ -322,14 +585,14 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
               Query Parameters
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {parameters.map((param: any, idx: number) => (
+              {endpoint.parameters.map((param: any, idx: number) => (
                 <div key={idx} style={{
-                  padding: '0.75rem',
-                  background: '#f9fafb',
+                  padding: '1rem',
+                  background: '#ffffff',
                   border: '1px solid #e5e7eb',
-                  borderRadius: '6px'
+                  borderRadius: '8px'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
                     <code style={{
                       fontSize: '0.875rem',
                       fontWeight: '600',
@@ -341,9 +604,9 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
                     <span style={{
                       fontSize: '0.75rem',
                       color: '#6b7280',
-                      background: '#ffffff',
-                      padding: '0.125rem 0.375rem',
-                      borderRadius: '3px',
+                      background: '#f9fafb',
+                      padding: '0.125rem 0.5rem',
+                      borderRadius: '4px',
                       border: '1px solid #e5e7eb'
                     }}>
                       {param.type}
@@ -351,7 +614,7 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
                   </div>
                   <p style={{
                     margin: 0,
-                    fontSize: '0.8125rem',
+                    fontSize: '0.875rem',
                     color: '#6b7280',
                     lineHeight: '1.5'
                   }}>
@@ -364,10 +627,10 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
         )}
 
         {/* Request Body */}
-        {requestBody && (
-          <div style={{ marginBottom: '1.5rem' }}>
+        {endpoint.requestBody && (
+          <div style={{ marginBottom: '2rem' }}>
             <h3 style={{
-              margin: '0 0 0.75rem 0',
+              margin: '0 0 1rem 0',
               fontSize: '0.875rem',
               fontWeight: '600',
               color: '#111827',
@@ -377,14 +640,14 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
               Request Body
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {Object.entries(requestBody).map(([key, value]: any, idx: number) => (
+              {Object.entries(endpoint.requestBody).map(([key, value]: any, idx: number) => (
                 <div key={idx} style={{
-                  padding: '0.75rem',
-                  background: '#f9fafb',
+                  padding: '1rem',
+                  background: '#ffffff',
                   border: '1px solid #e5e7eb',
-                  borderRadius: '6px'
+                  borderRadius: '8px'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
                     <code style={{
                       fontSize: '0.875rem',
                       fontWeight: '600',
@@ -396,9 +659,9 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
                     <span style={{
                       fontSize: '0.75rem',
                       color: '#6b7280',
-                      background: '#ffffff',
-                      padding: '0.125rem 0.375rem',
-                      borderRadius: '3px',
+                      background: '#f9fafb',
+                      padding: '0.125rem 0.5rem',
+                      borderRadius: '4px',
                       border: '1px solid #e5e7eb'
                     }}>
                       {value.type}
@@ -415,7 +678,7 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
                   </div>
                   <p style={{
                     margin: 0,
-                    fontSize: '0.8125rem',
+                    fontSize: '0.875rem',
                     color: '#6b7280',
                     lineHeight: '1.5'
                   }}>
@@ -430,7 +693,7 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
         {/* Responses */}
         <div>
           <h3 style={{
-            margin: '0 0 0.75rem 0',
+            margin: '0 0 1rem 0',
             fontSize: '0.875rem',
             fontWeight: '600',
             color: '#111827',
@@ -440,15 +703,15 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
             Responses
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {responses.map((resp: any, idx: number) => (
+            {endpoint.responses.map((resp: any, idx: number) => (
               <div key={idx} style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.75rem',
-                padding: '0.625rem 0.75rem',
-                background: '#f9fafb',
+                gap: '1rem',
+                padding: '0.75rem 1rem',
+                background: '#ffffff',
                 border: '1px solid #e5e7eb',
-                borderRadius: '6px'
+                borderRadius: '8px'
               }}>
                 <span style={{
                   fontSize: '0.875rem',
@@ -460,7 +723,7 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
                   {resp.status}
                 </span>
                 <span style={{
-                  fontSize: '0.8125rem',
+                  fontSize: '0.875rem',
                   color: '#4b5563'
                 }}>
                   {resp.description}
@@ -471,19 +734,20 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
         </div>
       </div>
 
-      {/* Right Column - Code Examples (Sticky) */}
+      {/* Right - Code Examples (Sticky) */}
       <div style={{
         position: 'sticky',
-        top: '5rem',
+        top: '2rem',
         height: 'fit-content'
       }}>
+        {/* Request */}
         <div style={{
           background: '#1f2937',
           borderRadius: '8px',
           overflow: 'hidden',
-          border: '1px solid #374151'
+          border: '1px solid #374151',
+          marginBottom: '1rem'
         }}>
-          {/* Header */}
           <div style={{
             padding: '0.75rem 1rem',
             background: '#111827',
@@ -502,7 +766,7 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
               Request
             </span>
             <button
-              onClick={() => copyToClipboard(curl)}
+              onClick={() => copyToClipboard(endpoint.curl)}
               style={{
                 background: copied ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
                 color: copied ? '#10b981' : '#9ca3af',
@@ -511,7 +775,6 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
                 borderRadius: '4px',
                 cursor: 'pointer',
                 display: 'flex',
-                alignItems: 'center',
                 transition: 'all 0.2s'
               }}
               title={copied ? 'Copied!' : 'Copy'}
@@ -528,8 +791,6 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
               )}
             </button>
           </div>
-
-          {/* Code */}
           <pre style={{
             margin: 0,
             padding: '1rem',
@@ -540,17 +801,16 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
             overflow: 'auto',
             maxHeight: '300px'
           }}>
-            {curl}
+            {endpoint.curl}
           </pre>
         </div>
 
-        {/* Response Example */}
+        {/* Response */}
         <div style={{
           background: '#1f2937',
           borderRadius: '8px',
           overflow: 'hidden',
-          border: '1px solid #374151',
-          marginTop: '1rem'
+          border: '1px solid #374151'
         }}>
           <div style={{
             padding: '0.75rem 1rem',
@@ -577,10 +837,12 @@ function EndpointSection({ method, path, description, requiresAuth, parameters, 
             overflow: 'auto',
             maxHeight: '400px'
           }}>
-            {response}
+            {endpoint.response}
           </pre>
         </div>
       </div>
     </div>
   )
 }
+
+
