@@ -482,31 +482,11 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
   }
 
   const toggleExample = () => {
-    const newState = showExample ? null : endpointId
-    setActiveExample(newState)
-    // Smooth scroll to endpoint when opening
-    if (newState) {
-      setTimeout(() => {
-        document.getElementById(endpointId)?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'nearest' 
-        })
-      }, 100)
-    }
+    setActiveExample(showExample ? null : endpointId)
   }
 
   const toggleResponses = () => {
-    const newState = showResponses ? null : endpointId
-    setActiveResponses(newState)
-    // Smooth scroll to endpoint when opening
-    if (newState) {
-      setTimeout(() => {
-        document.getElementById(endpointId)?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'nearest' 
-        })
-      }, 100)
-    }
+    setActiveResponses(showResponses ? null : endpointId)
   }
 
   return (
@@ -653,26 +633,28 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
                   position: 'absolute',
                   top: '0.5rem',
                   right: '0.5rem',
-                  background: copied ? '#d1fae5' : 'rgba(255, 255, 255, 0.1)',
-                  color: copied ? '#065f46' : '#e5e7eb',
-                  border: `1px solid ${copied ? '#a7f3d0' : 'rgba(255, 255, 255, 0.2)'}`,
-                  padding: '0.5rem',
-                  borderRadius: '6px',
+                  background: copied ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                  color: copied ? '#10b981' : '#e5e7eb',
+                  border: 'none',
+                  padding: '0.375rem',
+                  borderRadius: '4px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   transition: 'all 0.2s',
-                  backdropFilter: 'blur(4px)'
+                  backdropFilter: 'blur(4px)',
+                  width: '28px',
+                  height: '28px'
                 }}
                 title={copied ? 'Copied!' : 'Copy to clipboard'}
               >
                 {copied ? (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <polyline points="20 6 9 17 4 12"/>
                   </svg>
                 ) : (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                     <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
                   </svg>
