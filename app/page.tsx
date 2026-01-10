@@ -443,11 +443,20 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
 
   return (
     <div style={{
-      background: '#f9fafb',
+      background: '#ffffff',
       border: '1px solid #e5e7eb',
       borderRadius: '8px',
-      padding: '1rem'
-    }}>
+      padding: '1rem',
+      transition: 'box-shadow 0.2s',
+      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)'
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)'
+    }}
+    >
       <div style={{
         display: 'flex',
         alignItems: 'center',
