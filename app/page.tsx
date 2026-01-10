@@ -482,28 +482,51 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
   }
 
   const toggleExample = () => {
-    setActiveExample(showExample ? null : endpointId)
+    const newState = showExample ? null : endpointId
+    setActiveExample(newState)
+    // Smooth scroll to endpoint when opening
+    if (newState) {
+      setTimeout(() => {
+        document.getElementById(endpointId)?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'nearest' 
+        })
+      }, 100)
+    }
   }
 
   const toggleResponses = () => {
-    setActiveResponses(showResponses ? null : endpointId)
+    const newState = showResponses ? null : endpointId
+    setActiveResponses(newState)
+    // Smooth scroll to endpoint when opening
+    if (newState) {
+      setTimeout(() => {
+        document.getElementById(endpointId)?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'nearest' 
+        })
+      }, 100)
+    }
   }
 
   return (
-    <div style={{
-      background: '#ffffff',
-      border: '1px solid #e5e7eb',
-      borderRadius: '8px',
-      padding: '1rem',
-      transition: 'box-shadow 0.2s',
-      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)'
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)'
-    }}
+    <div 
+      id={endpointId}
+      style={{
+        background: '#ffffff',
+        border: '1px solid #e5e7eb',
+        borderRadius: '8px',
+        padding: '1rem',
+        transition: 'box-shadow 0.2s',
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+        scrollMarginTop: '2rem'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)'
+      }}
     >
       <div style={{
         display: 'flex',
@@ -606,61 +629,56 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
         }}>
           <div style={{ marginBottom: '1rem' }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '0.5rem'
-            }}>
-              <strong style={{ fontSize: '0.8125rem', color: '#374151' }}>Request</strong>
+            <strong style={{ fontSize: '0.8125rem', color: '#374151', display: 'block', marginBottom: '0.5rem' }}>
+              Request
+            </strong>
+            <div style={{ position: 'relative' }}>
+              <pre style={{
+                background: '#1f2937',
+                color: '#e5e7eb',
+                padding: '1rem',
+                paddingTop: '2.5rem',
+                borderRadius: '6px',
+                overflow: 'auto',
+                fontSize: '0.75rem',
+                lineHeight: '1.5',
+                fontFamily: 'Monaco, Consolas, monospace',
+                margin: 0
+              }}>
+                {curl}
+              </pre>
               <button
                 onClick={() => copyToClipboard(curl)}
                 style={{
-                  background: copied ? '#d1fae5' : '#ffffff',
-                  color: copied ? '#065f46' : '#6b7280',
-                  border: `1px solid ${copied ? '#a7f3d0' : '#d1d5db'}`,
-                  padding: '0.375rem 0.75rem',
+                  position: 'absolute',
+                  top: '0.5rem',
+                  right: '0.5rem',
+                  background: copied ? '#d1fae5' : 'rgba(255, 255, 255, 0.1)',
+                  color: copied ? '#065f46' : '#e5e7eb',
+                  border: `1px solid ${copied ? '#a7f3d0' : 'rgba(255, 255, 255, 0.2)'}`,
+                  padding: '0.5rem',
                   borderRadius: '6px',
                   cursor: 'pointer',
-                  fontSize: '0.75rem',
-                  fontWeight: '500',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.375rem',
-                  transition: 'all 0.2s'
+                  justifyContent: 'center',
+                  transition: 'all 0.2s',
+                  backdropFilter: 'blur(4px)'
                 }}
+                title={copied ? 'Copied!' : 'Copy to clipboard'}
               >
                 {copied ? (
-                  <>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    Copied!
-                  </>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
                 ) : (
-                  <>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                    </svg>
-                    Copy
-                  </>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                  </svg>
                 )}
               </button>
             </div>
-            <pre style={{
-              background: '#1f2937',
-              color: '#e5e7eb',
-              padding: '1rem',
-              borderRadius: '6px',
-              overflow: 'auto',
-              fontSize: '0.75rem',
-              lineHeight: '1.5',
-              fontFamily: 'Monaco, Consolas, monospace',
-              margin: 0
-            }}>
-              {curl}
-            </pre>
           </div>
 
           <div>
