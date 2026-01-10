@@ -533,9 +533,9 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
           <button
             onClick={() => setShowResponses(!showResponses)}
             style={{
-              background: showResponses ? '#fef3c7' : '#ffffff',
-              color: '#92400e',
-              border: '1px solid #fde68a',
+              background: showResponses ? '#f3f4f6' : '#ffffff',
+              color: '#374151',
+              border: '1px solid #d1d5db',
               padding: '0.5rem 1rem',
               borderRadius: '6px',
               cursor: 'pointer',
@@ -620,8 +620,8 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
         <div style={{ 
           marginTop: '1rem',
           padding: '1rem',
-          background: '#fffbeb',
-          border: '2px solid #fde68a',
+          background: '#f9fafb',
+          border: '2px solid #d1d5db',
           borderRadius: '8px',
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
         }}>
