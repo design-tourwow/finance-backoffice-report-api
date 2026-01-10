@@ -480,9 +480,16 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
             color: '#6b7280',
             background: '#f3f4f6',
             padding: '0.25rem 0.5rem',
-            borderRadius: '4px'
+            borderRadius: '4px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.25rem'
           }}>
-            🔒 Auth Required
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+            Auth Required
           </span>
         )}
       </div>
@@ -533,7 +540,14 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
       </div>
 
       {showExample && (
-        <div style={{ marginTop: '1rem' }}>
+        <div style={{ 
+          marginTop: '1rem',
+          padding: '1rem',
+          background: '#ffffff',
+          border: '2px solid #e0e7ff',
+          borderRadius: '8px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
+        }}>
           <div style={{ marginBottom: '1rem' }}>
             <div style={{
               display: 'flex',
@@ -594,7 +608,14 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
       )}
 
       {showResponses && responseExamples && (
-        <div style={{ marginTop: '1rem' }}>
+        <div style={{ 
+          marginTop: '1rem',
+          padding: '1rem',
+          background: '#fffbeb',
+          border: '2px solid #fde68a',
+          borderRadius: '8px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
+        }}>
           <strong style={{ fontSize: '0.8125rem', color: '#374151', display: 'block', marginBottom: '0.75rem' }}>
             Response Examples
           </strong>
@@ -603,7 +624,8 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
               <div key={idx} style={{
                 border: '1px solid #e5e7eb',
                 borderRadius: '6px',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                background: '#ffffff'
               }}>
                 <div style={{
                   padding: '0.5rem 0.75rem',
