@@ -2,6 +2,423 @@
 
 import { useState, useEffect } from 'react'
 
+// Helper Components
+function EndpointListItem({ endpoint, isSelected, onClick }: any) {
+  const methodColors: any = {
+    GET: { bg: '#dbeafe', text: '#1e40af' },
+    POST: { bg: '#d1fae5', text: '#065f46' },
+    PUT: { bg: '#fef3c7', text: '#92400e' },
+    DELETE: { bg: '#fee2e2', text: '#991b1b' }
+  }
+
+  const color = methodColors[endpoint.method] || methodColors.GET
+
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+        padding: '0.75rem 0.5rem',
+        background: isSelected ? '#f3f4f6' : 'transparent',
+        border: 'none',
+        borderLeft: isSelected ? '3px solid #4f46e5' : '3px solid transparent',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        textAlign: 'left',
+        transition: 'all 0.15s',
+        width: '100%'
+      }}
+      onMouseEnter={(e) => {
+        if (!isSelected) e.currentTarget.style.background = '#f9fafb'
+      }}
+      onMouseLeave={(e) => {
+        if (!isSelected) e.currentTarget.style.background = 'transparent'
+      }}
+    >
+      <span style={{
+        background: color.bg,
+        color: color.text,
+        padding: '0.25rem 0.5rem',
+        borderRadius: '4px',
+        fontWeight: '700',
+        fontSize: '0.75rem',
+        letterSpacing: '0.3px',
+        minWidth: '3.5rem',
+        textAlign: 'center'
+      }}>
+        {endpoint.method}
+      </span>
+      <code style={{
+        fontSize: '0.8125rem',
+        fontWeight: isSelected ? '600' : '500',
+        color: isSelected ? '#111827' : '#4b5563',
+        fontFamily: 'Monaco, Consolas, monospace',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap'
+      }}>
+        {endpoint.path}
+      </code>
+    </button>
+  )
+}
+
+function EndpointDetail({ endpoint }: any) {
+  const [copied, setCopied] = useState(false)
+
+  const methodColors: any = {
+    GET: { bg: '#dbeafe', text: '#1e40af' },
+    POST: { bg: '#d1fae5', text: '#065f46' },
+    PUT: { bg: '#fef3c7', text: '#92400e' },
+    DELETE: { bg: '#fee2e2', text: '#991b1b' }
+  }
+
+  const color = methodColors[endpoint.method] || methodColors.GET
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: '2rem',
+      padding: '2rem',
+      minHeight: '100%'
+    }}>
+      {/* Left - Documentation */}
+      <div>
+        <div style={{ marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+            <span style={{
+              background: color.bg,
+              color: color.text,
+              padding: '0.375rem 0.875rem',
+              borderRadius: '6px',
+              fontWeight: '700',
+              fontSize: '0.875rem',
+              letterSpacing: '0.5px'
+            }}>
+              {endpoint.method}
+            </span>
+            <code style={{
+              fontSize: '1.25rem',
+              fontWeight: '600',
+              color: '#111827',
+              fontFamily: 'Monaco, Consolas, monospace'
+            }}>
+              {endpoint.path}
+            </code>
+          </div>
+          {endpoint.requiresAuth && (
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.375rem',
+              fontSize: '0.8125rem',
+              color: '#6b7280',
+              background: '#ffffff',
+              padding: '0.375rem 0.75rem',
+              borderRadius: '6px',
+              border: '1px solid #e5e7eb'
+            }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
+              Requires API Key
+            </div>
+          )}
+        </div>
+
+        <p style={{
+          margin: '0 0 2rem 0',
+          fontSize: '1rem',
+          color: '#4b5563',
+          lineHeight: '1.6'
+        }}>
+          {endpoint.description}
+        </p>
+
+        {/* Parameters */}
+        {endpoint.parameters && endpoint.parameters.length > 0 && (
+          <div style={{ marginBottom: '2rem' }}>
+            <h3 style={{
+              margin: '0 0 1rem 0',
+              fontSize: '0.875rem',
+              fontWeight: '600',
+              color: '#111827',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              Query Parameters
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {endpoint.parameters.map((param: any, idx: number) => (
+                <div key={idx} style={{
+                  padding: '1rem',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
+                    <code style={{
+                      fontSize: '0.875rem',
+                      fontWeight: '600',
+                      color: '#111827',
+                      fontFamily: 'Monaco, Consolas, monospace'
+                    }}>
+                      {param.name}
+                    </code>
+                    <span style={{
+                      fontSize: '0.75rem',
+                      color: '#6b7280',
+                      background: '#f9fafb',
+                      padding: '0.125rem 0.5rem',
+                      borderRadius: '4px',
+                      border: '1px solid #e5e7eb'
+                    }}>
+                      {param.type}
+                    </span>
+                  </div>
+                  <p style={{
+                    margin: 0,
+                    fontSize: '0.875rem',
+                    color: '#6b7280',
+                    lineHeight: '1.5'
+                  }}>
+                    {param.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Request Body */}
+        {endpoint.requestBody && (
+          <div style={{ marginBottom: '2rem' }}>
+            <h3 style={{
+              margin: '0 0 1rem 0',
+              fontSize: '0.875rem',
+              fontWeight: '600',
+              color: '#111827',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              Request Body
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {Object.entries(endpoint.requestBody).map(([key, value]: any, idx: number) => (
+                <div key={idx} style={{
+                  padding: '1rem',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
+                    <code style={{
+                      fontSize: '0.875rem',
+                      fontWeight: '600',
+                      color: '#111827',
+                      fontFamily: 'Monaco, Consolas, monospace'
+                    }}>
+                      {key}
+                    </code>
+                    <span style={{
+                      fontSize: '0.75rem',
+                      color: '#6b7280',
+                      background: '#f9fafb',
+                      padding: '0.125rem 0.5rem',
+                      borderRadius: '4px',
+                      border: '1px solid #e5e7eb'
+                    }}>
+                      {value.type}
+                    </span>
+                    {value.required && (
+                      <span style={{
+                        fontSize: '0.75rem',
+                        color: '#dc2626',
+                        fontWeight: '600'
+                      }}>
+                        required
+                      </span>
+                    )}
+                  </div>
+                  <p style={{
+                    margin: 0,
+                    fontSize: '0.875rem',
+                    color: '#6b7280',
+                    lineHeight: '1.5'
+                  }}>
+                    {value.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Responses */}
+        <div>
+          <h3 style={{
+            margin: '0 0 1rem 0',
+            fontSize: '0.875rem',
+            fontWeight: '600',
+            color: '#111827',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>
+            Responses
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {endpoint.responses.map((resp: any, idx: number) => (
+              <div key={idx} style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                padding: '0.75rem 1rem',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px'
+              }}>
+                <span style={{
+                  fontSize: '0.875rem',
+                  fontWeight: '700',
+                  color: resp.status < 300 ? '#059669' : resp.status < 400 ? '#d97706' : '#dc2626',
+                  fontFamily: 'Monaco, Consolas, monospace',
+                  minWidth: '3rem'
+                }}>
+                  {resp.status}
+                </span>
+                <span style={{
+                  fontSize: '0.875rem',
+                  color: '#4b5563'
+                }}>
+                  {resp.description}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right - Code Examples (Sticky) */}
+      <div style={{
+        position: 'sticky',
+        top: '2rem',
+        height: 'fit-content'
+      }}>
+        {/* Request */}
+        <div style={{
+          background: '#1f2937',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          border: '1px solid #374151',
+          marginBottom: '1rem'
+        }}>
+          <div style={{
+            padding: '0.75rem 1rem',
+            background: '#111827',
+            borderBottom: '1px solid #374151',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <span style={{
+              fontSize: '0.8125rem',
+              fontWeight: '600',
+              color: '#9ca3af',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              Request
+            </span>
+            <button
+              onClick={() => copyToClipboard(endpoint.curl)}
+              style={{
+                background: copied ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
+                color: copied ? '#10b981' : '#9ca3af',
+                border: 'none',
+                padding: '0.375rem',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                transition: 'all 0.2s'
+              }}
+              title={copied ? 'Copied!' : 'Copy'}
+            >
+              {copied ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                </svg>
+              )}
+            </button>
+          </div>
+          <pre style={{
+            margin: 0,
+            padding: '1rem',
+            color: '#e5e7eb',
+            fontSize: '0.8125rem',
+            lineHeight: '1.6',
+            fontFamily: 'Monaco, Consolas, monospace',
+            overflow: 'auto',
+            maxHeight: '300px'
+          }}>
+            {endpoint.curl}
+          </pre>
+        </div>
+
+        {/* Response */}
+        <div style={{
+          background: '#1f2937',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          border: '1px solid #374151'
+        }}>
+          <div style={{
+            padding: '0.75rem 1rem',
+            background: '#111827',
+            borderBottom: '1px solid #374151'
+          }}>
+            <span style={{
+              fontSize: '0.8125rem',
+              fontWeight: '600',
+              color: '#9ca3af',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              Response
+            </span>
+          </div>
+          <pre style={{
+            margin: 0,
+            padding: '1rem',
+            color: '#e5e7eb',
+            fontSize: '0.8125rem',
+            lineHeight: '1.6',
+            fontFamily: 'Monaco, Consolas, monospace',
+            overflow: 'auto',
+            maxHeight: '400px'
+          }}>
+            {endpoint.response}
+          </pre>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Home() {
   const [healthStatus, setHealthStatus] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -426,422 +843,6 @@ export default function Home() {
       </div>
       </div>
     </main>
-  )
-}
-
-function EndpointListItem({ endpoint, isSelected, onClick }: any) {
-  const methodColors: any = {
-    GET: { bg: '#dbeafe', text: '#1e40af' },
-    POST: { bg: '#d1fae5', text: '#065f46' },
-    PUT: { bg: '#fef3c7', text: '#92400e' },
-    DELETE: { bg: '#fee2e2', text: '#991b1b' }
-  }
-
-  const color = methodColors[endpoint.method] || methodColors.GET
-
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.75rem',
-        padding: '0.75rem 0.5rem',
-        background: isSelected ? '#f3f4f6' : 'transparent',
-        border: 'none',
-        borderLeft: isSelected ? '3px solid #4f46e5' : '3px solid transparent',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        textAlign: 'left',
-        transition: 'all 0.15s',
-        width: '100%'
-      }}
-      onMouseEnter={(e) => {
-        if (!isSelected) e.currentTarget.style.background = '#f9fafb'
-      }}
-      onMouseLeave={(e) => {
-        if (!isSelected) e.currentTarget.style.background = 'transparent'
-      }}
-    >
-      <span style={{
-        background: color.bg,
-        color: color.text,
-        padding: '0.25rem 0.5rem',
-        borderRadius: '4px',
-        fontWeight: '700',
-        fontSize: '0.75rem',
-        letterSpacing: '0.3px',
-        minWidth: '3.5rem',
-        textAlign: 'center'
-      }}>
-        {endpoint.method}
-      </span>
-      <code style={{
-        fontSize: '0.8125rem',
-        fontWeight: isSelected ? '600' : '500',
-        color: isSelected ? '#111827' : '#4b5563',
-        fontFamily: 'Monaco, Consolas, monospace',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap'
-      }}>
-        {endpoint.path}
-      </code>
-    </button>
-  )
-}
-
-function EndpointDetail({ endpoint }: any) {
-  const [copied, setCopied] = useState(false)
-
-  const methodColors: any = {
-    GET: { bg: '#dbeafe', text: '#1e40af' },
-    POST: { bg: '#d1fae5', text: '#065f46' },
-    PUT: { bg: '#fef3c7', text: '#92400e' },
-    DELETE: { bg: '#fee2e2', text: '#991b1b' }
-  }
-
-  const color = methodColors[endpoint.method] || methodColors.GET
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: '2rem',
-      padding: '2rem',
-      minHeight: '100%'
-    }}>
-      {/* Left - Documentation */}
-      <div>
-        <div style={{ marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-            <span style={{
-              background: color.bg,
-              color: color.text,
-              padding: '0.375rem 0.875rem',
-              borderRadius: '6px',
-              fontWeight: '700',
-              fontSize: '0.875rem',
-              letterSpacing: '0.5px'
-            }}>
-              {endpoint.method}
-            </span>
-            <code style={{
-              fontSize: '1.25rem',
-              fontWeight: '600',
-              color: '#111827',
-              fontFamily: 'Monaco, Consolas, monospace'
-            }}>
-              {endpoint.path}
-            </code>
-          </div>
-          {endpoint.requiresAuth && (
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.375rem',
-              fontSize: '0.8125rem',
-              color: '#6b7280',
-              background: '#ffffff',
-              padding: '0.375rem 0.75rem',
-              borderRadius: '6px',
-              border: '1px solid #e5e7eb'
-            }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                <path d="M7 11V7a5 5 0 0110 0v4"/>
-              </svg>
-              Requires API Key
-            </div>
-          )}
-        </div>
-
-        <p style={{
-          margin: '0 0 2rem 0',
-          fontSize: '1rem',
-          color: '#4b5563',
-          lineHeight: '1.6'
-        }}>
-          {endpoint.description}
-        </p>
-
-        {/* Parameters */}
-        {endpoint.parameters && endpoint.parameters.length > 0 && (
-          <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{
-              margin: '0 0 1rem 0',
-              fontSize: '0.875rem',
-              fontWeight: '600',
-              color: '#111827',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
-              Query Parameters
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {endpoint.parameters.map((param: any, idx: number) => (
-                <div key={idx} style={{
-                  padding: '1rem',
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
-                    <code style={{
-                      fontSize: '0.875rem',
-                      fontWeight: '600',
-                      color: '#111827',
-                      fontFamily: 'Monaco, Consolas, monospace'
-                    }}>
-                      {param.name}
-                    </code>
-                    <span style={{
-                      fontSize: '0.75rem',
-                      color: '#6b7280',
-                      background: '#f9fafb',
-                      padding: '0.125rem 0.5rem',
-                      borderRadius: '4px',
-                      border: '1px solid #e5e7eb'
-                    }}>
-                      {param.type}
-                    </span>
-                  </div>
-                  <p style={{
-                    margin: 0,
-                    fontSize: '0.875rem',
-                    color: '#6b7280',
-                    lineHeight: '1.5'
-                  }}>
-                    {param.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Request Body */}
-        {endpoint.requestBody && (
-          <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{
-              margin: '0 0 1rem 0',
-              fontSize: '0.875rem',
-              fontWeight: '600',
-              color: '#111827',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
-              Request Body
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {Object.entries(endpoint.requestBody).map(([key, value]: any, idx: number) => (
-                <div key={idx} style={{
-                  padding: '1rem',
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
-                    <code style={{
-                      fontSize: '0.875rem',
-                      fontWeight: '600',
-                      color: '#111827',
-                      fontFamily: 'Monaco, Consolas, monospace'
-                    }}>
-                      {key}
-                    </code>
-                    <span style={{
-                      fontSize: '0.75rem',
-                      color: '#6b7280',
-                      background: '#f9fafb',
-                      padding: '0.125rem 0.5rem',
-                      borderRadius: '4px',
-                      border: '1px solid #e5e7eb'
-                    }}>
-                      {value.type}
-                    </span>
-                    {value.required && (
-                      <span style={{
-                        fontSize: '0.75rem',
-                        color: '#dc2626',
-                        fontWeight: '600'
-                      }}>
-                        required
-                      </span>
-                    )}
-                  </div>
-                  <p style={{
-                    margin: 0,
-                    fontSize: '0.875rem',
-                    color: '#6b7280',
-                    lineHeight: '1.5'
-                  }}>
-                    {value.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Responses */}
-        <div>
-          <h3 style={{
-            margin: '0 0 1rem 0',
-            fontSize: '0.875rem',
-            fontWeight: '600',
-            color: '#111827',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
-          }}>
-            Responses
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {endpoint.responses.map((resp: any, idx: number) => (
-              <div key={idx} style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-                padding: '0.75rem 1rem',
-                background: '#ffffff',
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px'
-              }}>
-                <span style={{
-                  fontSize: '0.875rem',
-                  fontWeight: '700',
-                  color: resp.status < 300 ? '#059669' : resp.status < 400 ? '#d97706' : '#dc2626',
-                  fontFamily: 'Monaco, Consolas, monospace',
-                  minWidth: '3rem'
-                }}>
-                  {resp.status}
-                </span>
-                <span style={{
-                  fontSize: '0.875rem',
-                  color: '#4b5563'
-                }}>
-                  {resp.description}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Right - Code Examples (Sticky) */}
-      <div style={{
-        position: 'sticky',
-        top: '2rem',
-        height: 'fit-content'
-      }}>
-        {/* Request */}
-        <div style={{
-          background: '#1f2937',
-          borderRadius: '8px',
-          overflow: 'hidden',
-          border: '1px solid #374151',
-          marginBottom: '1rem'
-        }}>
-          <div style={{
-            padding: '0.75rem 1rem',
-            background: '#111827',
-            borderBottom: '1px solid #374151',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}>
-            <span style={{
-              fontSize: '0.8125rem',
-              fontWeight: '600',
-              color: '#9ca3af',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
-              Request
-            </span>
-            <button
-              onClick={() => copyToClipboard(endpoint.curl)}
-              style={{
-                background: copied ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
-                color: copied ? '#10b981' : '#9ca3af',
-                border: 'none',
-                padding: '0.375rem',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                display: 'flex',
-                transition: 'all 0.2s'
-              }}
-              title={copied ? 'Copied!' : 'Copy'}
-            >
-              {copied ? (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-              ) : (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                </svg>
-              )}
-            </button>
-          </div>
-          <pre style={{
-            margin: 0,
-            padding: '1rem',
-            color: '#e5e7eb',
-            fontSize: '0.8125rem',
-            lineHeight: '1.6',
-            fontFamily: 'Monaco, Consolas, monospace',
-            overflow: 'auto',
-            maxHeight: '300px'
-          }}>
-            {endpoint.curl}
-          </pre>
-        </div>
-
-        {/* Response */}
-        <div style={{
-          background: '#1f2937',
-          borderRadius: '8px',
-          overflow: 'hidden',
-          border: '1px solid #374151'
-        }}>
-          <div style={{
-            padding: '0.75rem 1rem',
-            background: '#111827',
-            borderBottom: '1px solid #374151'
-          }}>
-            <span style={{
-              fontSize: '0.8125rem',
-              fontWeight: '600',
-              color: '#9ca3af',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
-              Response
-            </span>
-          </div>
-          <pre style={{
-            margin: 0,
-            padding: '1rem',
-            color: '#e5e7eb',
-            fontSize: '0.8125rem',
-            lineHeight: '1.6',
-            fontFamily: 'Monaco, Consolas, monospace',
-            overflow: 'auto',
-            maxHeight: '400px'
-          }}>
-            {endpoint.response}
-          </pre>
-        </div>
-      </div>
-    </div>
   )
 }
 
