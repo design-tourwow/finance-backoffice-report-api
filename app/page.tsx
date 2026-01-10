@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react'
 export default function Home() {
   const [healthStatus, setHealthStatus] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [activeExample, setActiveExample] = useState<string | null>(null)
+  const [activeResponses, setActiveResponses] = useState<string | null>(null)
 
   // Detect current environment and set API URL
   const apiUrl = typeof window !== 'undefined' 
@@ -152,6 +154,10 @@ export default function Home() {
   "timestamp": "2026-01-10T...",
   "service": "finance-backoffice-report-api"
 }`}
+            activeExample={activeExample}
+            setActiveExample={setActiveExample}
+            activeResponses={activeResponses}
+            setActiveResponses={setActiveResponses}
           />
 
           <EndpointCard
@@ -171,6 +177,10 @@ export default function Home() {
               { status: 401, label: 'Unauthorized', example: '{ "success": false, "error": "Invalid API key" }' },
               { status: 500, label: 'Server Error', example: '{ "success": false, "error": "Database error" }' }
             ]}
+            activeExample={activeExample}
+            setActiveExample={setActiveExample}
+            activeResponses={activeResponses}
+            setActiveResponses={setActiveResponses}
           />
 
           <EndpointCard
@@ -196,6 +206,10 @@ export default function Home() {
               { status: 400, label: 'Bad Request', example: '{ "success": false, "error": "Missing required fields" }' },
               { status: 401, label: 'Unauthorized', example: '{ "success": false, "error": "Invalid API key" }' }
             ]}
+            activeExample={activeExample}
+            setActiveExample={setActiveExample}
+            activeResponses={activeResponses}
+            setActiveResponses={setActiveResponses}
           />
         </Section>
 
@@ -231,6 +245,10 @@ export default function Home() {
               { status: 401, label: 'Unauthorized', example: '{ "success": false, "error": "Invalid API key" }' },
               { status: 503, label: 'Service Unavailable', example: '{ "success": false, "error": "Supabase not configured" }' }
             ]}
+            activeExample={activeExample}
+            setActiveExample={setActiveExample}
+            activeResponses={activeResponses}
+            setActiveResponses={setActiveResponses}
           />
 
           <EndpointCard
@@ -266,6 +284,10 @@ export default function Home() {
               { status: 400, label: 'Bad Request', example: '{ "success": false, "error": "user_id required" }' },
               { status: 500, label: 'Server Error', example: '{ "success": false, "error": "Duplicate key" }' }
             ]}
+            activeExample={activeExample}
+            setActiveExample={setActiveExample}
+            activeResponses={activeResponses}
+            setActiveResponses={setActiveResponses}
           />
 
           <EndpointCard
@@ -293,6 +315,10 @@ export default function Home() {
               { status: 200, label: 'OK', example: '{ "success": true, "data": {...} }' },
               { status: 400, label: 'Bad Request', example: '{ "success": false, "error": "user_id required" }' }
             ]}
+            activeExample={activeExample}
+            setActiveExample={setActiveExample}
+            activeResponses={activeResponses}
+            setActiveResponses={setActiveResponses}
           />
 
           <EndpointCard
@@ -313,6 +339,10 @@ export default function Home() {
               { status: 200, label: 'OK', example: '{ "success": true, "chat_history": [...] }' },
               { status: 400, label: 'Bad Request', example: '{ "success": false, "error": "user_id required" }' }
             ]}
+            activeExample={activeExample}
+            setActiveExample={setActiveExample}
+            activeResponses={activeResponses}
+            setActiveResponses={setActiveResponses}
           />
 
           <EndpointCard
@@ -341,6 +371,10 @@ export default function Home() {
               { status: 201, label: 'Created', example: '{ "success": true, "data": {...} }' },
               { status: 400, label: 'Bad Request', example: '{ "success": false, "error": "user_id and message required" }' }
             ]}
+            activeExample={activeExample}
+            setActiveExample={setActiveExample}
+            activeResponses={activeResponses}
+            setActiveResponses={setActiveResponses}
           />
 
           <EndpointCard
@@ -358,6 +392,10 @@ export default function Home() {
               { status: 200, label: 'OK', example: '{ "success": true, "message": "Chat history cleared" }' },
               { status: 400, label: 'Bad Request', example: '{ "success": false, "error": "user_id required" }' }
             ]}
+            activeExample={activeExample}
+            setActiveExample={setActiveExample}
+            activeResponses={activeResponses}
+            setActiveResponses={setActiveResponses}
           />
         </Section>
       </div>
@@ -421,10 +459,12 @@ function Section({ title, icon, children }: any) {
   )
 }
 
-function EndpointCard({ method, path, description, curl, response, requiresAuth, responseExamples }: any) {
-  const [showExample, setShowExample] = useState(false)
-  const [showResponses, setShowResponses] = useState(false)
+function EndpointCard({ method, path, description, curl, response, requiresAuth, responseExamples, activeExample, setActiveExample, activeResponses, setActiveResponses }: any) {
   const [copied, setCopied] = useState(false)
+  
+  const endpointId = `${method}-${path}`
+  const showExample = activeExample === endpointId
+  const showResponses = activeResponses === endpointId
 
   const methodStyles: any = {
     GET: { bg: '#dbeafe', text: '#1e40af', border: '#bfdbfe' },
@@ -439,6 +479,14 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
     navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const toggleExample = () => {
+    setActiveExample(showExample ? null : endpointId)
+  }
+
+  const toggleResponses = () => {
+    setActiveResponses(showResponses ? null : endpointId)
   }
 
   return (
@@ -514,7 +562,7 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
 
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
         <button
-          onClick={() => setShowExample(!showExample)}
+          onClick={toggleExample}
           style={{
             background: showExample ? '#e0e7ff' : '#ffffff',
             color: '#4f46e5',
@@ -531,7 +579,7 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
 
         {responseExamples && (
           <button
-            onClick={() => setShowResponses(!showResponses)}
+            onClick={toggleResponses}
             style={{
               background: showResponses ? '#f3f4f6' : '#ffffff',
               color: '#374151',
@@ -568,16 +616,36 @@ function EndpointCard({ method, path, description, curl, response, requiresAuth,
               <button
                 onClick={() => copyToClipboard(curl)}
                 style={{
-                  background: copied ? '#d1fae5' : '#f1f5f9',
-                  color: copied ? '#065f46' : '#475569',
-                  border: `1px solid ${copied ? '#a7f3d0' : '#cbd5e1'}`,
-                  padding: '0.25rem 0.5rem',
-                  borderRadius: '4px',
+                  background: copied ? '#d1fae5' : '#ffffff',
+                  color: copied ? '#065f46' : '#6b7280',
+                  border: `1px solid ${copied ? '#a7f3d0' : '#d1d5db'}`,
+                  padding: '0.375rem 0.75rem',
+                  borderRadius: '6px',
                   cursor: 'pointer',
-                  fontSize: '0.75rem'
+                  fontSize: '0.75rem',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.375rem',
+                  transition: 'all 0.2s'
                 }}
               >
-                {copied ? '✓ Copied' : 'Copy'}
+                {copied ? (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                    </svg>
+                    Copy
+                  </>
+                )}
               </button>
             </div>
             <pre style={{
