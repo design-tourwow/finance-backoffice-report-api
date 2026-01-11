@@ -308,19 +308,17 @@ function EndpointDetail({ endpoint }: any) {
         </div>
       </div>
 
-      {/* Right - Code Examples (Sticky) */}
-      <div style={{
-        position: 'sticky',
-        top: '2rem',
-        height: 'fit-content'
-      }}>
+      {/* Right - Code Examples */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {/* Request */}
         <div style={{
           background: '#1f2937',
           borderRadius: '8px',
           overflow: 'hidden',
           border: '1px solid #374151',
-          marginBottom: '1rem'
+          display: 'flex',
+          flexDirection: 'column',
+          maxHeight: '400px'
         }}>
           <div style={{
             padding: '0.75rem 1rem',
@@ -328,7 +326,8 @@ function EndpointDetail({ endpoint }: any) {
             borderBottom: '1px solid #374151',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            flexShrink: 0
           }}>
             <span style={{
               fontSize: '0.8125rem',
@@ -373,7 +372,7 @@ function EndpointDetail({ endpoint }: any) {
             lineHeight: '1.6',
             fontFamily: 'Monaco, Consolas, monospace',
             overflow: 'auto',
-            maxHeight: '300px'
+            flex: 1
           }}>
             {endpoint.curl}
           </pre>
@@ -384,12 +383,16 @@ function EndpointDetail({ endpoint }: any) {
           background: '#1f2937',
           borderRadius: '8px',
           overflow: 'hidden',
-          border: '1px solid #374151'
+          border: '1px solid #374151',
+          display: 'flex',
+          flexDirection: 'column',
+          maxHeight: '500px'
         }}>
           <div style={{
             padding: '0.75rem 1rem',
             background: '#111827',
-            borderBottom: '1px solid #374151'
+            borderBottom: '1px solid #374151',
+            flexShrink: 0
           }}>
             <span style={{
               fontSize: '0.8125rem',
@@ -398,7 +401,7 @@ function EndpointDetail({ endpoint }: any) {
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
-              Response
+              Response Example
             </span>
           </div>
           <pre style={{
@@ -409,7 +412,7 @@ function EndpointDetail({ endpoint }: any) {
             lineHeight: '1.6',
             fontFamily: 'Monaco, Consolas, monospace',
             overflow: 'auto',
-            maxHeight: '400px'
+            flex: 1
           }}>
             {endpoint.response}
           </pre>
