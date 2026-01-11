@@ -450,6 +450,78 @@ function EndpointDetail({ endpoint }: any) {
 
       {/* Right - Code Examples */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {/* Test API Key - Sticky at top */}
+        <div style={{
+          background: '#1f2937',
+          border: '1px solid #374151',
+          borderRadius: '8px',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            padding: '0.75rem 1rem',
+            background: '#111827',
+            borderBottom: '1px solid #374151',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
+                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+              </svg>
+              <span style={{
+                fontSize: '0.8125rem',
+                fontWeight: '600',
+                color: '#9ca3af',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                Test API Key
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText('sk_test_9a7b5c3d1e2f4a6b8c0d2e4f6a8b0c2d')
+                const btn = document.activeElement as HTMLButtonElement
+                btn.style.color = '#10b981'
+                setTimeout(() => btn.style.color = '#9ca3af', 2000)
+              }}
+              style={{
+                background: 'transparent',
+                color: '#9ca3af',
+                border: 'none',
+                padding: '0.375rem',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                transition: 'all 0.2s'
+              }}
+              title="Copy API Key"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+              </svg>
+            </button>
+          </div>
+          <div style={{
+            padding: '0.75rem 1rem',
+            background: '#1f2937'
+          }}>
+            <code style={{
+              fontFamily: 'Monaco, Consolas, monospace',
+              fontSize: '0.8125rem',
+              color: '#e5e7eb',
+              display: 'block',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}>
+              sk_test_9a7b5c3d1e2f4a6b8c0d2e4f6a8b0c2d
+            </code>
+          </div>
+        </div>
+        
         {/* Request */}
         <div style={{
           background: '#1f2937',
