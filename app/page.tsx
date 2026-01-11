@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 
 // Helper Components
-function EndpointListItem({ endpoint, isSelected, onClick }: any) {
+function EndpointListItem({ endpoint, isSelected, onClick, searchQuery }: any) {
   const methodColors: any = {
     GET: { bg: '#dbeafe', text: '#1e40af' },
     POST: { bg: '#d1fae5', text: '#065f46' },
@@ -12,6 +12,17 @@ function EndpointListItem({ endpoint, isSelected, onClick }: any) {
   }
 
   const color = methodColors[endpoint.method] || methodColors.GET
+
+  // Highlight search term
+  const highlightText = (text: string, query: string) => {
+    if (!query) return text
+    const parts = text.split(new RegExp(`(${query})`, 'gi'))
+    return parts.map((part, i) => 
+      part.toLowerCase() === query.toLowerCase() 
+        ? <mark key={i} style={{ background: '#fef08a', color: '#854d0e', padding: 0, borderRadius: '2px' }}>{part}</mark>
+        : part
+    )
+  }
 
   return (
     <button
@@ -48,7 +59,7 @@ function EndpointListItem({ endpoint, isSelected, onClick }: any) {
         minWidth: '3.5rem',
         textAlign: 'center'
       }}>
-        {endpoint.method}
+        {highlightText(endpoint.method, searchQuery)}
       </span>
       <code style={{
         fontSize: '0.8125rem',
@@ -59,7 +70,7 @@ function EndpointListItem({ endpoint, isSelected, onClick }: any) {
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap'
       }}>
-        {endpoint.path}
+        {highlightText(endpoint.path, searchQuery)}
       </code>
     </button>
   )
@@ -67,6 +78,7 @@ function EndpointListItem({ endpoint, isSelected, onClick }: any) {
 
 function EndpointDetail({ endpoint }: any) {
   const [copied, setCopied] = useState(false)
+  const [showErrorExamples, setShowErrorExamples] = useState(false)
 
   const methodColors: any = {
     GET: { bg: '#dbeafe', text: '#1e40af' },
@@ -81,6 +93,40 @@ function EndpointDetail({ endpoint }: any) {
     navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  // Generate error examples
+  const errorExamples: any = {
+    400: `{
+  "success": false,
+  "error": "Missing required fields"
+}`,
+    401: `{
+  "success": false,
+  "error": "Unauthorized - Invalid API key"
+}`,
+    404: `{
+  "success": false,
+  "error": "User not found"
+}`,
+    409: `{
+  "success": false,
+  "error": "User with this user_id already exists"
+}`,
+    429: `{
+  "success": false,
+  "error": "Rate limit exceeded. Try again later.",
+  "retryAfter": 45
+}`,
+    500: `{
+  "success": false,
+  "error": "Database query failed",
+  "message": "Connection timeout"
+}`,
+    503: `{
+  "success": false,
+  "error": "Supabase not configured"
+}`
   }
 
   return (
@@ -305,6 +351,92 @@ function EndpointDetail({ endpoint }: any) {
               </div>
             ))}
           </div>
+          
+          {/* Error Examples Toggle */}
+          {endpoint.responses.some((r: any) => r.status >= 400) && (
+            <div style={{ marginTop: '1rem' }}>
+              <button
+                onClick={() => setShowErrorExamples(!showErrorExamples)}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '6px',
+                  padding: '0.5rem 0.75rem',
+                  fontSize: '0.8125rem',
+                  fontWeight: '500',
+                  color: '#6b7280',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  transition: 'all 0.2s',
+                  width: '100%',
+                  justifyContent: 'center'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#f9fafb'
+                  e.currentTarget.style.borderColor = '#d1d5db'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent'
+                  e.currentTarget.style.borderColor = '#e5e7eb'
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{
+                  transform: showErrorExamples ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s'
+                }}>
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+                {showErrorExamples ? 'Hide' : 'Show'} Error Examples
+              </button>
+              
+              {showErrorExamples && (
+                <div style={{
+                  marginTop: '0.75rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.75rem'
+                }}>
+                  {endpoint.responses
+                    .filter((r: any) => r.status >= 400)
+                    .map((resp: any, idx: number) => (
+                      <div key={idx} style={{
+                        background: '#fef2f2',
+                        border: '1px solid #fecaca',
+                        borderRadius: '6px',
+                        overflow: 'hidden'
+                      }}>
+                        <div style={{
+                          padding: '0.5rem 0.75rem',
+                          background: '#fee2e2',
+                          borderBottom: '1px solid #fecaca',
+                          fontSize: '0.8125rem',
+                          fontWeight: '600',
+                          color: '#991b1b'
+                        }}>
+                          {resp.status} - {resp.description}
+                        </div>
+                        <pre style={{
+                          margin: 0,
+                          padding: '0.75rem',
+                          fontSize: '0.8125rem',
+                          lineHeight: '1.5',
+                          fontFamily: 'Monaco, Consolas, monospace',
+                          color: '#7f1d1d',
+                          overflow: 'auto'
+                        }}>
+                          {errorExamples[resp.status] || `{
+  "success": false,
+  "error": "Error message"
+}`}
+                        </pre>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -445,6 +577,7 @@ export default function Home() {
       method: 'GET',
       path: '/api/health',
       description: 'Health check endpoint to monitor API status',
+      category: 'System',
       requiresAuth: false,
       curl: `curl ${apiUrl}/api/health`,
       response: `{
@@ -461,6 +594,7 @@ export default function Home() {
       method: 'GET',
       path: '/api/bookings',
       description: 'Retrieve booking records from MySQL database',
+      category: 'MySQL - Bookings',
       requiresAuth: true,
       parameters: [
         { name: 'limit', type: 'integer', description: 'Max records to return (default: 100)' },
@@ -501,6 +635,7 @@ export default function Home() {
       method: 'POST',
       path: '/api/bookings',
       description: 'Create a new booking record',
+      category: 'MySQL - Bookings',
       requiresAuth: true,
       requestBody: {
         title: { type: 'string', required: true, description: 'Booking title' },
@@ -536,6 +671,7 @@ export default function Home() {
       method: 'GET',
       path: '/api/users',
       description: 'Retrieve user records from Supabase',
+      category: 'Supabase - Users',
       requiresAuth: true,
       parameters: [
         { name: 'user_id', type: 'string', description: 'Filter by user ID' },
@@ -588,6 +724,7 @@ export default function Home() {
       method: 'POST',
       path: '/api/users',
       description: 'Create a new user. Only user_id is required.',
+      category: 'Supabase - Users',
       requiresAuth: true,
       requestBody: {
         user_id: { type: 'string', required: true, description: 'Unique user identifier' },
@@ -643,6 +780,7 @@ export default function Home() {
       method: 'PUT',
       path: '/api/users',
       description: 'Update user. Requires user_id, send only fields to update.',
+      category: 'Supabase - Users',
       requiresAuth: true,
       requestBody: {
         user_id: { type: 'string', required: true, description: 'User ID to update' },
@@ -685,6 +823,7 @@ export default function Home() {
       method: 'GET',
       path: '/api/chat-history',
       description: 'Get chat_history for a user',
+      category: 'Supabase - Chat',
       requiresAuth: true,
       parameters: [
         { name: 'user_id', type: 'string', description: 'User ID (required)' }
@@ -712,6 +851,7 @@ export default function Home() {
       method: 'POST',
       path: '/api/chat-history',
       description: 'Add message to chat_history',
+      category: 'Supabase - Chat',
       requiresAuth: true,
       requestBody: {
         user_id: { type: 'string', required: true, description: 'User ID' },
@@ -755,6 +895,7 @@ export default function Home() {
       method: 'DELETE',
       path: '/api/chat-history',
       description: 'Clear chat_history for a user',
+      category: 'Supabase - Chat',
       requiresAuth: true,
       parameters: [
         { name: 'user_id', type: 'string', description: 'User ID (required)' }
@@ -1023,17 +1164,57 @@ export default function Home() {
               </div>
             )}
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              {filteredEndpoints.length > 0 ? (
-                filteredEndpoints.map((endpoint) => (
-                  <EndpointListItem
-                    key={endpoint.id}
-                    endpoint={endpoint}
-                    isSelected={selectedEndpoint === endpoint.id}
-                    onClick={() => setSelectedEndpoint(endpoint.id)}
-                  />
-                ))
-              ) : (
+            {filteredEndpoints.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                {!searchQuery ? (
+                  // Group by category when not searching
+                  (() => {
+                    const grouped = filteredEndpoints.reduce((acc: any, endpoint) => {
+                      const cat = endpoint.category || 'Other'
+                      if (!acc[cat]) acc[cat] = []
+                      acc[cat].push(endpoint)
+                      return acc
+                    }, {})
+                    
+                    return Object.entries(grouped).map(([category, eps]: any) => (
+                      <div key={category} style={{ marginBottom: '1rem' }}>
+                        <div style={{
+                          fontSize: '0.75rem',
+                          fontWeight: '600',
+                          color: '#9ca3af',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          padding: '0.5rem 0.5rem 0.375rem',
+                          marginTop: category !== 'System' ? '0.5rem' : '0'
+                        }}>
+                          {category}
+                        </div>
+                        {eps.map((endpoint: any) => (
+                          <EndpointListItem
+                            key={endpoint.id}
+                            endpoint={endpoint}
+                            isSelected={selectedEndpoint === endpoint.id}
+                            onClick={() => setSelectedEndpoint(endpoint.id)}
+                            searchQuery={searchQuery}
+                          />
+                        ))}
+                      </div>
+                    ))
+                  })()
+                ) : (
+                  // Show flat list when searching
+                  filteredEndpoints.map((endpoint) => (
+                    <EndpointListItem
+                      key={endpoint.id}
+                      endpoint={endpoint}
+                      isSelected={selectedEndpoint === endpoint.id}
+                      onClick={() => setSelectedEndpoint(endpoint.id)}
+                      searchQuery={searchQuery}
+                    />
+                  ))
+                )}
+              </div>
+            ) : (
                 <div style={{
                   padding: '2rem 1rem',
                   textAlign: 'center',
@@ -1060,8 +1241,7 @@ export default function Home() {
                     Try a different search term
                   </div>
                 </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
 
