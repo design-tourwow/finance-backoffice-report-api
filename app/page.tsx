@@ -431,6 +431,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [selectedEndpoint, setSelectedEndpoint] = useState('GET-/api/health')
   const [apiUrl, setApiUrl] = useState('http://localhost:3000')
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     // Set API URL on client side only to avoid hydration mismatch
@@ -771,6 +772,16 @@ export default function Home() {
     }
   ]
 
+  const filteredEndpoints = endpoints.filter(endpoint => {
+    if (!searchQuery) return true
+    const query = searchQuery.toLowerCase()
+    return (
+      endpoint.method.toLowerCase().includes(query) ||
+      endpoint.path.toLowerCase().includes(query) ||
+      endpoint.description.toLowerCase().includes(query)
+    )
+  })
+
   const selectedEndpointData = endpoints.find(e => e.id === selectedEndpoint) || endpoints[0]
 
   useEffect(() => {
@@ -904,9 +915,11 @@ export default function Home() {
           overflowY: 'auto',
           height: '100%',
           scrollBehavior: 'smooth',
-          WebkitOverflowScrolling: 'touch'
+          WebkitOverflowScrolling: 'touch',
+          display: 'flex',
+          flexDirection: 'column'
         }}>
-          <div style={{ padding: '1.5rem 1rem' }}>
+          <div style={{ padding: '1.5rem 1rem', flexShrink: 0 }}>
             <h2 style={{
               margin: '0 0 1rem 0',
               fontSize: '0.875rem',
@@ -918,15 +931,135 @@ export default function Home() {
             }}>
               Endpoints
             </h2>
+            
+            {/* Search Box */}
+            <div style={{
+              position: 'relative',
+              marginBottom: '1rem'
+            }}>
+              <svg 
+                width="16" 
+                height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="#9ca3af" 
+                strokeWidth="2"
+                style={{
+                  position: 'absolute',
+                  left: '0.75rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none'
+                }}
+              >
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+              </svg>
+              <input
+                type="text"
+                placeholder="Search endpoints..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.625rem 0.75rem 0.625rem 2.5rem',
+                  fontSize: '0.875rem',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '6px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                  color: '#111827',
+                  background: '#ffffff'
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = '#4f46e5'
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(79, 70, 229, 0.1)'
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = '#e5e7eb'
+                  e.currentTarget.style.boxShadow = 'none'
+                }}
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  style={{
+                    position: 'absolute',
+                    right: '0.75rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '0.25rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#9ca3af',
+                    transition: 'color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#111827'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#9ca3af'}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            {/* Results count */}
+            {searchQuery && (
+              <div style={{
+                fontSize: '0.75rem',
+                color: '#6b7280',
+                marginBottom: '0.75rem',
+                padding: '0 0.5rem'
+              }}>
+                {filteredEndpoints.length} {filteredEndpoints.length === 1 ? 'result' : 'results'}
+              </div>
+            )}
+            
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-              {endpoints.map((endpoint) => (
-                <EndpointListItem
-                  key={endpoint.id}
-                  endpoint={endpoint}
-                  isSelected={selectedEndpoint === endpoint.id}
-                  onClick={() => setSelectedEndpoint(endpoint.id)}
-                />
-              ))}
+              {filteredEndpoints.length > 0 ? (
+                filteredEndpoints.map((endpoint) => (
+                  <EndpointListItem
+                    key={endpoint.id}
+                    endpoint={endpoint}
+                    isSelected={selectedEndpoint === endpoint.id}
+                    onClick={() => setSelectedEndpoint(endpoint.id)}
+                  />
+                ))
+              ) : (
+                <div style={{
+                  padding: '2rem 1rem',
+                  textAlign: 'center',
+                  color: '#9ca3af',
+                  fontSize: '0.875rem'
+                }}>
+                  <svg 
+                    width="48" 
+                    height="48" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="1.5"
+                    style={{
+                      margin: '0 auto 0.75rem',
+                      opacity: 0.5
+                    }}
+                  >
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.35-4.35"/>
+                  </svg>
+                  <div>No endpoints found</div>
+                  <div style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                    Try a different search term
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
