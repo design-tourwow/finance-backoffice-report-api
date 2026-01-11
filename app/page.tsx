@@ -423,12 +423,12 @@ export default function Home() {
   const [healthStatus, setHealthStatus] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [selectedEndpoint, setSelectedEndpoint] = useState('GET-/api/health')
+  const [apiUrl, setApiUrl] = useState('http://localhost:3000')
 
-  const apiUrl = typeof window !== 'undefined' 
-    ? window.location.origin 
-    : process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'http://localhost:3002'
+  useEffect(() => {
+    // Set API URL on client side only to avoid hydration mismatch
+    setApiUrl(window.location.origin)
+  }, [])
 
   // Define all endpoints
   const endpoints = [
