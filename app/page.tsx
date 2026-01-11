@@ -520,20 +520,25 @@ export default function Home() {
   -H "x-api-key: YOUR_API_KEY"`,
       response: `{
   "success": true,
-  "data": [{
-    "id": 1,
-    "user_ns": "line",
-    "user_id": "U1234567890abcdef",
-    "first_name": "Somchai",
-    "last_name": "Jaidee",
-    "name": "Somchai Jaidee",
-    "profile_pic": "https://...",
-    "subscribed": "2024-12-06T08:29:36+00:00",
-    "last_interaction": "2024-12-06T08:31:02+00:00",
-    "chat_history": ["You: สวัสดีครับ"],
-    "created_at": "2026-01-01T...",
-    "updated_at": "2026-01-09T..."
-  }],
+  "data": [
+    {
+      "id": 1,
+      "user_ns": "line",
+      "user_id": "U1234567890abcdef",
+      "first_name": "Somchai",
+      "last_name": "Jaidee",
+      "name": "Somchai Jaidee",
+      "profile_pic": "https://profile.line-scdn.net/0h1234abcdef",
+      "subscribed": "2024-12-06T08:29:36+00:00",
+      "last_interaction": "2024-12-06T08:31:02+00:00",
+      "chat_history": [
+        "You: สวัสดีครับ",
+        "Bot: สวัสดีครับ ยินดีให้บริการ"
+      ],
+      "created_at": "2026-01-01T10:00:00+00:00",
+      "updated_at": "2026-01-09T15:30:00+00:00"
+    }
+  ],
   "pagination": {
     "total": 1,
     "limit": 10,
@@ -573,7 +578,11 @@ export default function Home() {
     "user_id": "U9876543210fedcba",
     "first_name": "Somying",
     "last_name": "Raksanuk",
-    "name": "Somying Raksanuk"
+    "name": "Somying Raksanuk",
+    "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
+    "subscribed": "2026-01-09T10:00:00+00:00",
+    "last_interaction": "2026-01-09T10:00:00+00:00",
+    "chat_history": ["You: สวัสดีค่ะ"]
   }'`,
       response: `{
   "success": true,
@@ -584,8 +593,12 @@ export default function Home() {
     "first_name": "Somying",
     "last_name": "Raksanuk",
     "name": "Somying Raksanuk",
-    "created_at": "2026-01-09T...",
-    "updated_at": "2026-01-09T..."
+    "profile_pic": "https://profile.line-scdn.net/0h9876fedcba",
+    "subscribed": "2026-01-09T10:00:00+00:00",
+    "last_interaction": "2026-01-09T10:00:00+00:00",
+    "chat_history": ["You: สวัสดีค่ะ"],
+    "created_at": "2026-01-09T10:00:00+00:00",
+    "updated_at": "2026-01-09T10:00:00+00:00"
   }
 }`,
       responses: [
@@ -611,15 +624,24 @@ export default function Home() {
   -H "x-api-key: YOUR_API_KEY" \\
   -d '{
     "user_id": "U1234567890abcdef",
-    "first_name": "Somchai Updated"
+    "first_name": "Somchai Updated",
+    "last_name": "Jaidee Updated"
   }'`,
       response: `{
   "success": true,
   "data": {
     "id": 1,
+    "user_ns": "line",
     "user_id": "U1234567890abcdef",
     "first_name": "Somchai Updated",
-    "updated_at": "2026-01-09T..."
+    "last_name": "Jaidee Updated",
+    "name": "Somchai Jaidee",
+    "profile_pic": "https://profile.line-scdn.net/0h1234abcdef",
+    "subscribed": "2024-12-06T08:29:36+00:00",
+    "last_interaction": "2024-12-06T08:31:02+00:00",
+    "chat_history": ["You: สวัสดีครับ"],
+    "created_at": "2026-01-01T10:00:00+00:00",
+    "updated_at": "2026-01-09T16:45:00+00:00"
   }
 }`,
       responses: [
@@ -643,8 +665,12 @@ export default function Home() {
   "success": true,
   "user_id": "U1234567890abcdef",
   "name": "Somchai Jaidee",
-  "chat_history": ["You: สวัสดีครับ"],
-  "total": 1
+  "chat_history": [
+    "You: สวัสดีครับ",
+    "Bot: สวัสดีครับ ยินดีให้บริการ",
+    "You: ต้องการจองทัวร์"
+  ],
+  "total": 3
 }`,
       responses: [
         { status: 200, description: 'Successful response' },
@@ -672,9 +698,21 @@ export default function Home() {
   "success": true,
   "data": {
     "id": 1,
+    "user_ns": "line",
     "user_id": "U1234567890abcdef",
-    "chat_history": ["You: สวัสดีครับ", "You: ต้องการจองทัวร์"],
-    "last_interaction": "2026-01-10T..."
+    "first_name": "Somchai",
+    "last_name": "Jaidee",
+    "name": "Somchai Jaidee",
+    "profile_pic": "https://profile.line-scdn.net/0h1234abcdef",
+    "subscribed": "2024-12-06T08:29:36+00:00",
+    "last_interaction": "2026-01-10T14:20:00+00:00",
+    "chat_history": [
+      "You: สวัสดีครับ",
+      "Bot: สวัสดีครับ ยินดีให้บริการ",
+      "You: ต้องการจองทัวร์"
+    ],
+    "created_at": "2026-01-01T10:00:00+00:00",
+    "updated_at": "2026-01-10T14:20:00+00:00"
   }
 }`,
       responses: [
@@ -799,16 +837,15 @@ export default function Home() {
         display: 'grid',
         gridTemplateColumns: '320px 1fr',
         gap: 0,
-        minHeight: 'calc(100vh - 4rem)'
+        height: 'calc(100vh - 4rem)',
+        overflow: 'hidden'
       }}>
         {/* Left Sidebar - Endpoints List */}
         <div style={{
           background: '#ffffff',
           borderRight: '1px solid #e5e7eb',
           overflowY: 'auto',
-          height: 'calc(100vh - 4rem)',
-          position: 'sticky',
-          top: '4rem'
+          height: '100%'
         }}>
           <div style={{ padding: '1.5rem 1rem' }}>
             <h2 style={{
@@ -839,7 +876,7 @@ export default function Home() {
         <div style={{
           background: '#fafafa',
           overflowY: 'auto',
-          height: 'calc(100vh - 4rem)'
+          height: '100%'
         }}>
           <EndpointDetail endpoint={selectedEndpointData} />
         </div>
