@@ -372,7 +372,9 @@ function EndpointDetail({ endpoint }: any) {
             lineHeight: '1.6',
             fontFamily: 'Monaco, Consolas, monospace',
             overflow: 'auto',
-            flex: 1
+            flex: 1,
+            scrollBehavior: 'smooth',
+            WebkitOverflowScrolling: 'touch'
           }}>
             {endpoint.curl}
           </pre>
@@ -412,7 +414,9 @@ function EndpointDetail({ endpoint }: any) {
             lineHeight: '1.6',
             fontFamily: 'Monaco, Consolas, monospace',
             overflow: 'auto',
-            flex: 1
+            flex: 1,
+            scrollBehavior: 'smooth',
+            WebkitOverflowScrolling: 'touch'
           }}>
             {endpoint.response}
           </pre>
@@ -458,18 +462,37 @@ export default function Home() {
       description: 'Retrieve booking records from MySQL database',
       requiresAuth: true,
       parameters: [
-        { name: 'limit', type: 'integer', description: 'Max records to return' }
+        { name: 'limit', type: 'integer', description: 'Max records to return (default: 100)' },
+        { name: 'type', type: 'string', description: 'Filter by booking type' }
       ],
       curl: `curl "${apiUrl}/api/bookings?limit=10" \\
   -H "x-api-key: YOUR_API_KEY"`,
       response: `{
   "success": true,
-  "data": [...],
-  "total": 10
+  "data": [
+    {
+      "id": 1,
+      "title": "ทัวร์ภูเก็ต 3 วัน 2 คืน",
+      "type": "tour",
+      "status": "confirmed",
+      "created_at": "2026-01-05T10:30:00.000Z",
+      "updated_at": "2026-01-05T10:30:00.000Z"
+    },
+    {
+      "id": 2,
+      "title": "จองโรงแรม กรุงเทพ",
+      "type": "hotel",
+      "status": "pending",
+      "created_at": "2026-01-08T14:20:00.000Z",
+      "updated_at": "2026-01-08T14:20:00.000Z"
+    }
+  ],
+  "total": 2
 }`,
       responses: [
         { status: 200, description: 'Successful response' },
-        { status: 401, description: 'Invalid API key' }
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
       ]
     },
     {
@@ -480,25 +503,31 @@ export default function Home() {
       requiresAuth: true,
       requestBody: {
         title: { type: 'string', required: true, description: 'Booking title' },
-        type: { type: 'string', required: true, description: 'Booking type' }
+        type: { type: 'string', required: true, description: 'Booking type (tour, hotel, flight, etc.)' }
       },
       curl: `curl -X POST "${apiUrl}/api/bookings" \\
   -H "Content-Type: application/json" \\
   -H "x-api-key: YOUR_API_KEY" \\
-  -d '{"title":"New Booking","type":"standard"}'`,
+  -d '{
+    "title": "ทัวร์เชียงใหม่ 4 วัน 3 คืน",
+    "type": "tour"
+  }'`,
       response: `{
   "success": true,
   "data": {
     "id": 151,
-    "title": "New Booking",
-    "type": "standard",
-    "created_at": "2026-01-10T..."
+    "title": "ทัวร์เชียงใหม่ 4 วัน 3 คืน",
+    "type": "tour",
+    "status": "pending",
+    "created_at": "2026-01-10T16:45:00.000Z",
+    "updated_at": "2026-01-10T16:45:00.000Z"
   }
 }`,
       responses: [
         { status: 201, description: 'Created successfully' },
-        { status: 400, description: 'Missing required fields' },
-        { status: 401, description: 'Invalid API key' }
+        { status: 400, description: 'Missing required fields (title or type)' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database insert failed' }
       ]
     },
     {
@@ -845,7 +874,9 @@ export default function Home() {
           background: '#ffffff',
           borderRight: '1px solid #e5e7eb',
           overflowY: 'auto',
-          height: '100%'
+          height: '100%',
+          scrollBehavior: 'smooth',
+          WebkitOverflowScrolling: 'touch'
         }}>
           <div style={{ padding: '1.5rem 1rem' }}>
             <h2 style={{
@@ -876,7 +907,9 @@ export default function Home() {
         <div style={{
           background: '#fafafa',
           overflowY: 'auto',
-          height: '100%'
+          height: '100%',
+          scrollBehavior: 'smooth',
+          WebkitOverflowScrolling: 'touch'
         }}>
           <EndpointDetail endpoint={selectedEndpointData} />
         </div>
