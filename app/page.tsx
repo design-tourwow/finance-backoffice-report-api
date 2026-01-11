@@ -143,10 +143,14 @@ function EndpointDetail({ endpoint }: any) {
       gridTemplateColumns: '1fr 1fr',
       gap: '2rem',
       padding: '2rem',
-      minHeight: '100%'
+      minHeight: '100%',
+      alignItems: 'start'
     }}>
       {/* Left - Documentation */}
-      <div>
+      <div style={{
+        minWidth: 0,
+        width: '100%'
+      }}>
         <div style={{ marginBottom: '2rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
             <span style={{
@@ -457,7 +461,13 @@ function EndpointDetail({ endpoint }: any) {
       </div>
 
       {/* Right - Code Examples */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '1rem',
+        minWidth: 0,
+        width: '100%'
+      }}>
         {/* Test API Key - Sticky at top */}
         <div style={{
           background: '#1f2937',
