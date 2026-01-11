@@ -78,6 +78,7 @@ function EndpointListItem({ endpoint, isSelected, onClick, searchQuery }: any) {
 
 function EndpointDetail({ endpoint }: any) {
   const [copied, setCopied] = useState(false)
+  const [copiedWithKey, setCopiedWithKey] = useState(false)
   const [showErrorExamples, setShowErrorExamples] = useState(false)
 
   const methodColors: any = {
@@ -93,6 +94,13 @@ function EndpointDetail({ endpoint }: any) {
     navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const copyWithApiKey = () => {
+    const curlWithKey = endpoint.curl.replace('YOUR_API_KEY', 'sk_test_9a7b5c3d1e2f4a6b8c0d2e4f6a8b0c2d')
+    navigator.clipboard.writeText(curlWithKey)
+    setCopiedWithKey(true)
+    setTimeout(() => setCopiedWithKey(false), 2000)
   }
 
   // Generate error examples
@@ -550,31 +558,57 @@ function EndpointDetail({ endpoint }: any) {
             }}>
               Request
             </span>
-            <button
-              onClick={() => copyToClipboard(endpoint.curl)}
-              style={{
-                background: copied ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
-                color: copied ? '#10b981' : '#9ca3af',
-                border: 'none',
-                padding: '0.375rem',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                display: 'flex',
-                transition: 'all 0.2s'
-              }}
-              title={copied ? 'Copied!' : 'Copy'}
-            >
-              {copied ? (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-              ) : (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                </svg>
-              )}
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button
+                onClick={copyWithApiKey}
+                style={{
+                  background: copiedWithKey ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
+                  color: copiedWithKey ? '#10b981' : '#9ca3af',
+                  border: 'none',
+                  padding: '0.375rem',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  transition: 'all 0.2s'
+                }}
+                title={copiedWithKey ? 'Copied with API Key!' : 'Copy with Test API Key'}
+              >
+                {copiedWithKey ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                  </svg>
+                )}
+              </button>
+              <button
+                onClick={() => copyToClipboard(endpoint.curl)}
+                style={{
+                  background: copied ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
+                  color: copied ? '#10b981' : '#9ca3af',
+                  border: 'none',
+                  padding: '0.375rem',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  transition: 'all 0.2s'
+                }}
+                title={copied ? 'Copied!' : 'Copy'}
+              >
+                {copied ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
           <pre style={{
             margin: 0,
