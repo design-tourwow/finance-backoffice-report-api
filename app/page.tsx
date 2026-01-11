@@ -786,18 +786,22 @@ export default function Home() {
   return (
     <main style={{
       minHeight: '100vh',
+      maxHeight: '100vh',
+      height: '100vh',
       background: '#fafafa',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column'
     }}>
       {/* Top Navigation */}
       <nav style={{
         background: '#ffffff',
         borderBottom: '1px solid #e5e7eb',
         padding: '1rem 2rem',
-        position: 'sticky',
-        top: 0,
         zIndex: 100,
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+        flexShrink: 0
       }}>
         <div style={{
           maxWidth: '1400px',
@@ -838,35 +842,53 @@ export default function Home() {
       </nav>
 
       <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: '2rem'
+        flex: 1,
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column'
       }}>
-        {/* Hero */}
-        <div style={{ marginBottom: '3rem' }}>
-          <h1 style={{
-            margin: '0 0 0.5rem 0',
-            fontSize: '2.5rem',
-            fontWeight: '700',
-            color: '#111827'
-          }}>
-            API Documentation
-          </h1>
-          <p style={{
-            margin: 0,
-            fontSize: '1.125rem',
-            color: '#6b7280',
-            lineHeight: '1.6'
-          }}>
-            RESTful API for financial reporting and backoffice operations
-          </p>
+        <div style={{
+          maxWidth: '1400px',
+          width: '100%',
+          margin: '0 auto',
+          padding: '2rem 2rem 0 2rem',
+          flexShrink: 0
+        }}>
+          {/* Hero */}
+          <div style={{ marginBottom: '2rem' }}>
+            <h1 style={{
+              margin: '0 0 0.5rem 0',
+              fontSize: '2.5rem',
+              fontWeight: '700',
+              color: '#111827'
+            }}>
+              API Documentation
+            </h1>
+            <p style={{
+              margin: 0,
+              fontSize: '1.125rem',
+              color: '#6b7280',
+              lineHeight: '1.6'
+            }}>
+              RESTful API for financial reporting and backoffice operations
+            </p>
+          </div>
         </div>
 
+      <div style={{
+        flex: 1,
+        overflow: 'hidden',
+        maxWidth: '1400px',
+        width: '100%',
+        margin: '0 auto',
+        display: 'flex'
+      }}>
       <div style={{
         display: 'grid',
         gridTemplateColumns: '320px 1fr',
         gap: 0,
-        height: 'calc(100vh - 4rem)',
+        width: '100%',
+        height: '100%',
         overflow: 'hidden'
       }}>
         {/* Left Sidebar - Endpoints List */}
@@ -913,6 +935,7 @@ export default function Home() {
         }}>
           <EndpointDetail endpoint={selectedEndpointData} />
         </div>
+      </div>
       </div>
       </div>
     </main>
