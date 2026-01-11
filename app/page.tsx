@@ -785,14 +785,20 @@ export default function Home() {
 
   return (
     <main style={{
-      minHeight: '100vh',
-      maxHeight: '100vh',
+      width: '100vw',
       height: '100vh',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
       background: '#fafafa',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       overflow: 'hidden',
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0
     }}>
       {/* Top Navigation */}
       <nav style={{
