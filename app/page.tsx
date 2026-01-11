@@ -777,8 +777,7 @@ export default function Home() {
     const query = searchQuery.toLowerCase()
     return (
       endpoint.method.toLowerCase().includes(query) ||
-      endpoint.path.toLowerCase().includes(query) ||
-      endpoint.description.toLowerCase().includes(query)
+      endpoint.path.toLowerCase().includes(query)
     )
   })
 
@@ -935,7 +934,8 @@ export default function Home() {
             {/* Search Box */}
             <div style={{
               position: 'relative',
-              marginBottom: '1rem'
+              marginBottom: '1rem',
+              padding: '0 0.5rem'
             }}>
               <svg 
                 width="16" 
@@ -946,7 +946,7 @@ export default function Home() {
                 strokeWidth="2"
                 style={{
                   position: 'absolute',
-                  left: '0.75rem',
+                  left: '1.25rem',
                   top: '50%',
                   transform: 'translateY(-50%)',
                   pointerEvents: 'none'
@@ -962,7 +962,7 @@ export default function Home() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '0.625rem 0.75rem 0.625rem 2.5rem',
+                  padding: '0.625rem 2.5rem 0.625rem 2.5rem',
                   fontSize: '0.875rem',
                   border: '1px solid #e5e7eb',
                   borderRadius: '6px',
@@ -970,7 +970,8 @@ export default function Home() {
                   transition: 'all 0.2s',
                   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                   color: '#111827',
-                  background: '#ffffff'
+                  background: '#ffffff',
+                  boxSizing: 'border-box'
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = '#4f46e5'
@@ -986,7 +987,7 @@ export default function Home() {
                   onClick={() => setSearchQuery('')}
                   style={{
                     position: 'absolute',
-                    right: '0.75rem',
+                    right: '1.25rem',
                     top: '50%',
                     transform: 'translateY(-50%)',
                     background: 'transparent',
