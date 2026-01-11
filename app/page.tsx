@@ -402,19 +402,27 @@ function EndpointDetail({ endpoint }: any) {
                     .filter((r: any) => r.status >= 400)
                     .map((resp: any, idx: number) => (
                       <div key={idx} style={{
-                        background: '#fef2f2',
-                        border: '1px solid #fecaca',
+                        background: '#1f2937',
+                        border: '1px solid #374151',
                         borderRadius: '6px',
                         overflow: 'hidden'
                       }}>
                         <div style={{
                           padding: '0.5rem 0.75rem',
-                          background: '#fee2e2',
-                          borderBottom: '1px solid #fecaca',
+                          background: '#111827',
+                          borderBottom: '1px solid #374151',
                           fontSize: '0.8125rem',
                           fontWeight: '600',
-                          color: '#991b1b'
+                          color: resp.status < 500 ? '#fbbf24' : '#ef4444',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem'
                         }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                          </svg>
                           {resp.status} - {resp.description}
                         </div>
                         <pre style={{
@@ -423,7 +431,7 @@ function EndpointDetail({ endpoint }: any) {
                           fontSize: '0.8125rem',
                           lineHeight: '1.5',
                           fontFamily: 'Monaco, Consolas, monospace',
-                          color: '#7f1d1d',
+                          color: '#e5e7eb',
                           overflow: 'auto'
                         }}>
                           {errorExamples[resp.status] || `{
