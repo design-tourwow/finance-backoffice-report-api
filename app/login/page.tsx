@@ -7,12 +7,34 @@ export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [validationError, setValidationError] = useState({ username: '', password: '' })
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setValidationError({ username: '', password: '' })
+
+    // Client-side validation
+    let hasError = false
+    const newValidationError = { username: '', password: '' }
+
+    if (!username.trim()) {
+      newValidationError.username = 'Username is required'
+      hasError = true
+    }
+
+    if (!password.trim()) {
+      newValidationError.password = 'Password is required'
+      hasError = true
+    }
+
+    if (hasError) {
+      setValidationError(newValidationError)
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -60,13 +82,13 @@ export default function LoginPage() {
           <div style={{
             width: '64px',
             height: '64px',
-            background: '#4f46e5',
+            background: '#1f2937',
             borderRadius: '12px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             margin: '0 auto 1.5rem',
-            boxShadow: '0 4px 12px rgba(79, 70, 229, 0.2)'
+            boxShadow: '0 4px 12px rgba(31, 41, 55, 0.3)'
           }}>
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -104,14 +126,18 @@ export default function LoginPage() {
             <input
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
+              onChange={(e) => {
+                setUsername(e.target.value)
+                if (validationError.username) {
+                  setValidationError({ ...validationError, username: '' })
+                }
+              }}
               autoComplete="username"
               style={{
                 width: '100%',
                 padding: '0.75rem 1rem',
                 fontSize: '0.9375rem',
-                border: '2px solid #e5e7eb',
+                border: `2px solid ${validationError.username ? '#ef4444' : '#e5e7eb'}`,
                 borderRadius: '8px',
                 outline: 'none',
                 transition: 'all 0.2s',
@@ -119,14 +145,35 @@ export default function LoginPage() {
                 boxSizing: 'border-box'
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#4f46e5'
-                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(79, 70, 229, 0.1)'
+                if (!validationError.username) {
+                  e.currentTarget.style.borderColor = '#1f2937'
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(31, 41, 55, 0.1)'
+                }
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = '#e5e7eb'
-                e.currentTarget.style.boxShadow = 'none'
+                if (!validationError.username) {
+                  e.currentTarget.style.borderColor = '#e5e7eb'
+                  e.currentTarget.style.boxShadow = 'none'
+                }
               }}
             />
+            {validationError.username && (
+              <div style={{
+                marginTop: '0.5rem',
+                fontSize: '0.8125rem',
+                color: '#ef4444',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.375rem'
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                {validationError.username}
+              </div>
+            )}
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
@@ -142,14 +189,18 @@ export default function LoginPage() {
             <input
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+              onChange={(e) => {
+                setPassword(e.target.value)
+                if (validationError.password) {
+                  setValidationError({ ...validationError, password: '' })
+                }
+              }}
               autoComplete="current-password"
               style={{
                 width: '100%',
                 padding: '0.75rem 1rem',
                 fontSize: '0.9375rem',
-                border: '2px solid #e5e7eb',
+                border: `2px solid ${validationError.password ? '#ef4444' : '#e5e7eb'}`,
                 borderRadius: '8px',
                 outline: 'none',
                 transition: 'all 0.2s',
@@ -157,14 +208,35 @@ export default function LoginPage() {
                 boxSizing: 'border-box'
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#4f46e5'
-                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(79, 70, 229, 0.1)'
+                if (!validationError.password) {
+                  e.currentTarget.style.borderColor = '#1f2937'
+                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(31, 41, 55, 0.1)'
+                }
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = '#e5e7eb'
-                e.currentTarget.style.boxShadow = 'none'
+                if (!validationError.password) {
+                  e.currentTarget.style.borderColor = '#e5e7eb'
+                  e.currentTarget.style.boxShadow = 'none'
+                }
               }}
             />
+            {validationError.password && (
+              <div style={{
+                marginTop: '0.5rem',
+                fontSize: '0.8125rem',
+                color: '#ef4444',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.375rem'
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                {validationError.password}
+              </div>
+            )}
           </div>
 
           {error && (
@@ -195,7 +267,7 @@ export default function LoginPage() {
             style={{
               width: '100%',
               padding: '0.875rem',
-              background: loading ? '#9ca3af' : '#4f46e5',
+              background: loading ? '#9ca3af' : '#1f2937',
               color: '#ffffff',
               border: 'none',
               borderRadius: '8px',
@@ -203,19 +275,19 @@ export default function LoginPage() {
               fontWeight: '600',
               cursor: loading ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s',
-              boxShadow: loading ? 'none' : '0 1px 3px rgba(79, 70, 229, 0.3)',
+              boxShadow: loading ? 'none' : '0 1px 3px rgba(31, 41, 55, 0.3)',
               fontFamily: 'inherit'
             }}
             onMouseEnter={(e) => {
               if (!loading) {
-                e.currentTarget.style.background = '#4338ca'
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(79, 70, 229, 0.4)'
+                e.currentTarget.style.background = '#111827'
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(31, 41, 55, 0.4)'
               }
             }}
             onMouseLeave={(e) => {
               if (!loading) {
-                e.currentTarget.style.background = '#4f46e5'
-                e.currentTarget.style.boxShadow = '0 1px 3px rgba(79, 70, 229, 0.3)'
+                e.currentTarget.style.background = '#1f2937'
+                e.currentTarget.style.boxShadow = '0 1px 3px rgba(31, 41, 55, 0.3)'
               }
             }}
           >
