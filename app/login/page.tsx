@@ -7,31 +7,27 @@ export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [validationError, setValidationError] = useState({ username: '', password: '' })
+  const [validationError, setValidationError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    setValidationError({ username: '', password: '' })
+    setValidationError('')
 
     // Client-side validation
-    let hasError = false
-    const newValidationError = { username: '', password: '' }
+    const usernameEmpty = !username.trim()
+    const passwordEmpty = !password.trim()
 
-    if (!username.trim()) {
-      newValidationError.username = 'Username is required'
-      hasError = true
-    }
-
-    if (!password.trim()) {
-      newValidationError.password = 'Password is required'
-      hasError = true
-    }
-
-    if (hasError) {
-      setValidationError(newValidationError)
+    if (usernameEmpty && passwordEmpty) {
+      setValidationError('Please enter your username and password')
+      return
+    } else if (usernameEmpty) {
+      setValidationError('Please enter your username')
+      return
+    } else if (passwordEmpty) {
+      setValidationError('Please enter your password')
       return
     }
 
@@ -128,8 +124,8 @@ export default function LoginPage() {
               value={username}
               onChange={(e) => {
                 setUsername(e.target.value)
-                if (validationError.username) {
-                  setValidationError({ ...validationError, username: '' })
+                if (validationError) {
+                  setValidationError('')
                 }
               }}
               autoComplete="username"
@@ -137,7 +133,7 @@ export default function LoginPage() {
                 width: '100%',
                 padding: '0.75rem 1rem',
                 fontSize: '0.9375rem',
-                border: `2px solid ${validationError.username ? '#ef4444' : '#e5e7eb'}`,
+                border: `2px solid ${validationError ? '#ef4444' : '#e5e7eb'}`,
                 borderRadius: '8px',
                 outline: 'none',
                 transition: 'all 0.2s',
@@ -145,35 +141,18 @@ export default function LoginPage() {
                 boxSizing: 'border-box'
               }}
               onFocus={(e) => {
-                if (!validationError.username) {
+                if (!validationError) {
                   e.currentTarget.style.borderColor = '#1f2937'
                   e.currentTarget.style.boxShadow = '0 0 0 3px rgba(31, 41, 55, 0.1)'
                 }
               }}
               onBlur={(e) => {
-                if (!validationError.username) {
+                if (!validationError) {
                   e.currentTarget.style.borderColor = '#e5e7eb'
                   e.currentTarget.style.boxShadow = 'none'
                 }
               }}
             />
-            {validationError.username && (
-              <div style={{
-                marginTop: '0.5rem',
-                fontSize: '0.8125rem',
-                color: '#ef4444',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.375rem'
-              }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="15" y1="9" x2="9" y2="15"/>
-                  <line x1="9" y1="9" x2="15" y2="15"/>
-                </svg>
-                {validationError.username}
-              </div>
-            )}
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
@@ -191,8 +170,8 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value)
-                if (validationError.password) {
-                  setValidationError({ ...validationError, password: '' })
+                if (validationError) {
+                  setValidationError('')
                 }
               }}
               autoComplete="current-password"
@@ -200,7 +179,7 @@ export default function LoginPage() {
                 width: '100%',
                 padding: '0.75rem 1rem',
                 fontSize: '0.9375rem',
-                border: `2px solid ${validationError.password ? '#ef4444' : '#e5e7eb'}`,
+                border: `2px solid ${validationError ? '#ef4444' : '#e5e7eb'}`,
                 borderRadius: '8px',
                 outline: 'none',
                 transition: 'all 0.2s',
@@ -208,35 +187,18 @@ export default function LoginPage() {
                 boxSizing: 'border-box'
               }}
               onFocus={(e) => {
-                if (!validationError.password) {
+                if (!validationError) {
                   e.currentTarget.style.borderColor = '#1f2937'
                   e.currentTarget.style.boxShadow = '0 0 0 3px rgba(31, 41, 55, 0.1)'
                 }
               }}
               onBlur={(e) => {
-                if (!validationError.password) {
+                if (!validationError) {
                   e.currentTarget.style.borderColor = '#e5e7eb'
                   e.currentTarget.style.boxShadow = 'none'
                 }
               }}
             />
-            {validationError.password && (
-              <div style={{
-                marginTop: '0.5rem',
-                fontSize: '0.8125rem',
-                color: '#ef4444',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.375rem'
-              }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="15" y1="9" x2="9" y2="15"/>
-                  <line x1="9" y1="9" x2="15" y2="15"/>
-                </svg>
-                {validationError.password}
-              </div>
-            )}
           </div>
 
           {error && (
@@ -258,6 +220,20 @@ export default function LoginPage() {
                 <line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
               {error}
+            </div>
+          )}
+
+          {validationError && (
+            <div style={{
+              padding: '0.75rem 1rem',
+              background: '#fee2e2',
+              border: '1px solid #fecaca',
+              borderRadius: '8px',
+              marginBottom: '1.5rem',
+              fontSize: '0.875rem',
+              color: '#991b1b'
+            }}>
+              {validationError}
             </div>
           )}
 
