@@ -43,13 +43,14 @@ export default function LoginPage() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: '#fafafa',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
       <div style={{
         background: '#ffffff',
-        borderRadius: '16px',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+        borderRadius: '12px',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+        border: '1px solid #e5e7eb',
         padding: '3rem',
         width: '100%',
         maxWidth: '420px',
@@ -59,13 +60,13 @@ export default function LoginPage() {
           <div style={{
             width: '64px',
             height: '64px',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            borderRadius: '16px',
+            background: '#4f46e5',
+            borderRadius: '12px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             margin: '0 auto 1.5rem',
-            boxShadow: '0 8px 16px rgba(102, 126, 234, 0.4)'
+            boxShadow: '0 4px 12px rgba(79, 70, 229, 0.2)'
           }}>
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -118,8 +119,8 @@ export default function LoginPage() {
                 boxSizing: 'border-box'
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#667eea'
-                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)'
+                e.currentTarget.style.borderColor = '#4f46e5'
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(79, 70, 229, 0.1)'
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = '#e5e7eb'
@@ -156,8 +157,8 @@ export default function LoginPage() {
                 boxSizing: 'border-box'
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#667eea'
-                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)'
+                e.currentTarget.style.borderColor = '#4f46e5'
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(79, 70, 229, 0.1)'
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = '#e5e7eb'
@@ -194,7 +195,7 @@ export default function LoginPage() {
             style={{
               width: '100%',
               padding: '0.875rem',
-              background: loading ? '#9ca3af' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: loading ? '#9ca3af' : '#4f46e5',
               color: '#ffffff',
               border: 'none',
               borderRadius: '8px',
@@ -202,19 +203,19 @@ export default function LoginPage() {
               fontWeight: '600',
               cursor: loading ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s',
-              boxShadow: loading ? 'none' : '0 4px 12px rgba(102, 126, 234, 0.4)',
+              boxShadow: loading ? 'none' : '0 1px 3px rgba(79, 70, 229, 0.3)',
               fontFamily: 'inherit'
             }}
             onMouseEnter={(e) => {
               if (!loading) {
-                e.currentTarget.style.transform = 'translateY(-2px)'
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.5)'
+                e.currentTarget.style.background = '#4338ca'
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(79, 70, 229, 0.4)'
               }
             }}
             onMouseLeave={(e) => {
               if (!loading) {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)'
+                e.currentTarget.style.background = '#4f46e5'
+                e.currentTarget.style.boxShadow = '0 1px 3px rgba(79, 70, 229, 0.3)'
               }
             }}
           >
