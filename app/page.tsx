@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 // Helper Components
 function EndpointListItem({ endpoint, isSelected, onClick, searchQuery }: any) {
@@ -683,11 +684,34 @@ function EndpointDetail({ endpoint }: any) {
 }
 
 export default function Home() {
+  const router = useRouter()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [authLoading, setAuthLoading] = useState(true)
   const [healthStatus, setHealthStatus] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [selectedEndpoint, setSelectedEndpoint] = useState('GET-/api/health')
   const [apiUrl, setApiUrl] = useState('http://localhost:3000')
   const [searchQuery, setSearchQuery] = useState('')
+
+  // Check authentication
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/check')
+        const data = await res.json()
+        if (data.authenticated) {
+          setIsAuthenticated(true)
+        } else {
+          router.push('/login')
+        }
+      } catch {
+        router.push('/login')
+      } finally {
+        setAuthLoading(false)
+      }
+    }
+    checkAuth()
+  }, [router])
 
   useEffect(() => {
     // Set API URL on client side only to avoid hydration mismatch
@@ -1058,6 +1082,45 @@ export default function Home() {
       .catch(() => setLoading(false))
   }, [])
 
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div style={{
+        width: '100vw',
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#fafafa',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            border: '4px solid #e5e7eb',
+            borderTopColor: '#4f46e5',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 1rem'
+          }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          <p style={{ margin: 0, color: '#6b7280', fontSize: '0.875rem' }}>Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Only show documentation if authenticated
+  if (!isAuthenticated) {
+    return null
+  }
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' })
+    router.push('/login')
+  }
+
   return (
     <main style={{
       width: '100vw',
@@ -1100,24 +1163,60 @@ export default function Home() {
               Finance Backoffice API
             </div>
           </div>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            background: healthStatus?.status === 'ok' ? '#ecfdf5' : '#fef2f2',
-            padding: '0.375rem 0.75rem',
-            borderRadius: '6px',
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: healthStatus?.status === 'ok' ? '#065f46' : '#991b1b'
-          }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              background: healthStatus?.status === 'ok' ? '#10b981' : '#ef4444'
-            }} />
-            {loading ? 'Checking...' : healthStatus?.status === 'ok' ? 'Operational' : 'Offline'}
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              background: healthStatus?.status === 'ok' ? '#ecfdf5' : '#fef2f2',
+              padding: '0.375rem 0.75rem',
+              borderRadius: '6px',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              color: healthStatus?.status === 'ok' ? '#065f46' : '#991b1b'
+            }}>
+              <div style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: healthStatus?.status === 'ok' ? '#10b981' : '#ef4444'
+              }} />
+              {loading ? 'Checking...' : healthStatus?.status === 'ok' ? 'Operational' : 'Offline'}
+            </div>
+            <button
+              onClick={handleLogout}
+              style={{
+                background: 'transparent',
+                border: '1px solid #e5e7eb',
+                borderRadius: '6px',
+                padding: '0.375rem 0.875rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: '#6b7280',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#f9fafb'
+                e.currentTarget.style.borderColor = '#d1d5db'
+                e.currentTarget.style.color = '#111827'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent'
+                e.currentTarget.style.borderColor = '#e5e7eb'
+                e.currentTarget.style.color = '#6b7280'
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Logout
+            </button>
           </div>
         </div>
       </nav>
