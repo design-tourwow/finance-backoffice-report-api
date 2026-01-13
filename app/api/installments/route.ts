@@ -80,15 +80,30 @@ export async function GET(request: NextRequest) {
 
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(query, params)
 
+    // Parse JSON fields (customer_order_installment_snapshot)
+    const parsedRows = rows.map(row => {
+      const parsed = { ...row }
+      
+      if (parsed.customer_order_installment_snapshot && typeof parsed.customer_order_installment_snapshot === 'string') {
+        try {
+          parsed.customer_order_installment_snapshot = JSON.parse(parsed.customer_order_installment_snapshot)
+        } catch (e) {
+          // Keep as string if parse fails
+        }
+      }
+      
+      return parsed
+    })
+
     logApiRequest('GET', '/api/installments', 200, apiKey)
     return NextResponse.json(
       {
         success: true,
-        data: rows,
+        data: parsedRows,
         pagination: {
           limit,
           offset,
-          returned: rows.length
+          returned: parsedRows.length
         }
       },
       {

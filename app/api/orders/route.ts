@@ -97,15 +97,35 @@ export async function GET(request: NextRequest) {
 
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(query, params)
 
+    // Parse JSON fields
+    const parsedRows = rows.map(row => {
+      const parsed = { ...row }
+      
+      // Parse JSON fields if they exist and are strings
+      const jsonFields = ['product_snapshot', 'product_period_snapshot', 'product_pool_snapshot', 'customer_order_installment_snapshot']
+      
+      jsonFields.forEach(field => {
+        if (parsed[field] && typeof parsed[field] === 'string') {
+          try {
+            parsed[field] = JSON.parse(parsed[field])
+          } catch (e) {
+            // Keep as string if parse fails
+          }
+        }
+      })
+      
+      return parsed
+    })
+
     logApiRequest('GET', '/api/orders', 200, apiKey)
     return NextResponse.json(
       {
         success: true,
-        data: rows,
+        data: parsedRows,
         pagination: {
           limit,
           offset,
-          returned: rows.length
+          returned: parsedRows.length
         }
       },
       {
