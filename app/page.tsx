@@ -1039,6 +1039,817 @@ export default function Home() {
       ]
     },
     {
+      id: 'GET-/api/customers',
+      method: 'GET',
+      path: '/api/customers',
+      description: 'Retrieve customer records from MySQL database (Xqc7k7_customers table)',
+      category: 'MySQL - Customers',
+      requiresAuth: true,
+      parameters: [
+        { name: 'id', type: 'integer', description: 'Filter by customer ID' },
+        { name: 'customer_code', type: 'string', description: 'Filter by customer code' },
+        { name: 'name', type: 'string', description: 'Search by customer name (partial match)' },
+        { name: 'phone_number', type: 'string', description: 'Filter by phone number' },
+        { name: 'limit', type: 'integer', description: 'Max records (default: 100, max: 1000)' },
+        { name: 'offset', type: 'integer', description: 'Skip records (default: 0)' }
+      ],
+      curl: `curl "${apiUrl}/api/customers?limit=10" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 152,
+      "team_number": 3,
+      "seller_agency_member_id": 629,
+      "crm_agency_member_id": 623,
+      "customer_code_prefix": "CUS2512",
+      "customer_code_number": 1,
+      "customer_code": "CUS251200001",
+      "name": "จอง Item จากทัวร์ว้าว",
+      "birth_date": null,
+      "phone_number": "0292293211",
+      "address": null,
+      "email": "",
+      "facebook_name": "",
+      "facebook_url": null,
+      "line_name": "",
+      "line_url": null,
+      "instagram": null,
+      "remark": "",
+      "first_paid_status_customer_order_installment_count": 1,
+      "last_touchpoint_updated_at": null,
+      "created_at": "2025-12-16T22:26:27.000Z",
+      "created_by_agency_member_id": null,
+      "updated_at": "2025-12-16T22:26:27.000Z",
+      "updated_by_agency_member_id": null
+    }
+  ],
+  "pagination": {
+    "limit": 10,
+    "offset": 0,
+    "returned": 1
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 400, description: 'Invalid parameters (limit exceeds 1000)' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 429, description: 'Rate limit exceeded' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'POST-/api/customers',
+      method: 'POST',
+      path: '/api/customers',
+      description: 'Create a new customer record',
+      category: 'MySQL - Customers',
+      requiresAuth: true,
+      requestBody: {
+        customer_code_prefix: { type: 'string', required: true, description: 'Customer code prefix (e.g., "CUS2601")' },
+        customer_code_number: { type: 'integer', required: true, description: 'Customer code number' },
+        customer_code: { type: 'string', required: true, description: 'Full customer code (e.g., "CUS260100001")' },
+        name: { type: 'string', required: true, description: 'Customer name' },
+        phone_number: { type: 'string', required: true, description: 'Phone number' },
+        email: { type: 'string', required: false, description: 'Email address' },
+        address: { type: 'string', required: false, description: 'Address' },
+        birth_date: { type: 'date', required: false, description: 'Birth date (YYYY-MM-DD)' },
+        facebook_name: { type: 'string', required: false, description: 'Facebook name' },
+        line_name: { type: 'string', required: false, description: 'LINE name' },
+        remark: { type: 'string', required: false, description: 'Additional notes' }
+      },
+      curl: `curl -X POST "${apiUrl}/api/customers" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "customer_code_prefix": "CUS2601",
+    "customer_code_number": 1,
+    "customer_code": "CUS260100001",
+    "name": "สมชาย ใจดี",
+    "phone_number": "0812345678",
+    "email": "somchai@example.com"
+  }'`,
+      response: `{
+  "success": true,
+  "data": {
+    "id": 153,
+    "customer_code_prefix": "CUS2601",
+    "customer_code_number": 1,
+    "customer_code": "CUS260100001",
+    "name": "สมชาย ใจดี",
+    "phone_number": "0812345678",
+    "email": "somchai@example.com"
+  }
+}`,
+      responses: [
+        { status: 201, description: 'Customer created successfully' },
+        { status: 400, description: 'Missing required fields' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database insert failed' }
+      ]
+    },
+    {
+      id: 'PUT-/api/customers',
+      method: 'PUT',
+      path: '/api/customers',
+      description: 'Update an existing customer. Requires id, send only fields to update.',
+      category: 'MySQL - Customers',
+      requiresAuth: true,
+      requestBody: {
+        id: { type: 'integer', required: true, description: 'Customer ID to update' },
+        name: { type: 'string', required: false, description: 'Updated name' },
+        phone_number: { type: 'string', required: false, description: 'Updated phone' },
+        email: { type: 'string', required: false, description: 'Updated email' },
+        address: { type: 'string', required: false, description: 'Updated address' }
+      },
+      curl: `curl -X PUT "${apiUrl}/api/customers" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "id": 152,
+    "name": "สมชาย ใจดีมาก",
+    "email": "somchai.new@example.com"
+  }'`,
+      response: `{
+  "success": true,
+  "data": {
+    "id": 152,
+    "name": "สมชาย ใจดีมาก",
+    "email": "somchai.new@example.com"
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Updated successfully' },
+        { status: 400, description: 'Missing id' },
+        { status: 404, description: 'Customer not found' },
+        { status: 500, description: 'Database update failed' }
+      ]
+    },
+    {
+      id: 'DELETE-/api/customers',
+      method: 'DELETE',
+      path: '/api/customers',
+      description: 'Delete a customer by ID',
+      category: 'MySQL - Customers',
+      requiresAuth: true,
+      parameters: [
+        { name: 'id', type: 'integer', description: 'Customer ID (required)' }
+      ],
+      curl: `curl -X DELETE "${apiUrl}/api/customers?id=152" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "message": "Customer deleted successfully"
+}`,
+      responses: [
+        { status: 200, description: 'Deleted successfully' },
+        { status: 400, description: 'Missing id' },
+        { status: 404, description: 'Customer not found' }
+      ]
+    },
+    {
+      id: 'GET-/api/orders',
+      method: 'GET',
+      path: '/api/orders',
+      description: 'Retrieve order records from MySQL database (Xqc7k7_orders table). Excludes soft-deleted orders.',
+      category: 'MySQL - Orders',
+      requiresAuth: true,
+      parameters: [
+        { name: 'id', type: 'integer', description: 'Filter by order ID' },
+        { name: 'order_code', type: 'string', description: 'Filter by order code' },
+        { name: 'customer_id', type: 'integer', description: 'Filter by customer ID' },
+        { name: 'order_status', type: 'string', description: 'Filter by order status' },
+        { name: 'limit', type: 'integer', description: 'Max records (default: 100, max: 1000)' },
+        { name: 'offset', type: 'integer', description: 'Skip records (default: 0)' }
+      ],
+      curl: `curl "${apiUrl}/api/orders?limit=10" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 1262,
+      "booking_id": null,
+      "agcy_agency_id": 1,
+      "customer_id": 152,
+      "parent_order_id": null,
+      "team_number": 3,
+      "seller_agency_member_id": 629,
+      "crm_agency_member_id": 623,
+      "is_old_customer": 0,
+      "order_code_prefix": "TWP2601",
+      "order_code_number": 1,
+      "order_code": "TWP26010001",
+      "order_status": "pending",
+      "order_key": "ABC1234",
+      "order_temp_key": "TMP1234",
+      "order_passport_key": "PP12345678",
+      "order_visa_key": "VS12345678",
+      "product_owner_supplier_id": 1,
+      "product_id": 100,
+      "product_period_id": 50,
+      "product_snapshot": {"name": "ทัวร์ญี่ปุ่น 5 วัน 4 คืน", "price": 50000},
+      "product_period_snapshot": {"start_date": "2026-03-01", "end_date": "2026-03-05"},
+      "product_pool_snapshot": null,
+      "amount": "50000.00000",
+      "discount": "5000.00000",
+      "amount_with_discount": "45000.00000",
+      "use_vat": 1,
+      "use_visa": 0,
+      "vat_percentage": "7.00000",
+      "vat": "3150.00000",
+      "net_amount": "48150.00000",
+      "commission_company": "5000.00000",
+      "commission_seller": "2000.00000",
+      "extra_commission": null,
+      "extra_discount": null,
+      "extra_commission_per_unit": null,
+      "extra_commission_unit": null,
+      "extra_discount_per_unit": null,
+      "extra_discount_unit": null,
+      "supplier_income": null,
+      "supplier_commission_vat_percentage": null,
+      "supplier_commission_vat": null,
+      "supplier_commission": null,
+      "supplier_commission_with_vat": null,
+      "supplier_commission_with_income": null,
+      "supplier_commission_with_income_with_vat": null,
+      "supplier_commission_with_income_vat": null,
+      "supplier_use_withholding_tax": 0,
+      "supplier_withholding_tax_percentage": null,
+      "supplier_withholding_tax": null,
+      "sum_supplier_order_installment_amount": "40000.00000",
+      "sum_customer_order_installment_amount": "48150.00000",
+      "customer_name": "จอง Item จากทัวร์ว้าว",
+      "customer_phone_number": "0292293211",
+      "customer_email": "",
+      "customer_facebook": "",
+      "customer_line": "",
+      "customer_instagram": "",
+      "customer_remark": "",
+      "review_star": null,
+      "review_note": null,
+      "note": null,
+      "visa_note": null,
+      "passport_downloaded_count": 0,
+      "visa_downloaded_count": 0,
+      "first_seller_agency_member_id": null,
+      "created_at": "2026-01-13T10:00:00.000Z",
+      "created_by_agency_member_id": 629,
+      "updated_at": "2026-01-13T10:00:00.000Z",
+      "updated_by_agency_member_id": 629,
+      "passport_approved_at": null,
+      "passport_expired_at": null,
+      "passport_approved_by_agency_member_id": null,
+      "visa_approved_at": null,
+      "visa_expired_at": null,
+      "visa_approved_by_agency_member_id": null,
+      "sent_file_to_supplier_at": null,
+      "sent_file_to_supplier_by_agency_member_id": null,
+      "approved_at": null,
+      "approved_by_agency_member_id": null,
+      "completed_at": null,
+      "completed_by_agency_member_id": null,
+      "completed_traveled_at": null,
+      "completed_traveled_by_agency_member_id": null,
+      "reviewed_at": null,
+      "reviewed_by_agency_member_id": null,
+      "waiting_canceled_at": null,
+      "waiting_canceled_by_agency_member_id": null,
+      "canceled_at": null,
+      "canceled_by_agency_member_id": null,
+      "deleted_at": null,
+      "deleted_at_as_string": "",
+      "deleted_by_agency_member_id": null
+    }
+  ],
+  "pagination": {
+    "limit": 10,
+    "offset": 0,
+    "returned": 1
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 400, description: 'Invalid parameters' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 429, description: 'Rate limit exceeded' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'POST-/api/orders',
+      method: 'POST',
+      path: '/api/orders',
+      description: 'Create a new order record. Many fields are required for order creation.',
+      category: 'MySQL - Orders',
+      requiresAuth: true,
+      requestBody: {
+        agcy_agency_id: { type: 'integer', required: true, description: 'Agency ID' },
+        order_code_prefix: { type: 'string', required: true, description: 'Order code prefix' },
+        order_code_number: { type: 'integer', required: true, description: 'Order code number' },
+        order_code: { type: 'string', required: true, description: 'Full order code' },
+        order_status: { type: 'string', required: true, description: 'Order status (pending, approved, etc.)' },
+        product_owner_supplier_id: { type: 'integer', required: true, description: 'Supplier ID' },
+        product_id: { type: 'integer', required: true, description: 'Product ID' },
+        product_snapshot: { type: 'json', required: true, description: 'Product details snapshot' },
+        product_period_snapshot: { type: 'json', required: true, description: 'Period details snapshot' },
+        amount: { type: 'decimal', required: true, description: 'Order amount' },
+        amount_with_discount: { type: 'decimal', required: true, description: 'Amount after discount' },
+        use_vat: { type: 'boolean', required: true, description: 'Whether VAT is applied' },
+        vat_percentage: { type: 'decimal', required: true, description: 'VAT percentage' },
+        vat: { type: 'decimal', required: true, description: 'VAT amount' },
+        net_amount: { type: 'decimal', required: true, description: 'Net amount' },
+        commission_company: { type: 'decimal', required: true, description: 'Company commission' },
+        commission_seller: { type: 'decimal', required: true, description: 'Seller commission' },
+        sum_supplier_order_installment_amount: { type: 'decimal', required: true, description: 'Total supplier installments' },
+        sum_customer_order_installment_amount: { type: 'decimal', required: true, description: 'Total customer installments' },
+        customer_name: { type: 'string', required: true, description: 'Customer name' },
+        customer_phone_number: { type: 'string', required: true, description: 'Customer phone' }
+      },
+      curl: `curl -X POST "${apiUrl}/api/orders" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "agcy_agency_id": 1,
+    "order_code_prefix": "TWP2601",
+    "order_code_number": 2,
+    "order_code": "TWP26010002",
+    "order_status": "pending",
+    "product_owner_supplier_id": 1,
+    "product_id": 100,
+    "product_snapshot": {"name": "ทัวร์ญี่ปุ่น 5 วัน 4 คืน"},
+    "product_period_snapshot": {"start_date": "2026-03-01"},
+    "amount": 50000.00,
+    "amount_with_discount": 45000.00,
+    "use_vat": true,
+    "vat_percentage": 7.00,
+    "vat": 3150.00,
+    "net_amount": 48150.00,
+    "commission_company": 5000.00,
+    "commission_seller": 2000.00,
+    "sum_supplier_order_installment_amount": 40000.00,
+    "sum_customer_order_installment_amount": 48150.00,
+    "customer_name": "สมชาย ใจดี",
+    "customer_phone_number": "0812345678"
+  }'`,
+      response: `{
+  "success": true,
+  "data": {
+    "id": 1263,
+    "order_code": "TWP26010002",
+    "order_status": "pending",
+    "customer_name": "สมชาย ใจดี",
+    "net_amount": 48150.00
+  }
+}`,
+      responses: [
+        { status: 201, description: 'Order created successfully' },
+        { status: 400, description: 'Missing required fields' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database insert failed' }
+      ]
+    },
+    {
+      id: 'PUT-/api/orders',
+      method: 'PUT',
+      path: '/api/orders',
+      description: 'Update an existing order. Requires id, send only fields to update.',
+      category: 'MySQL - Orders',
+      requiresAuth: true,
+      requestBody: {
+        id: { type: 'integer', required: true, description: 'Order ID to update' },
+        order_status: { type: 'string', required: false, description: 'Updated status' },
+        note: { type: 'string', required: false, description: 'Updated note' },
+        review_star: { type: 'integer', required: false, description: 'Review rating (1-5)' }
+      },
+      curl: `curl -X PUT "${apiUrl}/api/orders" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "id": 1262,
+    "order_status": "approved",
+    "note": "Customer confirmed payment"
+  }'`,
+      response: `{
+  "success": true,
+  "data": {
+    "id": 1262,
+    "order_status": "approved",
+    "note": "Customer confirmed payment"
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Updated successfully' },
+        { status: 400, description: 'Missing id' },
+        { status: 404, description: 'Order not found' },
+        { status: 500, description: 'Database update failed' }
+      ]
+    },
+    {
+      id: 'DELETE-/api/orders',
+      method: 'DELETE',
+      path: '/api/orders',
+      description: 'Soft delete an order by ID (sets deleted_at timestamp)',
+      category: 'MySQL - Orders',
+      requiresAuth: true,
+      parameters: [
+        { name: 'id', type: 'integer', description: 'Order ID (required)' }
+      ],
+      curl: `curl -X DELETE "${apiUrl}/api/orders?id=1262" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "message": "Order deleted successfully"
+}`,
+      responses: [
+        { status: 200, description: 'Deleted successfully' },
+        { status: 400, description: 'Missing id' },
+        { status: 404, description: 'Order not found' }
+      ]
+    },
+    {
+      id: 'GET-/api/installments',
+      method: 'GET',
+      path: '/api/installments',
+      description: 'Retrieve customer order installment records from MySQL database (Xqc7k7_customer_order_installments table)',
+      category: 'MySQL - Installments',
+      requiresAuth: true,
+      parameters: [
+        { name: 'id', type: 'integer', description: 'Filter by installment ID' },
+        { name: 'order_id', type: 'integer', description: 'Filter by order ID' },
+        { name: 'status', type: 'string', description: 'Filter by status (pending, paid, etc.)' },
+        { name: 'limit', type: 'integer', description: 'Max records (default: 100, max: 1000)' },
+        { name: 'offset', type: 'integer', description: 'Skip records (default: 0)' }
+      ],
+      curl: `curl "${apiUrl}/api/installments?order_id=1262" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 1821,
+      "order_id": 1262,
+      "ordinal": 3,
+      "status": "pending",
+      "due_date": "2026-03-13T17:00:00.000Z",
+      "amount": "76.00000",
+      "payment_is_in_progress": 0,
+      "customer_order_installment_snapshot": null
+    },
+    {
+      "id": 1820,
+      "order_id": 1262,
+      "ordinal": 2,
+      "status": "pending",
+      "due_date": "2026-02-13T17:00:00.000Z",
+      "amount": "700.00000",
+      "payment_is_in_progress": 0,
+      "customer_order_installment_snapshot": null
+    },
+    {
+      "id": 1819,
+      "order_id": 1262,
+      "ordinal": 1,
+      "status": "paid",
+      "due_date": "2026-01-13T17:00:00.000Z",
+      "amount": "77000.00000",
+      "payment_is_in_progress": 0,
+      "customer_order_installment_snapshot": {"payment_method": "bank_transfer", "paid_at": "2026-01-13T10:00:00Z"}
+    }
+  ],
+  "pagination": {
+    "limit": 100,
+    "offset": 0,
+    "returned": 3
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 400, description: 'Invalid parameters' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 429, description: 'Rate limit exceeded' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'POST-/api/installments',
+      method: 'POST',
+      path: '/api/installments',
+      description: 'Create a new installment record for an order',
+      category: 'MySQL - Installments',
+      requiresAuth: true,
+      requestBody: {
+        order_id: { type: 'integer', required: true, description: 'Order ID' },
+        ordinal: { type: 'integer', required: true, description: 'Installment sequence number (1, 2, 3, etc.)' },
+        status: { type: 'string', required: true, description: 'Status (pending, paid, overdue, etc.)' },
+        amount: { type: 'decimal', required: true, description: 'Installment amount' },
+        due_date: { type: 'date', required: false, description: 'Due date (YYYY-MM-DD)' },
+        payment_is_in_progress: { type: 'boolean', required: false, description: 'Payment in progress flag (default: false)' },
+        customer_order_installment_snapshot: { type: 'json', required: false, description: 'Additional installment data' }
+      },
+      curl: `curl -X POST "${apiUrl}/api/installments" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "order_id": 1262,
+    "ordinal": 4,
+    "status": "pending",
+    "due_date": "2026-04-13",
+    "amount": 10000.00,
+    "payment_is_in_progress": 0
+  }'`,
+      response: `{
+  "success": true,
+  "data": {
+    "id": 1822,
+    "order_id": 1262,
+    "ordinal": 4,
+    "status": "pending",
+    "due_date": "2026-04-13",
+    "amount": 10000.00,
+    "payment_is_in_progress": 0
+  }
+}`,
+      responses: [
+        { status: 201, description: 'Installment created successfully' },
+        { status: 400, description: 'Missing required fields' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database insert failed' }
+      ]
+    },
+    {
+      id: 'PUT-/api/installments',
+      method: 'PUT',
+      path: '/api/installments',
+      description: 'Update an existing installment. Requires id, send only fields to update.',
+      category: 'MySQL - Installments',
+      requiresAuth: true,
+      requestBody: {
+        id: { type: 'integer', required: true, description: 'Installment ID to update' },
+        status: { type: 'string', required: false, description: 'Updated status' },
+        payment_is_in_progress: { type: 'boolean', required: false, description: 'Payment progress flag' },
+        customer_order_installment_snapshot: { type: 'json', required: false, description: 'Updated snapshot data' }
+      },
+      curl: `curl -X PUT "${apiUrl}/api/installments" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "id": 1819,
+    "status": "paid",
+    "customer_order_installment_snapshot": {
+      "payment_method": "bank_transfer",
+      "paid_at": "2026-01-13T10:00:00Z"
+    }
+  }'`,
+      response: `{
+  "success": true,
+  "data": {
+    "id": 1819,
+    "status": "paid",
+    "customer_order_installment_snapshot": {
+      "payment_method": "bank_transfer",
+      "paid_at": "2026-01-13T10:00:00Z"
+    }
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Updated successfully' },
+        { status: 400, description: 'Missing id' },
+        { status: 404, description: 'Installment not found' },
+        { status: 500, description: 'Database update failed' }
+      ]
+    },
+    {
+      id: 'DELETE-/api/installments',
+      method: 'DELETE',
+      path: '/api/installments',
+      description: 'Delete an installment by ID',
+      category: 'MySQL - Installments',
+      requiresAuth: true,
+      parameters: [
+        { name: 'id', type: 'integer', description: 'Installment ID (required)' }
+      ],
+      curl: `curl -X DELETE "${apiUrl}/api/installments?id=1822" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "message": "Installment deleted successfully"
+}`,
+      responses: [
+        { status: 200, description: 'Deleted successfully' },
+        { status: 400, description: 'Missing id' },
+        { status: 404, description: 'Installment not found' }
+      ]
+    },
+    {
+      id: 'GET-/api/suppliers',
+      method: 'GET',
+      path: '/api/suppliers',
+      description: 'Retrieve supplier records from MySQL database (tw_suppliers_db.GsF2WeS_suppliers table)',
+      category: 'MySQL - Suppliers',
+      requiresAuth: true,
+      parameters: [
+        { name: 'id', type: 'integer', description: 'Filter by supplier ID' },
+        { name: 'code', type: 'string', description: 'Filter by supplier code' },
+        { name: 'name_en', type: 'string', description: 'Search by English name (partial match)' },
+        { name: 'name_th', type: 'string', description: 'Search by Thai name (partial match)' },
+        { name: 'status_code', type: 'integer', description: 'Filter by status code' },
+        { name: 'limit', type: 'integer', description: 'Max records (default: 100, max: 1000)' },
+        { name: 'offset', type: 'integer', description: 'Skip records (default: 0)' }
+      ],
+      curl: `curl "${apiUrl}/api/suppliers?limit=10" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 75,
+      "name_en": "Sabaidee Tour",
+      "name_th": "สบายดรทัวร์",
+      "product_twp_slug": "sabaidee-tour",
+      "category_tourism_licenses_id": 1,
+      "tourism_license": "11/12345",
+      "tourism_license_expire_at": "2027-12-31T00:00:00.000Z",
+      "company_type": 1,
+      "company_license": "0105123456789",
+      "company_name": "บริษัท สบายดรทัวร์ จำกัด",
+      "individual_first_name": null,
+      "individual_last_name": null,
+      "individual_id_card": null,
+      "fax_no": "021234567",
+      "email": "contact@sabaideetour.com",
+      "line_id": "@sabaideetour",
+      "twitter": null,
+      "youtube": "https://youtube.com/@sabaideetour",
+      "instagram": "@sabaideetour",
+      "website": "https://www.sabaideetour.com",
+      "description": "ผู้ให้บริการทัวร์คุณภาพ",
+      "note": "Trusted partner",
+      "program_quantity": 50,
+      "status_code": 1,
+      "status_reason": null,
+      "product_pool_ranking": 10,
+      "created_by": "admin",
+      "created_at": "2024-01-01T10:00:00.000Z",
+      "updated_by": "admin",
+      "updated_at": "2026-01-10T15:30:00.000Z",
+      "validated_by": "admin",
+      "validated_at": "2024-01-15T10:00:00.000Z",
+      "code": "SUP001",
+      "image_file_name": "sabaidee-logo.jpg",
+      "image_file_size": 102400,
+      "image_content_type": "image/jpeg",
+      "image_updated_at": "2024-01-01T10:00:00.000Z",
+      "company_license_document_file_name": "company-license.pdf",
+      "company_license_document_file_size": 512000,
+      "company_license_document_content_type": "application/pdf",
+      "company_license_document_updated_at": "2024-01-01T10:00:00.000Z",
+      "individual_id_card_document_file_name": null,
+      "individual_id_card_document_file_size": null,
+      "individual_id_card_document_content_type": null,
+      "individual_id_card_document_updated_at": null,
+      "facebook": "https://facebook.com/sabaideetour",
+      "is_free_cancel": 1,
+      "is_withholding_tax": 1,
+      "tel": "021234567",
+      "is_product_twp": 1,
+      "is_product_tw": 0,
+      "product_twp_invoice_approve_auto": 0,
+      "product_twp_invoice_default_note": "ขอบคุณที่ใช้บริการ",
+      "product_twp_invoice_installment_first": 50,
+      "product_twp_invoice_installment_second": 50,
+      "product_twp_period_display_commission": 1,
+      "product_twp_invoice_themes_id": 1,
+      "product_twp_invoice_email_sender_seller": 1,
+      "is_channel_ob": 0
+    }
+  ],
+  "pagination": {
+    "limit": 10,
+    "offset": 0,
+    "returned": 1
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 400, description: 'Invalid parameters' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 429, description: 'Rate limit exceeded' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'POST-/api/suppliers',
+      method: 'POST',
+      path: '/api/suppliers',
+      description: 'Create a new supplier record',
+      category: 'MySQL - Suppliers',
+      requiresAuth: true,
+      requestBody: {
+        name_en: { type: 'string', required: false, description: 'English name' },
+        name_th: { type: 'string', required: false, description: 'Thai name' },
+        code: { type: 'string', required: false, description: 'Supplier code (unique)' },
+        email: { type: 'string', required: false, description: 'Email address' },
+        tel: { type: 'string', required: false, description: 'Telephone number' },
+        company_name: { type: 'string', required: false, description: 'Company name' },
+        company_license: { type: 'string', required: false, description: 'Company license number' },
+        tourism_license: { type: 'string', required: false, description: 'Tourism license number' },
+        website: { type: 'string', required: false, description: 'Website URL' },
+        status_code: { type: 'integer', required: false, description: 'Status code (default: 1)' }
+      },
+      curl: `curl -X POST "${apiUrl}/api/suppliers" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "name_en": "Amazing Tours",
+    "name_th": "ทัวร์สุดยอด",
+    "code": "SUP002",
+    "email": "contact@amazingtours.com",
+    "tel": "021234567",
+    "status_code": 1
+  }'`,
+      response: `{
+  "success": true,
+  "data": {
+    "id": 76,
+    "name_en": "Amazing Tours",
+    "name_th": "ทัวร์สุดยอด",
+    "code": "SUP002",
+    "email": "contact@amazingtours.com",
+    "tel": "021234567",
+    "status_code": 1
+  }
+}`,
+      responses: [
+        { status: 201, description: 'Supplier created successfully' },
+        { status: 400, description: 'Invalid data' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database insert failed' }
+      ]
+    },
+    {
+      id: 'PUT-/api/suppliers',
+      method: 'PUT',
+      path: '/api/suppliers',
+      description: 'Update an existing supplier. Requires id, send only fields to update.',
+      category: 'MySQL - Suppliers',
+      requiresAuth: true,
+      requestBody: {
+        id: { type: 'integer', required: true, description: 'Supplier ID to update' },
+        name_en: { type: 'string', required: false, description: 'Updated English name' },
+        name_th: { type: 'string', required: false, description: 'Updated Thai name' },
+        email: { type: 'string', required: false, description: 'Updated email' },
+        tel: { type: 'string', required: false, description: 'Updated telephone' },
+        status_code: { type: 'integer', required: false, description: 'Updated status' }
+      },
+      curl: `curl -X PUT "${apiUrl}/api/suppliers" \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: YOUR_API_KEY" \\
+  -d '{
+    "id": 75,
+    "name_en": "Sabaidee Tour Updated",
+    "email": "new@sabaideetour.com"
+  }'`,
+      response: `{
+  "success": true,
+  "data": {
+    "id": 75,
+    "name_en": "Sabaidee Tour Updated",
+    "email": "new@sabaideetour.com"
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Updated successfully' },
+        { status: 400, description: 'Missing id' },
+        { status: 404, description: 'Supplier not found' },
+        { status: 500, description: 'Database update failed' }
+      ]
+    },
+    {
+      id: 'DELETE-/api/suppliers',
+      method: 'DELETE',
+      path: '/api/suppliers',
+      description: 'Delete a supplier by ID',
+      category: 'MySQL - Suppliers',
+      requiresAuth: true,
+      parameters: [
+        { name: 'id', type: 'integer', description: 'Supplier ID (required)' }
+      ],
+      curl: `curl -X DELETE "${apiUrl}/api/suppliers?id=76" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "message": "Supplier deleted successfully"
+}`,
+      responses: [
+        { status: 200, description: 'Deleted successfully' },
+        { status: 400, description: 'Missing id' },
+        { status: 404, description: 'Supplier not found' }
+      ]
+    },
+    {
       id: 'DELETE-/api/chat-history',
       method: 'DELETE',
       path: '/api/chat-history',
