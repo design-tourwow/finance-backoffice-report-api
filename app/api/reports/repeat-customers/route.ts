@@ -45,12 +45,12 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url)
+    const countryId = searchParams.get('country_id')
+    const supplierId = searchParams.get('supplier_id')
     const travelDateFrom = searchParams.get('travel_date_from')
     const travelDateTo = searchParams.get('travel_date_to')
     const bookingDateFrom = searchParams.get('booking_date_from')
     const bookingDateTo = searchParams.get('booking_date_to')
-    const countryId = searchParams.get('country_id')
-    const supplierId = searchParams.get('supplier_id')
 
     let whereClause = `
       WHERE o.order_status != 'Canceled'
@@ -58,6 +58,18 @@ export async function GET(request: NextRequest) {
         AND o.customer_id IS NOT NULL
     `
     const params: any[] = []
+
+    // Filter by country_id (FIX: ใช้ JSON_EXTRACT แทน JSON_CONTAINS)
+    if (countryId) {
+      whereClause += ` AND CAST(JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') AS UNSIGNED) = ?`
+      params.push(parseInt(countryId))
+    }
+
+    // Filter by supplier_id
+    if (supplierId) {
+      whereClause += ` AND o.product_owner_supplier_id = ?`
+      params.push(supplierId)
+    }
 
     if (travelDateFrom) {
       whereClause += ` AND JSON_EXTRACT(o.product_period_snapshot, '$.start_at') >= ?`
@@ -74,14 +86,6 @@ export async function GET(request: NextRequest) {
     if (bookingDateTo) {
       whereClause += ` AND DATE(CONVERT_TZ(o.created_at, '+00:00', '+07:00')) <= ?`
       params.push(bookingDateTo)
-    }
-    if (countryId) {
-      whereClause += ` AND JSON_CONTAINS(JSON_EXTRACT(o.product_snapshot, '$.countries[*].id'), ?, '$')`
-      params.push(countryId)
-    }
-    if (supplierId) {
-      whereClause += ` AND o.product_owner_supplier_id = ?`
-      params.push(supplierId)
     }
 
     const query = `

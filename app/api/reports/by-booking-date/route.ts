@@ -50,12 +50,12 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url)
+    const countryId = searchParams.get('country_id')
+    const supplierId = searchParams.get('supplier_id')
     const travelDateFrom = searchParams.get('travel_date_from')
     const travelDateTo = searchParams.get('travel_date_to')
     const bookingDateFrom = searchParams.get('booking_date_from')
     const bookingDateTo = searchParams.get('booking_date_to')
-    const countryId = searchParams.get('country_id')
-    const supplierId = searchParams.get('supplier_id')
 
     let query = `
       SELECT 
@@ -68,6 +68,18 @@ export async function GET(request: NextRequest) {
         AND deleted_at IS NULL
     `
     const params: any[] = []
+
+    // Filter by country_id (FIX: ใช้ JSON_EXTRACT แทน JSON_CONTAINS)
+    if (countryId) {
+      query += ` AND CAST(JSON_EXTRACT(product_snapshot, '$.countries[0].id') AS UNSIGNED) = ?`
+      params.push(parseInt(countryId))
+    }
+
+    // Filter by supplier_id
+    if (supplierId) {
+      query += ` AND product_owner_supplier_id = ?`
+      params.push(supplierId)
+    }
 
     if (travelDateFrom) {
       query += ` AND JSON_EXTRACT(product_period_snapshot, '$.start_at') >= ?`
@@ -84,14 +96,6 @@ export async function GET(request: NextRequest) {
     if (bookingDateTo) {
       query += ` AND DATE(CONVERT_TZ(created_at, '+00:00', '+07:00')) <= ?`
       params.push(bookingDateTo)
-    }
-    if (countryId) {
-      query += ` AND JSON_CONTAINS(JSON_EXTRACT(product_snapshot, '$.countries[*].id'), ?, '$')`
-      params.push(countryId)
-    }
-    if (supplierId) {
-      query += ` AND product_owner_supplier_id = ?`
-      params.push(supplierId)
     }
 
     query += ` GROUP BY booking_month ORDER BY booking_month ASC`

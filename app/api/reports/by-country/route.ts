@@ -45,6 +45,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url)
+    const countryId = searchParams.get('country_id')
     const travelDateFrom = searchParams.get('travel_date_from')
     const travelDateTo = searchParams.get('travel_date_to')
     const bookingDateFrom = searchParams.get('booking_date_from')
@@ -65,6 +66,12 @@ export async function GET(request: NextRequest) {
         AND JSON_EXTRACT(product_snapshot, '$.countries[0].id') IS NOT NULL
     `
     const params: any[] = []
+
+    // Filter by country_id (FIX: เพิ่ม filter ประเทศ)
+    if (countryId) {
+      query += ` AND CAST(JSON_EXTRACT(product_snapshot, '$.countries[0].id') AS UNSIGNED) = ?`
+      params.push(parseInt(countryId))
+    }
 
     if (travelDateFrom) {
       query += ` AND JSON_EXTRACT(product_period_snapshot, '$.start_at') >= ?`
