@@ -45,12 +45,16 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url)
+    const countryIdParam = searchParams.get('country_id')
+    const supplierIdParam = searchParams.get('supplier_id')
     const travelDateFrom = searchParams.get('travel_date_from')
     const travelDateTo = searchParams.get('travel_date_to')
     const bookingDateFrom = searchParams.get('booking_date_from')
     const bookingDateTo = searchParams.get('booking_date_to')
-    const countryId = searchParams.get('country_id')
-    const supplierId = searchParams.get('supplier_id')
+
+    // Parse comma-separated IDs
+    const countryIds = countryIdParam ? countryIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
+    const supplierIds = supplierIdParam ? supplierIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
 
     let query = `
       SELECT 
@@ -84,16 +88,18 @@ export async function GET(request: NextRequest) {
       params.push(bookingDateTo)
     }
 
-    // Filter by country
-    if (countryId) {
-      query += ` AND JSON_CONTAINS(JSON_EXTRACT(product_snapshot, '$.countries[*].id'), ?, '$')`
-      params.push(countryId)
+    // Filter by country_id (support multiple IDs)
+    if (countryIds.length > 0) {
+      const placeholders = countryIds.map(() => '?').join(',')
+      query += ` AND CAST(JSON_EXTRACT(product_snapshot, '$.countries[0].id') AS UNSIGNED) IN (${placeholders})`
+      params.push(...countryIds)
     }
 
-    // Filter by supplier
-    if (supplierId) {
-      query += ` AND product_owner_supplier_id = ?`
-      params.push(supplierId)
+    // Filter by supplier_id (support multiple IDs)
+    if (supplierIds.length > 0) {
+      const placeholders = supplierIds.map(() => '?').join(',')
+      query += ` AND product_owner_supplier_id IN (${placeholders})`
+      params.push(...supplierIds)
     }
 
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(query, params)

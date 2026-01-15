@@ -45,12 +45,16 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url)
-    const countryId = searchParams.get('country_id')
-    const supplierId = searchParams.get('supplier_id')
+    const countryIdParam = searchParams.get('country_id')
+    const supplierIdParam = searchParams.get('supplier_id')
     const travelDateFrom = searchParams.get('travel_date_from')
     const travelDateTo = searchParams.get('travel_date_to')
     const bookingDateFrom = searchParams.get('booking_date_from')
     const bookingDateTo = searchParams.get('booking_date_to')
+
+    // Parse comma-separated IDs
+    const countryIds = countryIdParam ? countryIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
+    const supplierIds = supplierIdParam ? supplierIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
 
     let query = `
       SELECT 
@@ -67,16 +71,18 @@ export async function GET(request: NextRequest) {
     `
     const params: any[] = []
 
-    // Filter by country_id
-    if (countryId) {
-      query += ` AND CAST(JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') AS UNSIGNED) = ?`
-      params.push(parseInt(countryId))
+    // Filter by country_id (support multiple IDs)
+    if (countryIds.length > 0) {
+      const placeholders = countryIds.map(() => '?').join(',')
+      query += ` AND CAST(JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') AS UNSIGNED) IN (${placeholders})`
+      params.push(...countryIds)
     }
 
-    // Filter by supplier_id (FIX: เพิ่ม filter supplier)
-    if (supplierId) {
-      query += ` AND o.product_owner_supplier_id = ?`
-      params.push(supplierId)
+    // Filter by supplier_id (support multiple IDs)
+    if (supplierIds.length > 0) {
+      const placeholders = supplierIds.map(() => '?').join(',')
+      query += ` AND o.product_owner_supplier_id IN (${placeholders})`
+      params.push(...supplierIds)
     }
 
     if (travelDateFrom) {

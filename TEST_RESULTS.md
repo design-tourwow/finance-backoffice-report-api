@@ -211,3 +211,104 @@ All error responses:
 **Test Date**: January 13, 2026
 **Tested By**: Kiro AI Assistant
 **Server**: http://localhost:3001
+
+
+---
+
+## Report Endpoints Testing (January 14, 2026)
+
+### Country Filter Bug Fix ✅
+
+**Problem**: When filtering by `country_id`, endpoints 2-6 returned ALL countries instead of filtering to the selected country.
+
+**Root Cause**: 
+- Used `JSON_CONTAINS` which doesn't work correctly for integer comparison
+- Didn't cast JSON_EXTRACT values to integers
+
+**Solution**:
+Changed from:
+```sql
+JSON_CONTAINS(product_snapshot, ?, '$.countries[0].id')
+```
+
+To:
+```sql
+CAST(JSON_EXTRACT(product_snapshot, '$.countries[0].id') AS UNSIGNED) = ?
+```
+
+And used `parseInt()` when pushing country_id to params array.
+
+### Test Results (Localhost & Staging)
+
+#### ✅ 1. `/api/reports/by-country?country_id=78`
+- Returns only country_id 78 (กรีซ)
+- 1 order, 1 customer, 30,000 THB
+
+#### ✅ 2. `/api/reports/by-supplier?country_id=78`
+- Returns only suppliers with orders in country 78
+- Supplier ID 44: "บริษัท ทีทีเอ็น พลัส เวิลด์ จำกัด"
+
+#### ✅ 3. `/api/reports/by-travel-date?country_id=78`
+- Returns only travel dates for country 78
+- December 2025: 1 order
+
+#### ✅ 4. `/api/reports/by-booking-date?country_id=78`
+- Returns only booking dates for country 78
+- October 2025: 1 order
+
+#### ✅ 5. `/api/reports/repeat-customers?country_id=78`
+- Returns only repeat customers for country 78
+- Empty result (no repeat customers for this country)
+
+### Combined Filters Testing ✅
+
+**Test 1**: Country + Travel Date Range
+```bash
+curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/by-supplier?country_id=7&travel_date_from=2025-01-01&travel_date_to=2025-12-31" \
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
+```
+- ✅ Returns 4 suppliers for Japan (country_id=7) with travel dates in 2025
+
+**Test 2**: Country + Booking Date Range
+```bash
+curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/by-travel-date?country_id=7&booking_date_from=2024-01-01&booking_date_to=2024-12-31" \
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
+```
+- ✅ Returns 15 travel months for Japan with bookings made in 2024
+
+### Backward Compatibility ✅
+
+**Test**: No filters (should return all data)
+```bash
+curl "http://localhost:3001/api/reports/by-country" \
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
+```
+- ✅ Returns 23 countries (all data)
+
+```bash
+curl "http://localhost:3001/api/reports/by-supplier" \
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
+```
+- ✅ Returns 26 suppliers (all data)
+
+```bash
+curl "http://localhost:3001/api/reports/by-travel-date" \
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
+```
+- ✅ Returns 40 travel months (all data)
+
+### Deployment Status ✅
+
+- ✅ Committed: `1a25263 - fix: country_id filter now works correctly in all report endpoints`
+- ✅ Pushed to origin/staging
+- ✅ Deployed to staging: https://staging-finance-backoffice-report-api.vercel.app
+- ✅ All tests passed on staging environment
+
+### Fixed Endpoints:
+1. `/api/reports/by-country` - ✅ country_id filter working
+2. `/api/reports/by-supplier` - ✅ country_id filter working
+3. `/api/reports/by-travel-date` - ✅ country_id filter working
+4. `/api/reports/by-booking-date` - ✅ country_id filter working
+5. `/api/reports/repeat-customers` - ✅ country_id filter working
+
+**Status**: 🎉 Bug fixed and deployed successfully!
