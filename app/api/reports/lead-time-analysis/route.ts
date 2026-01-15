@@ -108,9 +108,18 @@ export async function GET(request: NextRequest) {
         JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')) as country_name,
         o.product_owner_supplier_id as supplier_id,
         s.name_th as supplier_name,
-        o.created_at,
-        JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.start_at')) as travel_start_date,
-        JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.end_at')) as travel_end_date,
+        DATE_FORMAT(CONVERT_TZ(o.created_at, '+00:00', '+07:00'), '%d/%m/%Y') as created_at_formatted,
+        YEAR(CONVERT_TZ(o.created_at, '+00:00', '+07:00')) + 543 as created_at_year_buddhist,
+        DATE_FORMAT(
+          STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.start_at')), '%Y-%m-%d'),
+          '%d/%m/%Y'
+        ) as travel_start_date_formatted,
+        YEAR(STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.start_at')), '%Y-%m-%d')) + 543 as travel_start_year_buddhist,
+        DATE_FORMAT(
+          STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.end_at')), '%Y-%m-%d'),
+          '%d/%m/%Y'
+        ) as travel_end_date_formatted,
+        YEAR(STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.end_at')), '%Y-%m-%d')) + 543 as travel_end_year_buddhist,
         DATEDIFF(
           STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.start_at')), '%Y-%m-%d'),
           DATE(CONVERT_TZ(o.created_at, '+00:00', '+07:00'))
@@ -243,23 +252,41 @@ export async function GET(request: NextRequest) {
 
     const [distributionRows] = await mysqlPool.execute<RowDataPacket[]>(distributionQuery, params)
 
-    // Format response data
-    const data = detailRows.map(row => ({
-      order_id: parseInt(row.order_id) || 0,
-      order_code: row.order_code || '',
-      customer_id: parseInt(row.customer_id) || 0,
-      customer_name: row.customer_name || '',
-      customer_code: row.customer_code || '',
-      country_id: parseInt(row.country_id) || 0,
-      country_name: row.country_name || '',
-      supplier_id: parseInt(row.supplier_id) || 0,
-      supplier_name: row.supplier_name || '',
-      created_at: row.created_at,
-      travel_start_date: row.travel_start_date || '',
-      travel_end_date: row.travel_end_date || '',
-      lead_time_days: parseInt(row.lead_time_days) || 0,
-      net_amount: parseFloat(row.net_amount) || 0
-    }))
+    // Format response data with Thai Buddhist calendar
+    const data = detailRows.map(row => {
+      // Format dates with Buddhist year (พ.ศ.)
+      const createdAtParts = row.created_at_formatted ? row.created_at_formatted.split('/') : ['', '', '']
+      const created_at = createdAtParts.length === 3 
+        ? `${createdAtParts[0]}/${createdAtParts[1]}/${row.created_at_year_buddhist || ''}`
+        : ''
+
+      const travelStartParts = row.travel_start_date_formatted ? row.travel_start_date_formatted.split('/') : ['', '', '']
+      const travel_start_date = travelStartParts.length === 3
+        ? `${travelStartParts[0]}/${travelStartParts[1]}/${row.travel_start_year_buddhist || ''}`
+        : ''
+
+      const travelEndParts = row.travel_end_date_formatted ? row.travel_end_date_formatted.split('/') : ['', '', '']
+      const travel_end_date = travelEndParts.length === 3
+        ? `${travelEndParts[0]}/${travelEndParts[1]}/${row.travel_end_year_buddhist || ''}`
+        : ''
+
+      return {
+        order_id: parseInt(row.order_id) || 0,
+        order_code: row.order_code || '',
+        customer_id: parseInt(row.customer_id) || 0,
+        customer_name: row.customer_name || '',
+        customer_code: row.customer_code || '',
+        country_id: parseInt(row.country_id) || 0,
+        country_name: row.country_name || '',
+        supplier_id: parseInt(row.supplier_id) || 0,
+        supplier_name: row.supplier_name || '',
+        created_at: created_at,
+        travel_start_date: travel_start_date,
+        travel_end_date: travel_end_date,
+        lead_time_days: parseInt(row.lead_time_days) || 0,
+        net_amount: parseFloat(row.net_amount) || 0
+      }
+    })
 
     const distribution = distributionRows.map(row => ({
       range: row.range_key,

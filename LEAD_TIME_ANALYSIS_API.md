@@ -37,9 +37,9 @@ API endpoint สำหรับวิเคราะห์ช่วงเวล�
       "country_name": "ญี่ปุ่น",
       "supplier_id": 5,
       "supplier_name": "ABC Tour",
-      "created_at": "2026-01-13T10:00:00.000Z",
-      "travel_start_date": "2026-03-01",
-      "travel_end_date": "2026-03-05",
+      "created_at": "13/01/2569",
+      "travel_start_date": "01/03/2569",
+      "travel_end_date": "05/03/2569",
       "lead_time_days": 47,
       "net_amount": 185000
     }
@@ -135,9 +135,9 @@ API endpoint สำหรับวิเคราะห์ช่วงเวล�
 - `country_name` - Country name (Thai)
 - `supplier_id` - Supplier ID
 - `supplier_name` - Supplier name (Thai)
-- `created_at` - Booking date/time (UTC)
-- `travel_start_date` - Travel start date
-- `travel_end_date` - Travel end date
+- `created_at` - Booking date in Thai format (DD/MM/YYYY พ.ศ.) e.g., "13/01/2569"
+- `travel_start_date` - Travel start date in Thai format (DD/MM/YYYY พ.ศ.) e.g., "01/03/2569"
+- `travel_end_date` - Travel end date in Thai format (DD/MM/YYYY พ.ศ.) e.g., "05/03/2569"
 - `lead_time_days` - Number of days between booking and travel (can be 0 or negative)
 - `net_amount` - Net amount
 
@@ -205,10 +205,10 @@ Lead Time (days) = Travel Start Date - Booking Date
 ```
 
 **Examples:**
-- Booking: 2026-01-15, Travel: 2026-03-01 → Lead Time: 45 days
-- Booking: 2026-02-28, Travel: 2026-03-01 → Lead Time: 1 day
-- Booking: 2026-03-01, Travel: 2026-03-01 → Lead Time: 0 days (same day booking)
-- Booking: 2026-03-05, Travel: 2026-03-01 → Lead Time: -4 days (booked after travel date - data error)
+- Booking: 15/01/2569, Travel: 01/03/2569 → Lead Time: 45 days
+- Booking: 28/02/2569, Travel: 01/03/2569 → Lead Time: 1 day
+- Booking: 01/03/2569, Travel: 01/03/2569 → Lead Time: 0 days (same day booking)
+- Booking: 05/03/2569, Travel: 01/03/2569 → Lead Time: -4 days (booked after travel date - data error)
 
 ## Distribution Ranges
 

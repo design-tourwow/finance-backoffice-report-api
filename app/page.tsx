@@ -1902,9 +1902,9 @@ export default function Home() {
       "country_name": "ญี่ปุ่น",
       "supplier_id": 1,
       "supplier_name": "Sabaidee Tour",
-      "created_at": "2026-01-13T10:00:00.000Z",
-      "travel_start_date": "2026-03-01",
-      "travel_end_date": "2026-03-05",
+      "created_at": "13/01/2569",
+      "travel_start_date": "01/03/2569",
+      "travel_end_date": "05/03/2569",
       "lead_time_days": 47,
       "net_amount": 48150
     }
