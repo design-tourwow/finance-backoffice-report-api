@@ -1869,6 +1869,130 @@ export default function Home() {
         { status: 200, description: 'Cleared successfully' },
         { status: 400, description: 'Missing user_id' }
       ]
+    },
+    {
+      id: 'GET-/api/reports/lead-time-analysis',
+      method: 'GET',
+      path: '/api/reports/lead-time-analysis',
+      description: 'Analyze booking lead time (days between booking date and travel date) with statistics and distribution',
+      category: 'MySQL - Reports',
+      requiresAuth: true,
+      parameters: [
+        { name: 'country_id', type: 'string', description: 'Single or comma-separated country IDs (e.g., "7" or "7,39,4")' },
+        { name: 'supplier_id', type: 'string', description: 'Single or comma-separated supplier IDs (e.g., "1" or "1,5,10")' },
+        { name: 'travel_date_from', type: 'date', description: 'Start travel date (YYYY-MM-DD)' },
+        { name: 'travel_date_to', type: 'date', description: 'End travel date (YYYY-MM-DD)' },
+        { name: 'booking_date_from', type: 'date', description: 'Start booking date (YYYY-MM-DD)' },
+        { name: 'booking_date_to', type: 'date', description: 'End booking date (YYYY-MM-DD)' },
+        { name: 'limit', type: 'integer', description: 'Max records (default: 1000, max: 10000)' },
+        { name: 'offset', type: 'integer', description: 'Skip records (default: 0)' }
+      ],
+      curl: `curl "${apiUrl}/api/reports/lead-time-analysis?country_id=7,39&limit=100" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "order_id": 1262,
+      "order_code": "TWP26010001",
+      "customer_id": 152,
+      "customer_name": "จอง Item จากทัวร์ว้าว",
+      "customer_code": "CUS251200001",
+      "country_id": 7,
+      "country_name": "ญี่ปุ่น",
+      "supplier_id": 1,
+      "supplier_name": "Sabaidee Tour",
+      "created_at": "2026-01-13T10:00:00.000Z",
+      "travel_start_date": "2026-03-01",
+      "travel_end_date": "2026-03-05",
+      "lead_time_days": 47,
+      "net_amount": 48150
+    }
+  ],
+  "summary": {
+    "total_orders": 877,
+    "avg_lead_time": 45.3,
+    "min_lead_time": 0,
+    "max_lead_time": 365,
+    "median_lead_time": 30,
+    "total_net_amount": 90971192
+  },
+  "distribution": [
+    {
+      "range": "0-7",
+      "range_label": "0-7 วัน (จองใกล้วันเดินทาง)",
+      "min_days": 0,
+      "max_days": 7,
+      "count": 150,
+      "percentage": 17.1,
+      "total_net_amount": 15000000,
+      "avg_net_amount": 100000
+    },
+    {
+      "range": "8-14",
+      "range_label": "8-14 วัน",
+      "min_days": 8,
+      "max_days": 14,
+      "count": 180,
+      "percentage": 20.5,
+      "total_net_amount": 18000000,
+      "avg_net_amount": 100000
+    },
+    {
+      "range": "15-30",
+      "range_label": "15-30 วัน",
+      "min_days": 15,
+      "max_days": 30,
+      "count": 280,
+      "percentage": 31.9,
+      "total_net_amount": 28000000,
+      "avg_net_amount": 100000
+    },
+    {
+      "range": "31-60",
+      "range_label": "31-60 วัน",
+      "min_days": 31,
+      "max_days": 60,
+      "count": 150,
+      "percentage": 17.1,
+      "total_net_amount": 15000000,
+      "avg_net_amount": 100000
+    },
+    {
+      "range": "61-90",
+      "range_label": "61-90 วัน",
+      "min_days": 61,
+      "max_days": 90,
+      "count": 80,
+      "percentage": 9.1,
+      "total_net_amount": 8000000,
+      "avg_net_amount": 100000
+    },
+    {
+      "range": "90+",
+      "range_label": "มากกว่า 90 วัน (จองล่วงหน้ามาก)",
+      "min_days": 91,
+      "max_days": null,
+      "count": 37,
+      "percentage": 4.2,
+      "total_net_amount": 6971192,
+      "avg_net_amount": 188410
+    }
+  ],
+  "pagination": {
+    "total": 877,
+    "limit": 1000,
+    "offset": 0,
+    "has_more": false
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response with lead time analysis' },
+        { status: 400, description: 'Invalid date format (use YYYY-MM-DD)' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 429, description: 'Rate limit exceeded' },
+        { status: 500, description: 'Database query failed' }
+      ]
     }
   ]
 
