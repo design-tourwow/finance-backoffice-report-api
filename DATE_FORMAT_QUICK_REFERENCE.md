@@ -13,7 +13,7 @@
 
 ---
 
-## 📋 Format Codes (8 แบบ)
+## 📋 Format Codes (10 แบบ)
 
 | Code | Example | Use Case |
 |------|---------|----------|
@@ -25,6 +25,8 @@
 | `en_short_be_short` | Jan 68 | International chart |
 | `en_full_ad_full` | January 2025 | International + ค.ศ. |
 | `en_short_ad_short` | Jan 25 | International chart + ค.ศ. |
+| `numeric_short` | 01/68 | **Numeric** - Chart (MM/YY) |
+| `numeric_full` | 14/01/2568 | **Numeric** - Full date (DD/MM/YYYY) |
 
 ---
 
@@ -68,6 +70,10 @@ const url = '/api/reports/by-travel-date?date_format=th_full_be_full'
 ```typescript
 const url = '/api/reports/by-travel-date?date_format=th_short_be_short'
 // Result: "ม.ค. 68" - ประหยัดพื้นที่
+
+// หรือใช้รูปแบบตัวเลข (กระชับสุด)
+const url2 = '/api/reports/by-travel-date?date_format=numeric_short'
+// Result: "01/68" - กระชับที่สุด
 ```
 
 ### สำหรับ International
@@ -76,13 +82,22 @@ const url = '/api/reports/by-travel-date?date_format=en_full_be_full'
 // Result: "January 2568" - เข้าใจสากล
 ```
 
+### สำหรับวันที่เต็ม (Full Date)
+```typescript
+// ใช้กับ Lead Time Analysis
+const url = '/api/reports/lead-time-analysis'
+// Result: "14/01/2568" - รูปแบบตัวเลข DD/MM/YYYY พ.ศ.
+```
+
 ---
 
 ## ⚠️ หมายเหตุ
 
 - ถ้าไม่ส่ง `date_format` → ใช้ `th_full_be_full` (มกราคม 2568)
 - ถ้าส่ง format ผิด → fallback ไปใช้ `th_full_be_full`
-- รองรับเฉพาะ 8 รูปแบบที่กำหนดไว้
+- รองรับเฉพาะ 10 รูปแบบที่กำหนดไว้
+- `numeric_short` (01/68) - ใช้กับ by-travel-date และ by-booking-date
+- `numeric_full` (14/01/2568) - ใช้กับ lead-time-analysis (วันที่เต็ม)
 
 ---
 

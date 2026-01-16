@@ -730,7 +730,7 @@ export default function Home() {
       category: '📚 Documentation',
       requiresAuth: false,
       parameters: [
-        { name: 'date_format', type: 'string', description: 'รูปแบบวันที่ (8 แบบ) - ใช้กับ /api/reports/by-travel-date และ /api/reports/by-booking-date' }
+        { name: 'date_format', type: 'string', description: 'รูปแบบวันที่ (10 แบบ) - ใช้กับ /api/reports/by-travel-date และ /api/reports/by-booking-date' }
       ],
       curl: `# ตัวอย่างการใช้งาน Date Format
 
@@ -752,9 +752,14 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=en_full_be_full" \\
 # 4. เดือนอังกฤษย่อ + ปี ค.ศ. ย่อ
 curl "${apiUrl}/api/reports/by-travel-date?date_format=en_short_ad_short" \\
   -H "x-api-key: YOUR_API_KEY"
-# Result: "Jan 25"`,
+# Result: "Jan 25"
+
+# 5. รูปแบบตัวเลข MM/YY (กระชับสุด สำหรับ Chart)
+curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_short" \\
+  -H "x-api-key: YOUR_API_KEY"
+# Result: "01/68"`,
       response: `{
-  "📋 รูปแบบทั้งหมด (8 แบบ)": {
+  "📋 รูปแบบทั้งหมด (10 แบบ)": {
     "th_full_be_full": {
       "example": "มกราคม 2568",
       "description": "เดือนไทยเต็ม + ปี พ.ศ. เต็ม",
@@ -795,21 +800,35 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=en_short_ad_short" \\
       "example": "Jan 25",
       "description": "เดือนอังกฤษย่อ + ปี ค.ศ. ย่อ",
       "use_case": "International chart + ค.ศ."
+    },
+    "numeric_short": {
+      "example": "01/68",
+      "description": "รูปแบบตัวเลข MM/YY พ.ศ.",
+      "use_case": "Chart - กระชับที่สุด (ประหยัดพื้นที่)"
+    },
+    "numeric_full": {
+      "example": "14/01/2568",
+      "description": "รูปแบบตัวเลข DD/MM/YYYY พ.ศ.",
+      "use_case": "Full date - Lead Time Analysis"
     }
   },
   "🎯 API Endpoints ที่รองรับ": [
-    "/api/reports/by-travel-date",
-    "/api/reports/by-booking-date"
+    "/api/reports/by-travel-date (รองรับ 10 รูปแบบ)",
+    "/api/reports/by-booking-date (รองรับ 10 รูปแบบ)",
+    "/api/reports/lead-time-analysis (ใช้ numeric_full สำหรับวันที่เต็ม)"
   ],
   "💡 แนะนำการใช้งาน": {
     "table_display": "th_full_be_full → มกราคม 2568",
-    "chart_labels": "th_short_be_short → ม.ค. 68",
-    "international": "en_full_be_full → January 2568"
+    "chart_labels": "th_short_be_short → ม.ค. 68 หรือ numeric_short → 01/68",
+    "international": "en_full_be_full → January 2568",
+    "full_date": "numeric_full → 14/01/2568 (Lead Time Analysis)"
   },
   "⚠️ หมายเหตุ": [
     "ถ้าไม่ส่ง date_format → ใช้ th_full_be_full (มกราคม 2568)",
     "ถ้าส่ง format ผิด → fallback ไปใช้ th_full_be_full",
-    "รองรับเฉพาะ 8 รูปแบบที่กำหนดไว้"
+    "รองรับเฉพาะ 10 รูปแบบที่กำหนดไว้",
+    "numeric_short (01/68) - ใช้กับ by-travel-date และ by-booking-date",
+    "numeric_full (14/01/2568) - ใช้กับ lead-time-analysis (วันที่เต็ม)"
   ],
   "📚 เอกสารเพิ่มเติม": {
     "full_guide": "DATE_FORMAT_GUIDE.md",

@@ -44,19 +44,22 @@ export type DateFormatType =
   | 'en_short_be_short' // Jan 68
   | 'en_full_ad_full'   // January 2025
   | 'en_short_ad_short' // Jan 25
+  | 'numeric_short'     // 01/68 (MM/YY พ.ศ.)
+  | 'numeric_full'      // 14/01/2568 (DD/MM/YYYY พ.ศ.)
 
 /**
  * แปลง YYYY-MM เป็นรูปแบบที่ต้องการ
  * 
  * @param monthString รูปแบบ "2025-01"
  * @param format รูปแบบที่ต้องการ (default: 'th_full_be_full')
- * @returns string เช่น "มกราคม 2568"
+ * @returns string เช่น "มกราคม 2568" หรือ "01/68"
  * 
  * @example
  * formatMonthLabel('2025-01', 'th_full_be_full')  // "มกราคม 2568"
  * formatMonthLabel('2025-01', 'th_short_be_short') // "ม.ค. 68"
  * formatMonthLabel('2025-01', 'en_full_be_full')   // "January 2568"
  * formatMonthLabel('2025-01', 'en_short_ad_short') // "Jan 25"
+ * formatMonthLabel('2025-01', 'numeric_short')     // "01/68"
  */
 export function formatMonthLabel(
   monthString: string, 
@@ -64,6 +67,13 @@ export function formatMonthLabel(
 ): string {
   const [year, month] = monthString.split('-')
   const yearNum = parseInt(year)
+
+  // รูปแบบตัวเลข (Numeric Format)
+  if (format === 'numeric_short') {
+    const buddhistYear = yearNum + 543
+    const shortYear = String(buddhistYear).slice(-2)
+    return `${month}/${shortYear}`
+  }
 
   // เลือกเดือน
   let monthName = ''
@@ -130,7 +140,9 @@ export function isValidDateFormat(format: string): format is DateFormatType {
     'en_full_be_full',
     'en_short_be_short',
     'en_full_ad_full',
-    'en_short_ad_short'
+    'en_short_ad_short',
+    'numeric_short',
+    'numeric_full'
   ]
   return validFormats.includes(format as DateFormatType)
 }
@@ -146,5 +158,7 @@ export const DATE_FORMAT_EXAMPLES = {
   'en_full_be_full': 'January 2568',
   'en_short_be_short': 'Jan 68',
   'en_full_ad_full': 'January 2025',
-  'en_short_ad_short': 'Jan 25'
+  'en_short_ad_short': 'Jan 25',
+  'numeric_short': '01/68',
+  'numeric_full': '14/01/2568'
 }

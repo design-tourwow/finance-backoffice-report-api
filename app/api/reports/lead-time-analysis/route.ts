@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { mysqlPool } from '@/lib/db'
 import { logApiRequest, checkRateLimit } from '@/lib/logger'
 import { RowDataPacket } from 'mysql2'
+import { formatFullDate } from '@/lib/dateFormatter'
 
 function checkApiKey(request: NextRequest) {
   const apiKey = request.headers.get('x-api-key') || request.headers.get('authorization')
@@ -243,25 +244,8 @@ export async function GET(request: NextRequest) {
 
     const [distributionRows] = await mysqlPool.execute<RowDataPacket[]>(distributionQuery, params)
 
-    // Format response data with Thai Buddhist calendar
+    // Format response data with Thai Buddhist calendar (numeric format)
     const data = detailRows.map(row => {
-      // Helper function to format date to Thai Buddhist calendar
-      const formatThaiDate = (dateString: string | null) => {
-        if (!dateString) return ''
-        try {
-          const date = new Date(dateString)
-          if (isNaN(date.getTime())) return ''
-          
-          const day = String(date.getDate()).padStart(2, '0')
-          const month = String(date.getMonth() + 1).padStart(2, '0')
-          const year = date.getFullYear() + 543
-          
-          return `${day}/${month}/${year}`
-        } catch {
-          return ''
-        }
-      }
-
       return {
         order_id: parseInt(row.order_id) || 0,
         order_code: row.order_code || '',
@@ -272,9 +256,9 @@ export async function GET(request: NextRequest) {
         country_name: row.country_name || '',
         supplier_id: parseInt(row.supplier_id) || 0,
         supplier_name: row.supplier_name || '',
-        created_at: formatThaiDate(row.created_at_utc),
-        travel_start_date: formatThaiDate(row.travel_start_date_raw),
-        travel_end_date: formatThaiDate(row.travel_end_date_raw),
+        created_at: formatFullDate(row.created_at_utc),
+        travel_start_date: formatFullDate(row.travel_start_date_raw),
+        travel_end_date: formatFullDate(row.travel_end_date_raw),
         lead_time_days: parseInt(row.lead_time_days) || 0,
         net_amount: parseFloat(row.net_amount) || 0
       }
