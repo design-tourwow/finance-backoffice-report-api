@@ -112,10 +112,11 @@ export async function GET(request: NextRequest) {
       const [year, month] = row.booking_month.split('-')
       const monthIndex = parseInt(month) - 1
       const thaiMonth = THAI_MONTHS[monthIndex]
+      const buddhistYear = parseInt(year) + 543 // แปลงเป็น พ.ศ.
       
       return {
         booking_month: row.booking_month,
-        booking_month_label: `${thaiMonth} ${year}`,
+        booking_month_label: `${thaiMonth} ${buddhistYear}`,
         total_orders: parseInt(row.total_orders) || 0,
         total_customers: parseInt(row.total_customers) || 0,
         total_net_amount: parseFloat(row.total_net_amount) || 0
