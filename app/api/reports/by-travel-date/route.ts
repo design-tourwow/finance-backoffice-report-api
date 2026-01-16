@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { mysqlPool } from '@/lib/db'
 import { logApiRequest, checkRateLimit } from '@/lib/logger'
 import { RowDataPacket } from 'mysql2'
+import { formatMonthLabel, isValidDateFormat, DateFormatType } from '@/lib/dateFormatter'
 
 function checkApiKey(request: NextRequest) {
   const apiKey = request.headers.get('x-api-key') || request.headers.get('authorization')
@@ -56,6 +57,12 @@ export async function GET(request: NextRequest) {
     const travelDateTo = searchParams.get('travel_date_to')
     const bookingDateFrom = searchParams.get('booking_date_from')
     const bookingDateTo = searchParams.get('booking_date_to')
+    const dateFormatParam = searchParams.get('date_format') || 'th_full_be_full'
+
+    // Validate date_format parameter
+    const dateFormat: DateFormatType = isValidDateFormat(dateFormatParam) 
+      ? dateFormatParam as DateFormatType 
+      : 'th_full_be_full'
 
     // Parse comma-separated IDs
     const countryIds = countryIdParam ? countryIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
@@ -110,14 +117,9 @@ export async function GET(request: NextRequest) {
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(query, params)
 
     const data = rows.map(row => {
-      const [year, month] = row.travel_month.split('-')
-      const monthIndex = parseInt(month) - 1
-      const thaiMonth = THAI_MONTHS[monthIndex]
-      const buddhistYear = parseInt(year) + 543 // แปลงเป็น พ.ศ.
-      
       return {
         travel_month: row.travel_month,
-        travel_month_label: `${thaiMonth} ${buddhistYear}`,
+        travel_month_label: formatMonthLabel(row.travel_month, dateFormat),
         total_orders: parseInt(row.total_orders) || 0,
         total_customers: parseInt(row.total_customers) || 0,
         total_net_amount: parseFloat(row.total_net_amount) || 0
