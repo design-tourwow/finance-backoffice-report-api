@@ -103,8 +103,8 @@ export async function GET(request: NextRequest) {
         COUNT(o.id) as total_orders,
         GROUP_CONCAT(DISTINCT JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')) SEPARATOR ', ') as countries,
         COALESCE(SUM(o.net_amount), 0) as total_spent
-      FROM Xqc7k7_orders o
-      INNER JOIN Xqc7k7_customers c ON o.customer_id = c.id
+      FROM v_Xqc7k7_orders o
+      INNER JOIN v_Xqc7k7_customers c ON o.customer_id = c.id
       ${whereClause}
       GROUP BY c.id, c.customer_code, c.name, c.phone_number
       HAVING total_orders > 1

@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
         JSON_EXTRACT(product_snapshot, '$.countries[0].id') as id,
         JSON_UNQUOTE(JSON_EXTRACT(product_snapshot, '$.countries[0].name_th')) as name_th,
         JSON_UNQUOTE(JSON_EXTRACT(product_snapshot, '$.countries[0].name_en')) as name_en
-      FROM Xqc7k7_orders
+      FROM v_Xqc7k7_orders
       WHERE order_status != 'Canceled'
         AND deleted_at IS NULL
         AND JSON_EXTRACT(product_snapshot, '$.countries[0].id') IS NOT NULL
