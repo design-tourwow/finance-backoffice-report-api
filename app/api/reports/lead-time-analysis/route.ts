@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
         o.net_amount
       FROM v_Xqc7k7_orders o
       LEFT JOIN v_Xqc7k7_customers c ON o.customer_id = c.id
-      LEFT JOIN tw_suppliers_db.GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
+      LEFT JOIN tw_suppliers_db_views.GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
       ${whereClause}
       ORDER BY lead_time_days DESC
       LIMIT ${limit} OFFSET ${offset}

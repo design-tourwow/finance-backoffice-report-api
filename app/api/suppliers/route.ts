@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    let query = 'SELECT * FROM tw_suppliers_db.GsF2WeS_suppliers WHERE 1=1'
+    let query = 'SELECT * FROM tw_suppliers_db_views.GsF2WeS_suppliers WHERE 1=1'
     const params: any[] = []
 
     if (supplierId) {
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
     const placeholders = Object.keys(body).map(() => '?').join(', ')
     const values = Object.values(body)
 
-    const query = `INSERT INTO tw_suppliers_db.GsF2WeS_suppliers (${fields}, created_at, updated_at) VALUES (${placeholders}, NOW(), NOW())`
+    const query = `INSERT INTO tw_suppliers_db_views.GsF2WeS_suppliers (${fields}, created_at, updated_at) VALUES (${placeholders}, NOW(), NOW())`
 
     const [result] = await mysqlPool.execute<ResultSetHeader>(query, values)
 
@@ -191,7 +191,7 @@ export async function PUT(request: NextRequest) {
     const setClause = Object.keys(updateData).map(key => `${key} = ?`).join(', ')
     const values = [...Object.values(updateData), id]
 
-    const query = `UPDATE tw_suppliers_db.GsF2WeS_suppliers SET ${setClause}, updated_at = NOW() WHERE id = ?`
+    const query = `UPDATE tw_suppliers_db_views.GsF2WeS_suppliers SET ${setClause}, updated_at = NOW() WHERE id = ?`
 
     const [result] = await mysqlPool.execute<ResultSetHeader>(query, values)
 
@@ -239,7 +239,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    const query = 'DELETE FROM tw_suppliers_db.GsF2WeS_suppliers WHERE id = ?'
+    const query = 'DELETE FROM tw_suppliers_db_views.GsF2WeS_suppliers WHERE id = ?'
     const [result] = await mysqlPool.execute<ResultSetHeader>(query, [id])
 
     if (result.affectedRows === 0) {

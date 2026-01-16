@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
         COALESCE(SUM(o.net_amount), 0) as total_net_amount,
         COALESCE(AVG(o.net_amount), 0) as avg_net_amount
       FROM v_Xqc7k7_orders o
-      LEFT JOIN tw_suppliers_db.GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
+      LEFT JOIN tw_suppliers_db_views.GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
       WHERE o.order_status != 'Canceled'
         AND o.deleted_at IS NULL
     `
