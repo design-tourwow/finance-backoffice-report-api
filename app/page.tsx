@@ -9,7 +9,8 @@ function EndpointListItem({ endpoint, isSelected, onClick, searchQuery }: any) {
     GET: { bg: '#dbeafe', text: '#1e40af' },
     POST: { bg: '#d1fae5', text: '#065f46' },
     PUT: { bg: '#fef3c7', text: '#92400e' },
-    DELETE: { bg: '#fee2e2', text: '#991b1b' }
+    DELETE: { bg: '#fee2e2', text: '#991b1b' },
+    INFO: { bg: '#f3e8ff', text: '#6b21a8' }
   }
 
   const color = methodColors[endpoint.method] || methodColors.GET
@@ -86,7 +87,8 @@ function EndpointDetail({ endpoint }: any) {
     GET: { bg: '#dbeafe', text: '#1e40af' },
     POST: { bg: '#d1fae5', text: '#065f46' },
     PUT: { bg: '#fef3c7', text: '#92400e' },
-    DELETE: { bg: '#fee2e2', text: '#991b1b' }
+    DELETE: { bg: '#fee2e2', text: '#991b1b' },
+    INFO: { bg: '#f3e8ff', text: '#6b21a8' }
   }
 
   const color = methodColors[endpoint.method] || methodColors.GET
@@ -720,6 +722,105 @@ export default function Home() {
 
   // Define all endpoints
   const endpoints = [
+    {
+      id: 'INFO-date-formats',
+      method: 'INFO',
+      path: '📅 Date Format Standards',
+      description: 'รูปแบบวันที่ที่รองรับในระบบ - ใช้ query parameter "date_format" ใน API endpoints',
+      category: '📚 Documentation',
+      requiresAuth: false,
+      parameters: [
+        { name: 'date_format', type: 'string', description: 'รูปแบบวันที่ (8 แบบ) - ใช้กับ /api/reports/by-travel-date และ /api/reports/by-booking-date' }
+      ],
+      curl: `# ตัวอย่างการใช้งาน Date Format
+
+# 1. Default (เดือนไทยเต็ม + ปี พ.ศ. เต็ม)
+curl "${apiUrl}/api/reports/by-travel-date" \\
+  -H "x-api-key: YOUR_API_KEY"
+# Result: "มกราคม 2568"
+
+# 2. เดือนไทยย่อ + ปี พ.ศ. ย่อ (สำหรับ Chart)
+curl "${apiUrl}/api/reports/by-travel-date?date_format=th_short_be_short" \\
+  -H "x-api-key: YOUR_API_KEY"
+# Result: "ม.ค. 68"
+
+# 3. เดือนอังกฤษเต็ม + ปี พ.ศ. เต็ม
+curl "${apiUrl}/api/reports/by-travel-date?date_format=en_full_be_full" \\
+  -H "x-api-key: YOUR_API_KEY"
+# Result: "January 2568"
+
+# 4. เดือนอังกฤษย่อ + ปี ค.ศ. ย่อ
+curl "${apiUrl}/api/reports/by-travel-date?date_format=en_short_ad_short" \\
+  -H "x-api-key: YOUR_API_KEY"
+# Result: "Jan 25"`,
+      response: `{
+  "📋 รูปแบบทั้งหมด (8 แบบ)": {
+    "th_full_be_full": {
+      "example": "มกราคม 2568",
+      "description": "เดือนไทยเต็ม + ปี พ.ศ. เต็ม",
+      "use_case": "Default - Table display",
+      "is_default": true
+    },
+    "th_short_be_short": {
+      "example": "ม.ค. 68",
+      "description": "เดือนไทยย่อ + ปี พ.ศ. ย่อ",
+      "use_case": "Chart labels (many data)"
+    },
+    "th_full_ad_full": {
+      "example": "มกราคม 2025",
+      "description": "เดือนไทยเต็ม + ปี ค.ศ. เต็ม",
+      "use_case": "ถ้าต้องการ ค.ศ."
+    },
+    "th_short_ad_short": {
+      "example": "ม.ค. 25",
+      "description": "เดือนไทยย่อ + ปี ค.ศ. ย่อ",
+      "use_case": "Chart + ค.ศ."
+    },
+    "en_full_be_full": {
+      "example": "January 2568",
+      "description": "เดือนอังกฤษเต็ม + ปี พ.ศ. เต็ม",
+      "use_case": "International + พ.ศ."
+    },
+    "en_short_be_short": {
+      "example": "Jan 68",
+      "description": "เดือนอังกฤษย่อ + ปี พ.ศ. ย่อ",
+      "use_case": "International chart"
+    },
+    "en_full_ad_full": {
+      "example": "January 2025",
+      "description": "เดือนอังกฤษเต็ม + ปี ค.ศ. เต็ม",
+      "use_case": "International + ค.ศ."
+    },
+    "en_short_ad_short": {
+      "example": "Jan 25",
+      "description": "เดือนอังกฤษย่อ + ปี ค.ศ. ย่อ",
+      "use_case": "International chart + ค.ศ."
+    }
+  },
+  "🎯 API Endpoints ที่รองรับ": [
+    "/api/reports/by-travel-date",
+    "/api/reports/by-booking-date"
+  ],
+  "💡 แนะนำการใช้งาน": {
+    "table_display": "th_full_be_full → มกราคม 2568",
+    "chart_labels": "th_short_be_short → ม.ค. 68",
+    "international": "en_full_be_full → January 2568"
+  },
+  "⚠️ หมายเหตุ": [
+    "ถ้าไม่ส่ง date_format → ใช้ th_full_be_full (มกราคม 2568)",
+    "ถ้าส่ง format ผิด → fallback ไปใช้ th_full_be_full",
+    "รองรับเฉพาะ 8 รูปแบบที่กำหนดไว้"
+  ],
+  "📚 เอกสารเพิ่มเติม": {
+    "full_guide": "DATE_FORMAT_GUIDE.md",
+    "quick_reference": "DATE_FORMAT_QUICK_REFERENCE.md",
+    "utility_code": "lib/dateFormatter.ts"
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Information only - not an actual endpoint' }
+      ]
+    },
     {
       id: 'GET-/api/health',
       method: 'GET',
