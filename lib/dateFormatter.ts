@@ -144,6 +144,94 @@ export function formatMonthLabel(
 }
 
 /**
+ * แปลงวันที่เต็ม YYYY-MM-DD เป็นรูปแบบที่ต้องการ
+ * 
+ * @param dateString รูปแบบ "2025-01-14"
+ * @param format รูปแบบที่ต้องการ (default: 'numeric_full')
+ * @returns string เช่น "14/01/2568" หรือ "14 มกราคม 2568"
+ * 
+ * @example
+ * formatDateLabel('2025-01-14', 'numeric_full')  // "14/01/2568"
+ * formatDateLabel('2025-01-14', 'numeric_full_ad') // "14/01/2025"
+ * formatDateLabel('2025-01-14', 'th_full_be_full') // "14 มกราคม 2568"
+ */
+export function formatDateLabel(
+  dateString: string, 
+  format: DateFormatType = 'numeric_full'
+): string {
+  if (!dateString) return ''
+  
+  try {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return ''
+    
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const yearNum = date.getFullYear()
+
+    // รูปแบบตัวเลขเต็ม (DD/MM/YYYY)
+    if (format === 'numeric_full') {
+      const buddhistYear = yearNum + 543
+      return `${day}/${month}/${buddhistYear}`
+    }
+    
+    if (format === 'numeric_full_ad') {
+      return `${day}/${month}/${yearNum}`
+    }
+
+    // รูปแบบตัวเลขแบบสั้น (DD/MM/YY)
+    if (format === 'numeric_short') {
+      const buddhistYear = yearNum + 543
+      const shortYear = String(buddhistYear).slice(-2)
+      return `${day}/${month}/${shortYear}`
+    }
+    
+    if (format === 'numeric_short_ad') {
+      const shortYear = String(yearNum).slice(-2)
+      return `${day}/${month}/${shortYear}`
+    }
+
+    // รูปแบบเดือน/ปี (MM/YYYY)
+    if (format === 'numeric_month_year_full') {
+      const buddhistYear = yearNum + 543
+      return `${month}/${buddhistYear}`
+    }
+    
+    if (format === 'numeric_month_year_full_ad') {
+      return `${month}/${yearNum}`
+    }
+
+    // เลือกชื่อเดือน
+    let monthName = ''
+    if (format.startsWith('th_full')) {
+      monthName = THAI_MONTHS_FULL[month]
+    } else if (format.startsWith('th_short')) {
+      monthName = THAI_MONTHS_SHORT[month]
+    } else if (format.startsWith('en_full')) {
+      monthName = ENG_MONTHS_FULL[month]
+    } else if (format.startsWith('en_short')) {
+      monthName = ENG_MONTHS_SHORT[month]
+    }
+
+    // เลือกปี
+    let yearStr = ''
+    if (format.includes('_be_full')) {
+      yearStr = String(yearNum + 543) // พ.ศ. เต็ม
+    } else if (format.includes('_be_short')) {
+      yearStr = String(yearNum + 543).slice(-2) // พ.ศ. ย่อ
+    } else if (format.includes('_ad_full')) {
+      yearStr = String(yearNum) // ค.ศ. เต็ม
+    } else if (format.includes('_ad_short')) {
+      yearStr = String(yearNum).slice(-2) // ค.ศ. ย่อ
+    }
+
+    return `${day} ${monthName} ${yearStr}`
+  } catch {
+    return ''
+  }
+}
+
+/**
  * แปลงวันที่เต็ม YYYY-MM-DD เป็น DD/MM/YYYY
  * 
  * @param dateString รูปแบบ "2025-01-14"
