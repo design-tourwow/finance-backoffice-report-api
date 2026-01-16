@@ -36,16 +36,39 @@ const ENG_MONTHS_SHORT: { [key: string]: string } = {
 }
 
 export type DateFormatType = 
+  // Thai Month + Buddhist Era
   | 'th_full_be_full'   // มกราคม 2568
   | 'th_short_be_short' // ม.ค. 68
+  | 'th_full_be_short'  // มกราคม 68
+  | 'th_short_be_full'  // ม.ค. 2568
+  
+  // Thai Month + Christian Era
   | 'th_full_ad_full'   // มกราคม 2025
   | 'th_short_ad_short' // ม.ค. 25
+  | 'th_full_ad_short'  // มกราคม 25
+  | 'th_short_ad_full'  // ม.ค. 2025
+  
+  // English Month + Buddhist Era
   | 'en_full_be_full'   // January 2568
   | 'en_short_be_short' // Jan 68
+  | 'en_full_be_short'  // January 68
+  | 'en_short_be_full'  // Jan 2568
+  
+  // English Month + Christian Era
   | 'en_full_ad_full'   // January 2025
   | 'en_short_ad_short' // Jan 25
-  | 'numeric_short'     // 01/68 (MM/YY พ.ศ.)
+  | 'en_full_ad_short'  // January 25
+  | 'en_short_ad_full'  // Jan 2025
+  
+  // Numeric Formats (Buddhist Era)
+  | 'numeric_short'     // 01/68 (MM/YY พ.ศ. - ปีย่อ 2 หลัก)
+  | 'numeric_month_year_full' // 01/2568 (MM/YYYY พ.ศ. - ปีเต็ม 4 หลัก)
   | 'numeric_full'      // 14/01/2568 (DD/MM/YYYY พ.ศ.)
+  
+  // Numeric Formats (Christian Era)
+  | 'numeric_short_ad'  // 01/25 (MM/YY ค.ศ. - ปีย่อ 2 หลัก)
+  | 'numeric_month_year_full_ad' // 01/2025 (MM/YYYY ค.ศ. - ปีเต็ม 4 หลัก)
+  | 'numeric_full_ad'   // 14/01/2025 (DD/MM/YYYY ค.ศ.)
 
 /**
  * แปลง YYYY-MM เป็นรูปแบบที่ต้องการ
@@ -60,6 +83,9 @@ export type DateFormatType =
  * formatMonthLabel('2025-01', 'en_full_be_full')   // "January 2568"
  * formatMonthLabel('2025-01', 'en_short_ad_short') // "Jan 25"
  * formatMonthLabel('2025-01', 'numeric_short')     // "01/68"
+ * formatMonthLabel('2025-01', 'numeric_month_year_full') // "01/2568"
+ * formatMonthLabel('2025-01', 'numeric_short_ad')  // "01/25"
+ * formatMonthLabel('2025-01', 'numeric_month_year_full_ad') // "01/2025"
  */
 export function formatMonthLabel(
   monthString: string, 
@@ -68,11 +94,26 @@ export function formatMonthLabel(
   const [year, month] = monthString.split('-')
   const yearNum = parseInt(year)
 
-  // รูปแบบตัวเลข (Numeric Format)
+  // รูปแบบตัวเลข (Numeric Format) - Buddhist Era
   if (format === 'numeric_short') {
     const buddhistYear = yearNum + 543
     const shortYear = String(buddhistYear).slice(-2)
     return `${month}/${shortYear}`
+  }
+  
+  if (format === 'numeric_month_year_full') {
+    const buddhistYear = yearNum + 543
+    return `${month}/${buddhistYear}`
+  }
+  
+  // รูปแบบตัวเลข (Numeric Format) - Christian Era
+  if (format === 'numeric_short_ad') {
+    const shortYear = String(yearNum).slice(-2)
+    return `${month}/${shortYear}`
+  }
+  
+  if (format === 'numeric_month_year_full_ad') {
+    return `${month}/${yearNum}`
   }
 
   // เลือกเดือน
@@ -103,15 +144,17 @@ export function formatMonthLabel(
 }
 
 /**
- * แปลงวันที่เต็ม YYYY-MM-DD เป็น DD/MM/YYYY พ.ศ.
+ * แปลงวันที่เต็ม YYYY-MM-DD เป็น DD/MM/YYYY
  * 
  * @param dateString รูปแบบ "2025-01-14"
- * @returns string เช่น "14/01/2568"
+ * @param useBuddhistEra ใช้ปี พ.ศ. (default: true)
+ * @returns string เช่น "14/01/2568" (BE) หรือ "14/01/2025" (CE)
  * 
  * @example
- * formatFullDate('2025-01-14') // "14/01/2568"
+ * formatFullDate('2025-01-14') // "14/01/2568" (Buddhist Era)
+ * formatFullDate('2025-01-14', false) // "14/01/2025" (Christian Era)
  */
-export function formatFullDate(dateString: string): string {
+export function formatFullDate(dateString: string, useBuddhistEra: boolean = true): string {
   if (!dateString) return ''
   
   try {
@@ -120,7 +163,7 @@ export function formatFullDate(dateString: string): string {
     
     const day = String(date.getDate()).padStart(2, '0')
     const month = String(date.getMonth() + 1).padStart(2, '0')
-    const year = date.getFullYear() + 543
+    const year = useBuddhistEra ? date.getFullYear() + 543 : date.getFullYear()
     
     return `${day}/${month}/${year}`
   } catch {
@@ -133,16 +176,39 @@ export function formatFullDate(dateString: string): string {
  */
 export function isValidDateFormat(format: string): format is DateFormatType {
   const validFormats: DateFormatType[] = [
+    // Thai + Buddhist Era
     'th_full_be_full',
     'th_short_be_short',
+    'th_full_be_short',
+    'th_short_be_full',
+    
+    // Thai + Christian Era
     'th_full_ad_full',
     'th_short_ad_short',
+    'th_full_ad_short',
+    'th_short_ad_full',
+    
+    // English + Buddhist Era
     'en_full_be_full',
     'en_short_be_short',
+    'en_full_be_short',
+    'en_short_be_full',
+    
+    // English + Christian Era
     'en_full_ad_full',
     'en_short_ad_short',
+    'en_full_ad_short',
+    'en_short_ad_full',
+    
+    // Numeric + Buddhist Era
     'numeric_short',
-    'numeric_full'
+    'numeric_month_year_full',
+    'numeric_full',
+    
+    // Numeric + Christian Era
+    'numeric_short_ad',
+    'numeric_month_year_full_ad',
+    'numeric_full_ad'
   ]
   return validFormats.includes(format as DateFormatType)
 }
@@ -151,14 +217,37 @@ export function isValidDateFormat(format: string): format is DateFormatType {
  * รายการ format ทั้งหมดที่รองรับ พร้อมตัวอย่าง
  */
 export const DATE_FORMAT_EXAMPLES = {
+  // Thai + Buddhist Era
   'th_full_be_full': 'มกราคม 2568',
   'th_short_be_short': 'ม.ค. 68',
+  'th_full_be_short': 'มกราคม 68',
+  'th_short_be_full': 'ม.ค. 2568',
+  
+  // Thai + Christian Era
   'th_full_ad_full': 'มกราคม 2025',
   'th_short_ad_short': 'ม.ค. 25',
+  'th_full_ad_short': 'มกราคม 25',
+  'th_short_ad_full': 'ม.ค. 2025',
+  
+  // English + Buddhist Era
   'en_full_be_full': 'January 2568',
   'en_short_be_short': 'Jan 68',
+  'en_full_be_short': 'January 68',
+  'en_short_be_full': 'Jan 2568',
+  
+  // English + Christian Era
   'en_full_ad_full': 'January 2025',
   'en_short_ad_short': 'Jan 25',
+  'en_full_ad_short': 'January 25',
+  'en_short_ad_full': 'Jan 2025',
+  
+  // Numeric + Buddhist Era
   'numeric_short': '01/68',
-  'numeric_full': '14/01/2568'
+  'numeric_month_year_full': '01/2568',
+  'numeric_full': '14/01/2568',
+  
+  // Numeric + Christian Era
+  'numeric_short_ad': '01/25',
+  'numeric_month_year_full_ad': '01/2025',
+  'numeric_full_ad': '14/01/2025'
 }

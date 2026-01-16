@@ -730,7 +730,7 @@ export default function Home() {
       category: '📚 Documentation',
       requiresAuth: false,
       parameters: [
-        { name: 'date_format', type: 'string', description: 'รูปแบบวันที่ (10 แบบ) - ใช้กับ /api/reports/by-travel-date และ /api/reports/by-booking-date' }
+        { name: 'date_format', type: 'string', description: 'รูปแบบวันที่ (22 แบบ) - ใช้กับ /api/reports/by-travel-date และ /api/reports/by-booking-date' }
       ],
       curl: `# ตัวอย่างการใช้งาน Date Format
 
@@ -757,77 +757,156 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=en_short_ad_short" \\
 # 5. รูปแบบตัวเลข MM/YY (กระชับสุด สำหรับ Chart)
 curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_short" \\
   -H "x-api-key: YOUR_API_KEY"
-# Result: "01/68"`,
+# Result: "01/68"
+
+# 6. รูปแบบตัวเลข MM/YYYY (ปีเต็ม 4 หลัก - แนะนำสำหรับ Frontend)
+curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" \\
+  -H "x-api-key: YOUR_API_KEY"
+# Result: "01/2568"`,
       response: `{
-  "📋 รูปแบบทั้งหมด (10 แบบ)": {
-    "th_full_be_full": {
-      "example": "มกราคม 2568",
-      "description": "เดือนไทยเต็ม + ปี พ.ศ. เต็ม",
-      "use_case": "Default - Table display",
-      "is_default": true
+  "📋 รูปแบบทั้งหมด (22 แบบ)": {
+    "🇹🇭 Thai + Buddhist Era (พ.ศ.)": {
+      "th_full_be_full": {
+        "example": "มกราคม 2568",
+        "description": "เดือนไทยเต็ม + ปี พ.ศ. เต็ม",
+        "use_case": "Default - Table display",
+        "is_default": true
+      },
+      "th_short_be_short": {
+        "example": "ม.ค. 68",
+        "description": "เดือนไทยย่อ + ปี พ.ศ. ย่อ",
+        "use_case": "Chart labels (compact)"
+      },
+      "th_full_be_short": {
+        "example": "มกราคม 68",
+        "description": "เดือนไทยเต็ม + ปี พ.ศ. ย่อ",
+        "use_case": "Readable + compact year"
+      },
+      "th_short_be_full": {
+        "example": "ม.ค. 2568",
+        "description": "เดือนไทยย่อ + ปี พ.ศ. เต็ม",
+        "use_case": "Compact month + full year"
+      }
     },
-    "th_short_be_short": {
-      "example": "ม.ค. 68",
-      "description": "เดือนไทยย่อ + ปี พ.ศ. ย่อ",
-      "use_case": "Chart labels (many data)"
+    "🇹🇭 Thai + Christian Era (ค.ศ.)": {
+      "th_full_ad_full": {
+        "example": "มกราคม 2025",
+        "description": "เดือนไทยเต็ม + ปี ค.ศ. เต็ม",
+        "use_case": "Thai text + Christian year"
+      },
+      "th_short_ad_short": {
+        "example": "ม.ค. 25",
+        "description": "เดือนไทยย่อ + ปี ค.ศ. ย่อ",
+        "use_case": "Compact + Christian year"
+      },
+      "th_full_ad_short": {
+        "example": "มกราคม 25",
+        "description": "เดือนไทยเต็ม + ปี ค.ศ. ย่อ",
+        "use_case": "Readable + compact CE year"
+      },
+      "th_short_ad_full": {
+        "example": "ม.ค. 2025",
+        "description": "เดือนไทยย่อ + ปี ค.ศ. เต็ม",
+        "use_case": "Compact month + full CE year"
+      }
     },
-    "th_full_ad_full": {
-      "example": "มกราคม 2025",
-      "description": "เดือนไทยเต็ม + ปี ค.ศ. เต็ม",
-      "use_case": "ถ้าต้องการ ค.ศ."
+    "🌍 English + Buddhist Era (พ.ศ.)": {
+      "en_full_be_full": {
+        "example": "January 2568",
+        "description": "เดือนอังกฤษเต็ม + ปี พ.ศ. เต็ม",
+        "use_case": "International + Buddhist Era"
+      },
+      "en_short_be_short": {
+        "example": "Jan 68",
+        "description": "เดือนอังกฤษย่อ + ปี พ.ศ. ย่อ",
+        "use_case": "International chart + BE"
+      },
+      "en_full_be_short": {
+        "example": "January 68",
+        "description": "เดือนอังกฤษเต็ม + ปี พ.ศ. ย่อ",
+        "use_case": "Readable English + compact BE"
+      },
+      "en_short_be_full": {
+        "example": "Jan 2568",
+        "description": "เดือนอังกฤษย่อ + ปี พ.ศ. เต็ม",
+        "use_case": "Compact English + full BE"
+      }
     },
-    "th_short_ad_short": {
-      "example": "ม.ค. 25",
-      "description": "เดือนไทยย่อ + ปี ค.ศ. ย่อ",
-      "use_case": "Chart + ค.ศ."
+    "🌍 English + Christian Era (ค.ศ.)": {
+      "en_full_ad_full": {
+        "example": "January 2025",
+        "description": "เดือนอังกฤษเต็ม + ปี ค.ศ. เต็ม",
+        "use_case": "Standard international format"
+      },
+      "en_short_ad_short": {
+        "example": "Jan 25",
+        "description": "เดือนอังกฤษย่อ + ปี ค.ศ. ย่อ",
+        "use_case": "International chart"
+      },
+      "en_full_ad_short": {
+        "example": "January 25",
+        "description": "เดือนอังกฤษเต็ม + ปี ค.ศ. ย่อ",
+        "use_case": "Readable + compact CE"
+      },
+      "en_short_ad_full": {
+        "example": "Jan 2025",
+        "description": "เดือนอังกฤษย่อ + ปี ค.ศ. เต็ม",
+        "use_case": "Compact + full CE year"
+      }
     },
-    "en_full_be_full": {
-      "example": "January 2568",
-      "description": "เดือนอังกฤษเต็ม + ปี พ.ศ. เต็ม",
-      "use_case": "International + พ.ศ."
+    "🔢 Numeric + Buddhist Era (พ.ศ.)": {
+      "numeric_short": {
+        "example": "01/68",
+        "description": "MM/YY พ.ศ. (ปีย่อ 2 หลัก)",
+        "use_case": "Most compact - Chart"
+      },
+      "numeric_month_year_full": {
+        "example": "01/2568",
+        "description": "MM/YYYY พ.ศ. (ปีเต็ม 4 หลัก)",
+        "use_case": "⭐ แนะนำสำหรับ Frontend - ชัดเจน"
+      },
+      "numeric_full": {
+        "example": "14/01/2568",
+        "description": "DD/MM/YYYY พ.ศ.",
+        "use_case": "Full date - Lead Time Analysis"
+      }
     },
-    "en_short_be_short": {
-      "example": "Jan 68",
-      "description": "เดือนอังกฤษย่อ + ปี พ.ศ. ย่อ",
-      "use_case": "International chart"
-    },
-    "en_full_ad_full": {
-      "example": "January 2025",
-      "description": "เดือนอังกฤษเต็ม + ปี ค.ศ. เต็ม",
-      "use_case": "International + ค.ศ."
-    },
-    "en_short_ad_short": {
-      "example": "Jan 25",
-      "description": "เดือนอังกฤษย่อ + ปี ค.ศ. ย่อ",
-      "use_case": "International chart + ค.ศ."
-    },
-    "numeric_short": {
-      "example": "01/68",
-      "description": "รูปแบบตัวเลข MM/YY พ.ศ.",
-      "use_case": "Chart - กระชับที่สุด (ประหยัดพื้นที่)"
-    },
-    "numeric_full": {
-      "example": "14/01/2568",
-      "description": "รูปแบบตัวเลข DD/MM/YYYY พ.ศ.",
-      "use_case": "Full date - Lead Time Analysis"
+    "🔢 Numeric + Christian Era (ค.ศ.)": {
+      "numeric_short_ad": {
+        "example": "01/25",
+        "description": "MM/YY ค.ศ. (ปีย่อ 2 หลัก)",
+        "use_case": "Compact international"
+      },
+      "numeric_month_year_full_ad": {
+        "example": "01/2025",
+        "description": "MM/YYYY ค.ศ. (ปีเต็ม 4 หลัก)",
+        "use_case": "International standard"
+      },
+      "numeric_full_ad": {
+        "example": "14/01/2025",
+        "description": "DD/MM/YYYY ค.ศ.",
+        "use_case": "Full date - Christian Era"
+      }
     }
   },
   "🎯 API Endpoints ที่รองรับ": [
-    "/api/reports/by-travel-date (รองรับ 10 รูปแบบ)",
-    "/api/reports/by-booking-date (รองรับ 10 รูปแบบ)",
+    "/api/reports/by-travel-date (รองรับ 22 รูปแบบ)",
+    "/api/reports/by-booking-date (รองรับ 22 รูปแบบ)",
     "/api/reports/lead-time-analysis (ใช้ numeric_full สำหรับวันที่เต็ม)"
   ],
   "💡 แนะนำการใช้งาน": {
     "table_display": "th_full_be_full → มกราคม 2568",
-    "chart_labels": "th_short_be_short → ม.ค. 68 หรือ numeric_short → 01/68",
+    "chart_labels_compact": "th_short_be_short → ม.ค. 68 หรือ numeric_short → 01/68",
+    "chart_labels_clear": "⭐ numeric_month_year_full → 01/2568 (แนะนำ - ชัดเจนที่สุด)",
     "international": "en_full_be_full → January 2568",
     "full_date": "numeric_full → 14/01/2568 (Lead Time Analysis)"
   },
   "⚠️ หมายเหตุ": [
     "ถ้าไม่ส่ง date_format → ใช้ th_full_be_full (มกราคม 2568)",
     "ถ้าส่ง format ผิด → fallback ไปใช้ th_full_be_full",
-    "รองรับเฉพาะ 10 รูปแบบที่กำหนดไว้",
-    "numeric_short (01/68) - ใช้กับ by-travel-date และ by-booking-date",
+    "รองรับเฉพาะ 22 รูปแบบที่กำหนดไว้",
+    "⭐ แนะนำ: numeric_month_year_full (01/2568) - ชัดเจน ไม่สับสน",
+    "numeric_short (01/68) - กระชับสุด แต่อาจสับสนถ้าข้ามศตวรรษ",
     "numeric_full (14/01/2568) - ใช้กับ lead-time-analysis (วันที่เต็ม)"
   ],
   "📚 เอกสารเพิ่มเติม": {
