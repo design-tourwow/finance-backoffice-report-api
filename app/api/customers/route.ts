@@ -1,21 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { mysqlPool } from '@/lib/db'
 import { logApiRequest, checkRateLimit } from '@/lib/logger'
+import { authenticate } from '@/lib/auth'
 import { RowDataPacket, ResultSetHeader } from 'mysql2'
-
-function checkApiKey(request: NextRequest) {
-  const apiKey = request.headers.get('x-api-key')
-  const validKeys = [
-    process.env.API_KEY_1,
-    process.env.API_KEY_2
-  ].filter(Boolean)
-
-  if (process.env.REQUIRE_API_KEY === 'true') {
-    if (!apiKey) return false
-    return validKeys.includes(apiKey)
-  }
-  return true
-}
 
 // GET /api/customers - Get customers with filters
 export async function GET(request: NextRequest) {
@@ -35,7 +22,8 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  if (!checkApiKey(request)) {
+  const auth = authenticate(request)
+  if (!auth.authenticated) {
     logApiRequest('GET', '/api/customers', 401, apiKey, 'Invalid API key')
     return NextResponse.json(
       { success: false, error: 'Unauthorized - Invalid API key' },
@@ -118,7 +106,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const apiKey = request.headers.get('x-api-key') || ''
   
-  if (!checkApiKey(request)) {
+  const auth = authenticate(request)
+  if (!auth.authenticated) {
     logApiRequest('POST', '/api/customers', 401, apiKey, 'Invalid API key')
     return NextResponse.json(
       { success: false, error: 'Unauthorized - Invalid API key' },
@@ -170,7 +159,8 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const apiKey = request.headers.get('x-api-key') || ''
   
-  if (!checkApiKey(request)) {
+  const auth = authenticate(request)
+  if (!auth.authenticated) {
     logApiRequest('PUT', '/api/customers', 401, apiKey, 'Invalid API key')
     return NextResponse.json(
       { success: false, error: 'Unauthorized - Invalid API key' },
@@ -221,7 +211,8 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const apiKey = request.headers.get('x-api-key') || ''
   
-  if (!checkApiKey(request)) {
+  const auth = authenticate(request)
+  if (!auth.authenticated) {
     logApiRequest('DELETE', '/api/customers', 401, apiKey, 'Invalid API key')
     return NextResponse.json(
       { success: false, error: 'Unauthorized - Invalid API key' },

@@ -1,21 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { mysqlPool } from '@/lib/db'
 import { logApiRequest, checkRateLimit } from '@/lib/logger'
+import { authenticate } from '@/lib/auth'
 import { RowDataPacket } from 'mysql2'
-
-function checkApiKey(request: NextRequest) {
-  const apiKey = request.headers.get('x-api-key') || request.headers.get('authorization')
-  const validKeys = [
-    process.env.API_KEY_1,
-    process.env.API_KEY_2
-  ].filter(Boolean)
-
-  if (process.env.REQUIRE_API_KEY === 'true') {
-    if (!apiKey) return false
-    return validKeys.includes(apiKey)
-  }
-  return true
-}
 
 // GET /api/reports/by-country - รายงาน Orders แยกตามประเทศ
 export async function GET(request: NextRequest) {
@@ -35,10 +22,12 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  if (!checkApiKey(request)) {
-    logApiRequest('GET', '/api/reports/by-country', 401, apiKey, 'Invalid API key')
+  // Authenticate using JWT or API Key
+  const auth = authenticate(request)
+  if (!auth.authenticated) {
+    logApiRequest('GET', '/api/reports/by-country', 401, apiKey, auth.error || 'Authentication failed')
     return NextResponse.json(
-      { success: false, error: 'Unauthorized - Invalid API key' },
+      { success: false, error: 'Unauthorized - ' + (auth.error || 'Invalid token or API key') },
       { status: 401 }
     )
   }

@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { validateApiKey, unauthorizedResponse } from '@/lib/auth'
+import { authenticate } from '@/lib/auth'
 import pool from '@/lib/db'
 import { RowDataPacket } from 'mysql2'
 
 export async function GET(request: NextRequest) {
-  // ตรวจสอบ API Key
-  if (!validateApiKey(request)) {
-    return unauthorizedResponse()
+  // Authenticate using JWT or API Key
+  const auth = authenticate(request)
+  if (!auth.authenticated) {
+    return Response.json(
+      { success: false, error: 'Unauthorized - ' + (auth.error || 'Invalid token or API key') },
+      { status: 401 }
+    )
   }
 
   try {
@@ -48,9 +52,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  // ตรวจสอบ API Key
-  if (!validateApiKey(request)) {
-    return unauthorizedResponse()
+  // Authenticate using JWT or API Key
+  const auth = authenticate(request)
+  if (!auth.authenticated) {
+    return Response.json(
+      { success: false, error: 'Unauthorized - ' + (auth.error || 'Invalid token or API key') },
+      { status: 401 }
+    )
   }
   
   try {
