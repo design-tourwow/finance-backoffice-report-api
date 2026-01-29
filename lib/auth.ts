@@ -1,14 +1,11 @@
 import { NextRequest } from 'next/server'
 import { verifyJWT, jwtUnauthorizedResponse, isJWTEnabled, JWTPayload } from './jwt'
 
-// API Keys - ในการใช้งานจริงควรเก็บใน Database
-// Test keys for demonstration
+// API Keys - เก็บใน Vercel Environment Variables เท่านั้น
 const VALID_API_KEYS = new Set([
-  process.env.API_KEY_1,
-  process.env.API_KEY_2,
-  'sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e', // Test key 1
-  'sk_test_9a7b5c3d1e2f4a6b8c0d2e4f6a8b0c2d', // Test key 2
-])
+  process.env.API_KEY_PRODUCTION,
+  process.env.API_KEY_STAGING,
+].filter(Boolean))
 
 /**
  * Validate API Key from request headers
