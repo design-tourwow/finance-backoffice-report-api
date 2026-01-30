@@ -1,7 +1,21 @@
 import mysql from 'mysql2/promise'
 import { createClient } from '@supabase/supabase-js'
 
-// MySQL Database connection pool configuration
+// Database names
+export const DB_NAMES = {
+  TOURWOW: process.env.DB_NAME || 'tw_tourwow_db_views',
+  LOCATIONS: process.env.DB_NAME_LOCATIONS || 'tw_locations_db_views',
+  SUPPLIERS: process.env.DB_NAME_SUPPLIERS || 'tw_suppliers_db_views'
+}
+
+// View prefixes for each database
+export const VIEW_PREFIXES = {
+  TOURWOW: 'v_Xqc7k7_',
+  LOCATIONS: 'v_Hdz2WSB_',
+  SUPPLIERS: 'v_GsF2WeS_'
+}
+
+// MySQL Database connection pool configuration (connects without specific database)
 const mysqlPool = mysql.createPool({
   host: process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT || '3306'),
@@ -17,6 +31,24 @@ const mysqlPool = mysql.createPool({
     rejectUnauthorized: false
   }
 })
+
+// Helper function to query specific database with full table name
+export async function queryDatabase(database: string, sql: string, params?: any[]) {
+  const connection = await mysqlPool.getConnection()
+  try {
+    const [rows] = await connection.query(sql, params)
+    return rows
+  } finally {
+    connection.release()
+  }
+}
+
+// Helper to get full table name with database prefix
+export function getFullTableName(database: keyof typeof DB_NAMES, viewName: string) {
+  const dbName = DB_NAMES[database]
+  const prefix = VIEW_PREFIXES[database]
+  return `${dbName}.${prefix}${viewName}`
+}
 
 // Supabase client configuration
 const supabaseUrl = process.env.SUPABASE_URL || ''

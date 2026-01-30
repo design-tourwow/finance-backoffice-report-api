@@ -2192,6 +2192,197 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
         { status: 429, description: 'Rate limit exceeded' },
         { status: 500, description: 'Database query failed' }
       ]
+    },
+    // ==================== LOCATIONS DATABASE ====================
+    {
+      id: 'GET-/api/locations/continents',
+      method: 'GET',
+      path: '/api/locations/continents',
+      description: 'ดึงรายการทวีปทั้งหมด (tw_locations_db_views)',
+      category: 'MySQL - Locations',
+      requiresAuth: true,
+      parameters: [],
+      curl: `curl "${apiUrl}/api/locations/continents" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name_th": "เอเชีย",
+      "name_en": "Asia",
+      "code": "AS",
+      "created_at": "2024-01-01T00:00:00.000Z",
+      "updated_at": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "total": 7
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'GET-/api/locations/countries',
+      method: 'GET',
+      path: '/api/locations/countries',
+      description: 'ดึงรายการประเทศทั้งหมด พร้อม filter และ pagination (tw_locations_db_views)',
+      category: 'MySQL - Locations',
+      requiresAuth: true,
+      parameters: [
+        { name: 'continent_id', type: 'integer', description: 'Filter by continent ID' },
+        { name: 'search', type: 'string', description: 'Search by name_th, name_en, or code' },
+        { name: 'limit', type: 'integer', description: 'Max records to return (default: 100)' },
+        { name: 'offset', type: 'integer', description: 'Skip records (default: 0)' }
+      ],
+      curl: `curl "${apiUrl}/api/locations/countries?continent_id=1&limit=10" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 7,
+      "name_th": "ญี่ปุ่น",
+      "name_en": "Japan",
+      "code": "JP",
+      "continent_id": 1,
+      "created_at": "2024-01-01T00:00:00.000Z",
+      "updated_at": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 250,
+    "limit": 10,
+    "offset": 0,
+    "hasMore": true
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'GET-/api/locations/regions',
+      method: 'GET',
+      path: '/api/locations/regions',
+      description: 'ดึงรายการภูมิภาคตาม country (tw_locations_db_views)',
+      category: 'MySQL - Locations',
+      requiresAuth: true,
+      parameters: [
+        { name: 'country_id', type: 'integer', description: 'Filter by country ID' },
+        { name: 'limit', type: 'integer', description: 'Max records to return (default: 100)' },
+        { name: 'offset', type: 'integer', description: 'Skip records (default: 0)' }
+      ],
+      curl: `curl "${apiUrl}/api/locations/regions?country_id=217" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name_th": "ภาคเหนือ",
+      "name_en": "Northern",
+      "country_id": 217,
+      "created_at": "2024-01-01T00:00:00.000Z",
+      "updated_at": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "limit": 100,
+    "offset": 0,
+    "count": 6
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'GET-/api/locations/provinces',
+      method: 'GET',
+      path: '/api/locations/provinces',
+      description: 'ดึงรายการจังหวัดตาม country หรือ region (tw_locations_db_views)',
+      category: 'MySQL - Locations',
+      requiresAuth: true,
+      parameters: [
+        { name: 'country_id', type: 'integer', description: 'Filter by country ID' },
+        { name: 'region_id', type: 'integer', description: 'Filter by region ID' },
+        { name: 'search', type: 'string', description: 'Search by name_th or name_en' },
+        { name: 'limit', type: 'integer', description: 'Max records to return (default: 100)' },
+        { name: 'offset', type: 'integer', description: 'Skip records (default: 0)' }
+      ],
+      curl: `curl "${apiUrl}/api/locations/provinces?country_id=217&search=กรุงเทพ" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name_th": "กรุงเทพมหานคร",
+      "name_en": "Bangkok",
+      "country_id": 217,
+      "region_id": 2,
+      "created_at": "2024-01-01T00:00:00.000Z",
+      "updated_at": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "limit": 100,
+    "offset": 0,
+    "count": 1
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'GET-/api/locations/airports',
+      method: 'GET',
+      path: '/api/locations/airports',
+      description: 'ดึงรายการสนามบินตาม country (tw_locations_db_views)',
+      category: 'MySQL - Locations',
+      requiresAuth: true,
+      parameters: [
+        { name: 'country_id', type: 'integer', description: 'Filter by country ID' },
+        { name: 'search', type: 'string', description: 'Search by name_th, name_en, or code' },
+        { name: 'limit', type: 'integer', description: 'Max records to return (default: 100)' },
+        { name: 'offset', type: 'integer', description: 'Skip records (default: 0)' }
+      ],
+      curl: `curl "${apiUrl}/api/locations/airports?country_id=217&search=สุวรรณภูมิ" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name_th": "ท่าอากาศยานสุวรรณภูมิ",
+      "name_en": "Suvarnabhumi Airport",
+      "code": "BKK",
+      "country_id": 217,
+      "created_at": "2024-01-01T00:00:00.000Z",
+      "updated_at": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "limit": 100,
+    "offset": 0,
+    "count": 1
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
+      ]
     }
   ]
 
