@@ -24,14 +24,7 @@ export async function GET(request: NextRequest) {
     const tableName = `${DB_NAMES.LOCATIONS}.${VIEW_PREFIXES.LOCATIONS}countries`
 
     let query = `
-      SELECT
-        id,
-        name_th,
-        name_en,
-        code,
-        continent_id,
-        created_at,
-        updated_at
+      SELECT *
       FROM ${tableName}
       WHERE 1=1
     `

@@ -18,13 +18,7 @@ export async function GET(request: NextRequest) {
     const tableName = `${DB_NAMES.LOCATIONS}.${VIEW_PREFIXES.LOCATIONS}continents`
 
     const query = `
-      SELECT
-        id,
-        name_th,
-        name_en,
-        code,
-        created_at,
-        updated_at
+      SELECT *
       FROM ${tableName}
       ORDER BY name_en ASC
     `
