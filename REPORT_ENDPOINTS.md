@@ -332,10 +332,91 @@ curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/count
 - `name_th` - ชื่อประเทศภาษาไทย
 - `name_en` - ชื่อประเทศภาษาอังกฤษ
 
-**หมายเหตุ**: 
+**หมายเหตุ**:
 - ดึง unique countries จาก orders ที่ไม่ถูก cancel
 - เรียงลำดับตาม `name_th` (ก-ฮ)
 - ไม่รับ query parameters
+
+---
+
+## 8. GET /api/reports/wholesale-by-country
+
+รายงาน Wholesale (Supplier) แยกตามประเทศปลายทาง - สำหรับหน้า Wholesale Destinations
+
+### Request Example:
+```bash
+curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/wholesale-by-country" \
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
+```
+
+### Response Example:
+```json
+{
+  "success": true,
+  "data": {
+    "wholesales": [
+      {
+        "id": 46,
+        "name": "บริษัท โปร บุ๊คกิ้ง เซนเตอร์ จำกัด",
+        "countries": {
+          "ญี่ปุ่น": 150,
+          "เวียดนาม": 80,
+          "จีน": 45
+        },
+        "total": 275
+      },
+      {
+        "id": 12,
+        "name": "ABC Travel",
+        "countries": {
+          "ญี่ปุ่น": 100,
+          "เกาหลีใต้": 50
+        },
+        "total": 150
+      }
+    ],
+    "summary": {
+      "total_bookings": 425,
+      "top_wholesale": {
+        "name": "บริษัท โปร บุ๊คกิ้ง เซนเตอร์ จำกัด",
+        "count": 275
+      },
+      "top_country": {
+        "name": "ญี่ปุ่น",
+        "count": 250
+      },
+      "total_partners": 2
+    },
+    "country_totals": {
+      "ญี่ปุ่น": 250,
+      "เวียดนาม": 80,
+      "เกาหลีใต้": 50,
+      "จีน": 45
+    }
+  }
+}
+```
+
+### Response Fields:
+
+**wholesales** (array):
+- `id` - ID Supplier/Wholesale
+- `name` - ชื่อ Supplier (ภาษาไทย)
+- `countries` - Object แสดงจำนวน orders แยกตามประเทศ `{ "ชื่อประเทศ": จำนวน }`
+- `total` - จำนวน orders ทั้งหมดของ Wholesale นี้
+
+**summary**:
+- `total_bookings` - จำนวน orders ทั้งหมด
+- `top_wholesale` - Wholesale ที่มียอดสูงสุด
+- `top_country` - ประเทศที่มียอดสูงสุด
+- `total_partners` - จำนวน Wholesale ทั้งหมด
+
+**country_totals**:
+- Object แสดงยอดรวมของแต่ละประเทศ `{ "ชื่อประเทศ": ยอดรวม }`
+
+**หมายเหตุ**:
+- เรียงลำดับ wholesales ตาม `total` มากไปน้อย
+- รองรับ filters: `country_id`, `supplier_id`, `travel_date_from/to`, `booking_date_from/to`
 
 ---
 
@@ -423,6 +504,7 @@ Endpoints รองรับ origins:
 | `/api/reports/by-booking-date` | GET | รายงานตามเดือนจอง | ✅ All |
 | `/api/reports/repeat-customers` | GET | ลูกค้าซื้อซ้ำ | ✅ All |
 | `/api/reports/countries` | GET | รายการประเทศ | ❌ None |
+| `/api/reports/wholesale-by-country` | GET | Wholesale แยกตามประเทศ | ✅ All |
 
 ---
 
