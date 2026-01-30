@@ -100,8 +100,8 @@ function EndpointDetail({ endpoint }: any) {
   }
 
   const copyWithApiKey = () => {
-    const curlWithKey = endpoint.curl.replace('YOUR_API_KEY', 'sk_test_9a7b5c3d1e2f4a6b8c0d2e4f6a8b0c2d')
-    navigator.clipboard.writeText(curlWithKey)
+    // Copy curl command as-is (with YOUR_API_KEY placeholder)
+    navigator.clipboard.writeText(endpoint.curl)
     setCopiedWithKey(true)
     setTimeout(() => setCopiedWithKey(false), 2000)
   }
@@ -471,7 +471,7 @@ function EndpointDetail({ endpoint }: any) {
         minWidth: 0,
         width: '100%'
       }}>
-        {/* Test API Key - Sticky at top */}
+        {/* API Key Info */}
         <div style={{
           background: '#1f2937',
           border: '1px solid #374151',
@@ -484,62 +484,48 @@ function EndpointDetail({ endpoint }: any) {
             borderBottom: '1px solid #374151',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            gap: '0.5rem'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
-                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
-              </svg>
-              <span style={{
-                fontSize: '0.8125rem',
-                fontWeight: '600',
-                color: '#9ca3af',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                Test API Key
-              </span>
-            </div>
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText('sk_test_9a7b5c3d1e2f4a6b8c0d2e4f6a8b0c2d')
-                const btn = document.activeElement as HTMLButtonElement
-                btn.style.color = '#10b981'
-                setTimeout(() => btn.style.color = '#9ca3af', 2000)
-              }}
-              style={{
-                background: 'transparent',
-                color: '#9ca3af',
-                border: 'none',
-                padding: '0.375rem',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                display: 'flex',
-                transition: 'all 0.2s'
-              }}
-              title="Copy API Key"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-              </svg>
-            </button>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
+              <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+            </svg>
+            <span style={{
+              fontSize: '0.8125rem',
+              fontWeight: '600',
+              color: '#9ca3af',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              Authentication
+            </span>
           </div>
           <div style={{
             padding: '0.75rem 1rem',
             background: '#1f2937'
           }}>
+            <div style={{
+              fontSize: '0.75rem',
+              color: '#9ca3af',
+              marginBottom: '0.5rem'
+            }}>
+              Use your API key from Vercel environment variables:
+            </div>
             <code style={{
               fontFamily: 'Monaco, Consolas, monospace',
               fontSize: '0.8125rem',
-              color: '#e5e7eb',
+              color: '#fbbf24',
               display: 'block',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
+              marginBottom: '0.5rem'
             }}>
-              sk_test_9a7b5c3d1e2f4a6b8c0d2e4f6a8b0c2d
+              Authorization: Bearer YOUR_API_KEY
             </code>
+            <div style={{
+              fontSize: '0.6875rem',
+              color: '#6b7280',
+              fontStyle: 'italic'
+            }}>
+              API keys: API_KEY_PRODUCTION, API_KEY_STAGING
+            </div>
           </div>
         </div>
         
@@ -584,7 +570,7 @@ function EndpointDetail({ endpoint }: any) {
                   display: 'flex',
                   transition: 'all 0.2s'
                 }}
-                title={copiedWithKey ? 'Copied with API Key!' : 'Copy with Test API Key'}
+                title={copiedWithKey ? 'Copied!' : 'Copy cURL command'}
               >
                 {copiedWithKey ? (
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -694,6 +680,7 @@ export default function Home() {
   const [selectedEndpoint, setSelectedEndpoint] = useState('GET-/api/health')
   const [apiUrl, setApiUrl] = useState('http://localhost:3000')
   const [searchQuery, setSearchQuery] = useState('')
+  const [expandedSubCategory, setExpandedSubCategory] = useState<string | null>(null)
 
   // Check authentication
   useEffect(() => {
@@ -723,200 +710,347 @@ export default function Home() {
   // Define all endpoints
   const endpoints = [
     {
-      id: 'INFO-date-formats',
-      method: 'INFO',
-      path: '📅 Date Format Standards',
-      description: 'รูปแบบวันที่ที่รองรับในระบบ - ใช้ query parameter "date_format" ใน API endpoints',
-      category: '📚 Documentation',
+      id: 'GET-/docs/date-formats',
+      method: 'GET',
+      path: '/docs/date-formats',
+      description: 'Supported date formats - Use query parameter "date_format" in report API endpoints',
+      category: 'API Reference',
+      subCategory: 'date-formats',
       requiresAuth: false,
       parameters: [
-        { name: 'date_format', type: 'string', description: 'รูปแบบวันที่ (22 แบบ) - ใช้กับ /api/reports/by-travel-date และ /api/reports/by-booking-date' }
+        { name: 'date_format', type: 'string', description: 'Date format key (22 formats available). Used with /api/reports/by-travel-date and /api/reports/by-booking-date' }
       ],
-      curl: `# ตัวอย่างการใช้งาน Date Format
+      curl: `# Date Format Usage Examples
 
-# 1. Default (เดือนไทยเต็ม + ปี พ.ศ. เต็ม)
+# 1. Default format (Thai full month + Buddhist Era full year)
 curl "${apiUrl}/api/reports/by-travel-date" \\
-  -H "x-api-key: YOUR_API_KEY"
-# Result: "มกราคม 2568"
+  -H "Authorization: Bearer YOUR_API_KEY"
+# Returns: "th_full_be_full" format
 
-# 2. เดือนไทยย่อ + ปี พ.ศ. ย่อ (สำหรับ Chart)
-curl "${apiUrl}/api/reports/by-travel-date?date_format=th_short_be_short" \\
-  -H "x-api-key: YOUR_API_KEY"
-# Result: "ม.ค. 68"
-
-# 3. เดือนอังกฤษเต็ม + ปี พ.ศ. เต็ม
-curl "${apiUrl}/api/reports/by-travel-date?date_format=en_full_be_full" \\
-  -H "x-api-key: YOUR_API_KEY"
-# Result: "January 2568"
-
-# 4. เดือนอังกฤษย่อ + ปี ค.ศ. ย่อ
+# 2. English short month + Christian Era short year (for charts)
 curl "${apiUrl}/api/reports/by-travel-date?date_format=en_short_ad_short" \\
-  -H "x-api-key: YOUR_API_KEY"
-# Result: "Jan 25"
+  -H "Authorization: Bearer YOUR_API_KEY"
+# Returns: "Jan 25"
 
-# 5. รูปแบบตัวเลข MM/YY (กระชับสุด สำหรับ Chart)
-curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_short" \\
-  -H "x-api-key: YOUR_API_KEY"
-# Result: "01/68"
+# 3. English full month + Buddhist Era full year
+curl "${apiUrl}/api/reports/by-travel-date?date_format=en_full_be_full" \\
+  -H "Authorization: Bearer YOUR_API_KEY"
+# Returns: "January 2568"
 
-# 6. รูปแบบตัวเลข MM/YYYY (ปีเต็ม 4 หลัก - แนะนำสำหรับ Frontend)
+# 4. Numeric MM/YYYY format (recommended for frontend)
 curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" \\
-  -H "x-api-key: YOUR_API_KEY"
-# Result: "01/2568"`,
+  -H "Authorization: Bearer YOUR_API_KEY"
+# Returns: "01/2568"
+
+# 5. Numeric compact MM/YY format (for charts)
+curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_short" \\
+  -H "Authorization: Bearer YOUR_API_KEY"
+# Returns: "01/68"`,
       response: `{
-  "📋 รูปแบบทั้งหมด (22 แบบ)": {
-    "🇹🇭 Thai + Buddhist Era (พ.ศ.)": {
+  "formats": {
+    "thai_buddhist_era": {
       "th_full_be_full": {
-        "example": "มกราคม 2568",
-        "description": "เดือนไทยเต็ม + ปี พ.ศ. เต็ม",
+        "example": "January 2568 (Thai)",
+        "description": "Thai full month + Buddhist Era full year",
         "use_case": "Default - Table display",
         "is_default": true
       },
       "th_short_be_short": {
-        "example": "ม.ค. 68",
-        "description": "เดือนไทยย่อ + ปี พ.ศ. ย่อ",
+        "example": "Jan 68 (Thai)",
+        "description": "Thai short month + Buddhist Era short year",
         "use_case": "Chart labels (compact)"
       },
       "th_full_be_short": {
-        "example": "มกราคม 68",
-        "description": "เดือนไทยเต็ม + ปี พ.ศ. ย่อ",
+        "example": "January 68 (Thai)",
+        "description": "Thai full month + Buddhist Era short year",
         "use_case": "Readable + compact year"
       },
       "th_short_be_full": {
-        "example": "ม.ค. 2568",
-        "description": "เดือนไทยย่อ + ปี พ.ศ. เต็ม",
+        "example": "Jan 2568 (Thai)",
+        "description": "Thai short month + Buddhist Era full year",
         "use_case": "Compact month + full year"
       }
     },
-    "🇹🇭 Thai + Christian Era (ค.ศ.)": {
+    "thai_christian_era": {
       "th_full_ad_full": {
-        "example": "มกราคม 2025",
-        "description": "เดือนไทยเต็ม + ปี ค.ศ. เต็ม",
+        "example": "January 2025 (Thai)",
+        "description": "Thai full month + Christian Era full year",
         "use_case": "Thai text + Christian year"
       },
       "th_short_ad_short": {
-        "example": "ม.ค. 25",
-        "description": "เดือนไทยย่อ + ปี ค.ศ. ย่อ",
+        "example": "Jan 25 (Thai)",
+        "description": "Thai short month + Christian Era short year",
         "use_case": "Compact + Christian year"
       },
       "th_full_ad_short": {
-        "example": "มกราคม 25",
-        "description": "เดือนไทยเต็ม + ปี ค.ศ. ย่อ",
+        "example": "January 25 (Thai)",
+        "description": "Thai full month + Christian Era short year",
         "use_case": "Readable + compact CE year"
       },
       "th_short_ad_full": {
-        "example": "ม.ค. 2025",
-        "description": "เดือนไทยย่อ + ปี ค.ศ. เต็ม",
+        "example": "Jan 2025 (Thai)",
+        "description": "Thai short month + Christian Era full year",
         "use_case": "Compact month + full CE year"
       }
     },
-    "🌍 English + Buddhist Era (พ.ศ.)": {
+    "english_buddhist_era": {
       "en_full_be_full": {
         "example": "January 2568",
-        "description": "เดือนอังกฤษเต็ม + ปี พ.ศ. เต็ม",
+        "description": "English full month + Buddhist Era full year",
         "use_case": "International + Buddhist Era"
       },
       "en_short_be_short": {
         "example": "Jan 68",
-        "description": "เดือนอังกฤษย่อ + ปี พ.ศ. ย่อ",
+        "description": "English short month + Buddhist Era short year",
         "use_case": "International chart + BE"
       },
       "en_full_be_short": {
         "example": "January 68",
-        "description": "เดือนอังกฤษเต็ม + ปี พ.ศ. ย่อ",
+        "description": "English full month + Buddhist Era short year",
         "use_case": "Readable English + compact BE"
       },
       "en_short_be_full": {
         "example": "Jan 2568",
-        "description": "เดือนอังกฤษย่อ + ปี พ.ศ. เต็ม",
+        "description": "English short month + Buddhist Era full year",
         "use_case": "Compact English + full BE"
       }
     },
-    "🌍 English + Christian Era (ค.ศ.)": {
+    "english_christian_era": {
       "en_full_ad_full": {
         "example": "January 2025",
-        "description": "เดือนอังกฤษเต็ม + ปี ค.ศ. เต็ม",
+        "description": "English full month + Christian Era full year",
         "use_case": "Standard international format"
       },
       "en_short_ad_short": {
         "example": "Jan 25",
-        "description": "เดือนอังกฤษย่อ + ปี ค.ศ. ย่อ",
+        "description": "English short month + Christian Era short year",
         "use_case": "International chart"
       },
       "en_full_ad_short": {
         "example": "January 25",
-        "description": "เดือนอังกฤษเต็ม + ปี ค.ศ. ย่อ",
+        "description": "English full month + Christian Era short year",
         "use_case": "Readable + compact CE"
       },
       "en_short_ad_full": {
         "example": "Jan 2025",
-        "description": "เดือนอังกฤษย่อ + ปี ค.ศ. เต็ม",
+        "description": "English short month + Christian Era full year",
         "use_case": "Compact + full CE year"
       }
     },
-    "🔢 Numeric + Buddhist Era (พ.ศ.)": {
+    "numeric_buddhist_era": {
       "numeric_short": {
         "example": "01/68",
-        "description": "MM/YY พ.ศ. (ปีย่อ 2 หลัก)",
+        "description": "MM/YY Buddhist Era (2-digit year)",
         "use_case": "Most compact - Chart"
       },
       "numeric_month_year_full": {
         "example": "01/2568",
-        "description": "MM/YYYY พ.ศ. (ปีเต็ม 4 หลัก)",
-        "use_case": "⭐ แนะนำสำหรับ Frontend - ชัดเจน"
+        "description": "MM/YYYY Buddhist Era (4-digit year)",
+        "use_case": "Recommended for frontend - Clear and unambiguous"
       },
       "numeric_full": {
         "example": "14/01/2568",
-        "description": "DD/MM/YYYY พ.ศ.",
+        "description": "DD/MM/YYYY Buddhist Era",
         "use_case": "Full date - Lead Time Analysis"
       }
     },
-    "🔢 Numeric + Christian Era (ค.ศ.)": {
+    "numeric_christian_era": {
       "numeric_short_ad": {
         "example": "01/25",
-        "description": "MM/YY ค.ศ. (ปีย่อ 2 หลัก)",
+        "description": "MM/YY Christian Era (2-digit year)",
         "use_case": "Compact international"
       },
       "numeric_month_year_full_ad": {
         "example": "01/2025",
-        "description": "MM/YYYY ค.ศ. (ปีเต็ม 4 หลัก)",
+        "description": "MM/YYYY Christian Era (4-digit year)",
         "use_case": "International standard"
       },
       "numeric_full_ad": {
         "example": "14/01/2025",
-        "description": "DD/MM/YYYY ค.ศ.",
+        "description": "DD/MM/YYYY Christian Era",
         "use_case": "Full date - Christian Era"
       }
     }
   },
-  "🎯 API Endpoints ที่รองรับ": [
-    "/api/reports/by-travel-date (รองรับ 22 รูปแบบ)",
-    "/api/reports/by-booking-date (รองรับ 22 รูปแบบ)",
-    "/api/reports/lead-time-analysis (ใช้ numeric_full สำหรับวันที่เต็ม)"
+  "supported_endpoints": [
+    "/api/reports/by-travel-date",
+    "/api/reports/by-booking-date",
+    "/api/reports/lead-time-analysis"
   ],
-  "💡 แนะนำการใช้งาน": {
-    "table_display": "th_full_be_full → มกราคม 2568",
-    "chart_labels_compact": "th_short_be_short → ม.ค. 68 หรือ numeric_short → 01/68",
-    "chart_labels_clear": "⭐ numeric_month_year_full → 01/2568 (แนะนำ - ชัดเจนที่สุด)",
-    "international": "en_full_be_full → January 2568",
-    "full_date": "numeric_full → 14/01/2568 (Lead Time Analysis)"
+  "recommendations": {
+    "table_display": "th_full_be_full (default)",
+    "chart_labels_compact": "numeric_short or en_short_ad_short",
+    "chart_labels_clear": "numeric_month_year_full (recommended)",
+    "international": "en_full_ad_full",
+    "full_date": "numeric_full"
   },
-  "⚠️ หมายเหตุ": [
-    "ถ้าไม่ส่ง date_format → ใช้ th_full_be_full (มกราคม 2568)",
-    "ถ้าส่ง format ผิด → fallback ไปใช้ th_full_be_full",
-    "รองรับเฉพาะ 22 รูปแบบที่กำหนดไว้",
-    "⭐ แนะนำ: numeric_month_year_full (01/2568) - ชัดเจน ไม่สับสน",
-    "numeric_short (01/68) - กระชับสุด แต่อาจสับสนถ้าข้ามศตวรรษ",
-    "numeric_full (14/01/2568) - ใช้กับ lead-time-analysis (วันที่เต็ม)"
-  ],
-  "📚 เอกสารเพิ่มเติม": {
-    "full_guide": "DATE_FORMAT_GUIDE.md",
-    "quick_reference": "DATE_FORMAT_QUICK_REFERENCE.md",
-    "utility_code": "lib/dateFormatter.ts"
-  }
+  "notes": [
+    "Default format is th_full_be_full if date_format is not specified",
+    "Invalid format values fallback to th_full_be_full",
+    "Only the 22 predefined formats are supported"
+  ]
 }`,
       responses: [
-        { status: 200, description: 'Information only - not an actual endpoint' }
+        { status: 200, description: 'Reference documentation - not an actual endpoint' }
+      ]
+    },
+    {
+      id: 'GET-/docs/time-periods',
+      method: 'GET',
+      path: '/docs/time-periods',
+      description: 'Supported time periods/intervals - Use query parameter "period" in report API endpoints',
+      category: 'API Reference',
+      subCategory: 'time-periods',
+      requiresAuth: false,
+      parameters: [
+        { name: 'period', type: 'string', description: 'Time period key (e.g., yearly, monthly, weekly, daily)' }
+      ],
+      curl: `# Time Period Usage Examples
+
+# 1. Yearly aggregation
+curl "\${apiUrl}/api/reports/summary?period=yearly" \\
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+# 2. Quarterly aggregation
+curl "\${apiUrl}/api/reports/summary?period=quarterly" \\
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+# 3. Monthly aggregation (default)
+curl "\${apiUrl}/api/reports/summary?period=monthly" \\
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+# 4. Weekly aggregation
+curl "\${apiUrl}/api/reports/summary?period=weekly" \\
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+# 5. Daily aggregation
+curl "\${apiUrl}/api/reports/summary?period=daily" \\
+  -H "Authorization: Bearer YOUR_API_KEY"`,
+      response: `{
+  "periods": {
+    "long_term": {
+      "yearly": {
+        "key": "yearly",
+        "name": "Yearly / Annually",
+        "description": "Every 1 year",
+        "interval_months": 12,
+        "use_case": "Annual reports, Year-over-year comparison"
+      },
+      "semi_annually": {
+        "key": "semi_annually",
+        "name": "Semi-annually",
+        "description": "Every 6 months",
+        "interval_months": 6,
+        "use_case": "Half-year reports, Semi-annual reviews"
+      },
+      "quarterly": {
+        "key": "quarterly",
+        "name": "Quarterly",
+        "description": "Every 3 months (Q1, Q2, Q3, Q4)",
+        "interval_months": 3,
+        "use_case": "Quarterly reports, Business performance"
+      }
+    },
+    "monthly": {
+      "monthly": {
+        "key": "monthly",
+        "name": "Monthly",
+        "description": "Every 1 month",
+        "interval_days": 30,
+        "use_case": "Monthly reports, Standard billing cycle"
+      },
+      "semi_monthly": {
+        "key": "semi_monthly",
+        "name": "Semi-monthly",
+        "description": "Twice per month (1st and 15th)",
+        "interval_days": 15,
+        "use_case": "Payroll (US), Bi-monthly payments"
+      },
+      "bi_monthly": {
+        "key": "bi_monthly",
+        "name": "Bi-monthly",
+        "description": "Every 2 months",
+        "interval_months": 2,
+        "use_case": "Every two months",
+        "note": "Ambiguous term - may be confused with semi_monthly. Recommend using every_two_months instead."
+      }
+    },
+    "weekly": {
+      "fortnightly": {
+        "key": "fortnightly",
+        "name": "Fortnightly",
+        "description": "Every 2 weeks",
+        "interval_days": 14,
+        "use_case": "Payroll (UK/AU), Bi-weekly reports",
+        "note": "Common in UK/Australia"
+      },
+      "bi_weekly": {
+        "key": "bi_weekly",
+        "name": "Bi-weekly",
+        "description": "Every 2 weeks",
+        "interval_days": 14,
+        "use_case": "Payroll, Regular check-ins",
+        "note": "Same as fortnightly - common in US"
+      },
+      "weekly": {
+        "key": "weekly",
+        "name": "Weekly",
+        "description": "Every 1 week",
+        "interval_days": 7,
+        "use_case": "Weekly reports, Sprint cycles"
+      }
+    },
+    "short_term": {
+      "daily": {
+        "key": "daily",
+        "name": "Daily",
+        "description": "Every 1 day",
+        "interval_hours": 24,
+        "use_case": "Daily reports, Dashboard updates"
+      },
+      "hourly": {
+        "key": "hourly",
+        "name": "Hourly",
+        "description": "Every 1 hour",
+        "interval_minutes": 60,
+        "use_case": "Real-time monitoring, Hourly metrics"
+      },
+      "minutely": {
+        "key": "minutely",
+        "name": "Minutely",
+        "description": "Every 1 minute",
+        "interval_seconds": 60,
+        "use_case": "High-frequency monitoring"
+      },
+      "secondly": {
+        "key": "secondly",
+        "name": "Secondly",
+        "description": "Every 1 second",
+        "interval_seconds": 1,
+        "use_case": "Real-time data streams"
+      }
+    }
+  },
+  "supported_endpoints": [
+    "/api/reports/summary",
+    "/api/reports/by-travel-date",
+    "/api/reports/by-booking-date"
+  ],
+  "recommendations": {
+    "dashboard_overview": "monthly (default)",
+    "trend_analysis": "weekly",
+    "real_time_dashboard": "daily",
+    "business_reports": "quarterly",
+    "annual_review": "yearly"
+  },
+  "notes": [
+    "Default period is 'monthly' if not specified",
+    "bi_monthly and semi_monthly may be confused - verify use case",
+    "fortnightly and bi_weekly have the same meaning (every 2 weeks)"
+  ]
+}`,
+      responses: [
+        { status: 200, description: 'Reference documentation - not an actual endpoint' }
       ]
     },
     {
@@ -925,6 +1059,7 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       path: '/api/health',
       description: 'Health check endpoint to monitor API status',
       category: 'System',
+      subCategory: 'health',
       requiresAuth: false,
       curl: `curl ${apiUrl}/api/health`,
       response: `{
@@ -941,7 +1076,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'GET',
       path: '/api/bookings',
       description: 'Retrieve booking records from MySQL database',
-      category: 'MySQL - Bookings',
+      category: 'MySQL Database',
+      subCategory: 'bookings',
       requiresAuth: true,
       parameters: [
         { name: 'limit', type: 'integer', description: 'Max records to return (default: 100)' },
@@ -982,7 +1118,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'POST',
       path: '/api/bookings',
       description: 'Create a new booking record',
-      category: 'MySQL - Bookings',
+      category: 'MySQL Database',
+      subCategory: 'bookings',
       requiresAuth: true,
       requestBody: {
         title: { type: 'string', required: true, description: 'Booking title' },
@@ -1018,7 +1155,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'GET',
       path: '/api/users',
       description: 'Retrieve user records from Supabase',
-      category: 'Supabase - Users',
+      category: 'Supabase',
+      subCategory: 'users',
       requiresAuth: true,
       parameters: [
         { name: 'user_id', type: 'string', description: 'Filter by user ID' },
@@ -1071,7 +1209,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'POST',
       path: '/api/users',
       description: 'Create a new user. Only user_id is required.',
-      category: 'Supabase - Users',
+      category: 'Supabase',
+      subCategory: 'users',
       requiresAuth: true,
       requestBody: {
         user_id: { type: 'string', required: true, description: 'Unique user identifier' },
@@ -1127,7 +1266,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'PUT',
       path: '/api/users',
       description: 'Update user. Requires user_id, send only fields to update.',
-      category: 'Supabase - Users',
+      category: 'Supabase',
+      subCategory: 'users',
       requiresAuth: true,
       requestBody: {
         user_id: { type: 'string', required: true, description: 'User ID to update' },
@@ -1170,7 +1310,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'GET',
       path: '/api/chat-history',
       description: 'Get chat_history for a user',
-      category: 'Supabase - Chat',
+      category: 'Supabase',
+      subCategory: 'chat',
       requiresAuth: true,
       parameters: [
         { name: 'user_id', type: 'string', description: 'User ID (required)' }
@@ -1198,7 +1339,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'POST',
       path: '/api/chat-history',
       description: 'Add message to chat_history',
-      category: 'Supabase - Chat',
+      category: 'Supabase',
+      subCategory: 'chat',
       requiresAuth: true,
       requestBody: {
         user_id: { type: 'string', required: true, description: 'User ID' },
@@ -1242,7 +1384,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'GET',
       path: '/api/customers',
       description: 'Retrieve customer records from MySQL database (Xqc7k7_customers table)',
-      category: 'MySQL - Customers',
+      category: 'MySQL Database',
+      subCategory: 'customers',
       requiresAuth: true,
       parameters: [
         { name: 'id', type: 'integer', description: 'Filter by customer ID' },
@@ -1303,7 +1446,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'POST',
       path: '/api/customers',
       description: 'Create a new customer record',
-      category: 'MySQL - Customers',
+      category: 'MySQL Database',
+      subCategory: 'customers',
       requiresAuth: true,
       requestBody: {
         customer_code_prefix: { type: 'string', required: true, description: 'Customer code prefix (e.g., "CUS2601")' },
@@ -1353,7 +1497,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'PUT',
       path: '/api/customers',
       description: 'Update an existing customer. Requires id, send only fields to update.',
-      category: 'MySQL - Customers',
+      category: 'MySQL Database',
+      subCategory: 'customers',
       requiresAuth: true,
       requestBody: {
         id: { type: 'integer', required: true, description: 'Customer ID to update' },
@@ -1390,7 +1535,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'DELETE',
       path: '/api/customers',
       description: 'Delete a customer by ID',
-      category: 'MySQL - Customers',
+      category: 'MySQL Database',
+      subCategory: 'customers',
       requiresAuth: true,
       parameters: [
         { name: 'id', type: 'integer', description: 'Customer ID (required)' }
@@ -1412,7 +1558,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'GET',
       path: '/api/orders',
       description: 'Retrieve order records from MySQL database (Xqc7k7_orders table). Excludes soft-deleted orders.',
-      category: 'MySQL - Orders',
+      category: 'MySQL Database',
+      subCategory: 'orders',
       requiresAuth: true,
       parameters: [
         { name: 'id', type: 'integer', description: 'Filter by order ID' },
@@ -1542,7 +1689,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'POST',
       path: '/api/orders',
       description: 'Create a new order record. Many fields are required for order creation.',
-      category: 'MySQL - Orders',
+      category: 'MySQL Database',
+      subCategory: 'orders',
       requiresAuth: true,
       requestBody: {
         agcy_agency_id: { type: 'integer', required: true, description: 'Agency ID' },
@@ -1615,7 +1763,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'PUT',
       path: '/api/orders',
       description: 'Update an existing order. Requires id, send only fields to update.',
-      category: 'MySQL - Orders',
+      category: 'MySQL Database',
+      subCategory: 'orders',
       requiresAuth: true,
       requestBody: {
         id: { type: 'integer', required: true, description: 'Order ID to update' },
@@ -1651,7 +1800,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'DELETE',
       path: '/api/orders',
       description: 'Soft delete an order by ID (sets deleted_at timestamp)',
-      category: 'MySQL - Orders',
+      category: 'MySQL Database',
+      subCategory: 'orders',
       requiresAuth: true,
       parameters: [
         { name: 'id', type: 'integer', description: 'Order ID (required)' }
@@ -1673,7 +1823,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'GET',
       path: '/api/installments',
       description: 'Retrieve customer order installment records from MySQL database (Xqc7k7_customer_order_installments table)',
-      category: 'MySQL - Installments',
+      category: 'MySQL Database',
+      subCategory: 'installments',
       requiresAuth: true,
       parameters: [
         { name: 'id', type: 'integer', description: 'Filter by installment ID' },
@@ -1737,7 +1888,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'POST',
       path: '/api/installments',
       description: 'Create a new installment record for an order',
-      category: 'MySQL - Installments',
+      category: 'MySQL Database',
+      subCategory: 'installments',
       requiresAuth: true,
       requestBody: {
         order_id: { type: 'integer', required: true, description: 'Order ID' },
@@ -1783,7 +1935,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'PUT',
       path: '/api/installments',
       description: 'Update an existing installment. Requires id, send only fields to update.',
-      category: 'MySQL - Installments',
+      category: 'MySQL Database',
+      subCategory: 'installments',
       requiresAuth: true,
       requestBody: {
         id: { type: 'integer', required: true, description: 'Installment ID to update' },
@@ -1825,7 +1978,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'DELETE',
       path: '/api/installments',
       description: 'Delete an installment by ID',
-      category: 'MySQL - Installments',
+      category: 'MySQL Database',
+      subCategory: 'installments',
       requiresAuth: true,
       parameters: [
         { name: 'id', type: 'integer', description: 'Installment ID (required)' }
@@ -1847,7 +2001,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'GET',
       path: '/api/suppliers',
       description: 'Retrieve supplier records from MySQL database (tw_suppliers_db.GsF2WeS_suppliers table)',
-      category: 'MySQL - Suppliers',
+      category: 'MySQL Database',
+      subCategory: 'suppliers',
       requiresAuth: true,
       parameters: [
         { name: 'id', type: 'integer', description: 'Filter by supplier ID' },
@@ -1944,7 +2099,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'POST',
       path: '/api/suppliers',
       description: 'Create a new supplier record',
-      category: 'MySQL - Suppliers',
+      category: 'MySQL Database',
+      subCategory: 'suppliers',
       requiresAuth: true,
       requestBody: {
         name_en: { type: 'string', required: false, description: 'English name' },
@@ -1993,7 +2149,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'PUT',
       path: '/api/suppliers',
       description: 'Update an existing supplier. Requires id, send only fields to update.',
-      category: 'MySQL - Suppliers',
+      category: 'MySQL Database',
+      subCategory: 'suppliers',
       requiresAuth: true,
       requestBody: {
         id: { type: 'integer', required: true, description: 'Supplier ID to update' },
@@ -2031,7 +2188,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'DELETE',
       path: '/api/suppliers',
       description: 'Delete a supplier by ID',
-      category: 'MySQL - Suppliers',
+      category: 'MySQL Database',
+      subCategory: 'suppliers',
       requiresAuth: true,
       parameters: [
         { name: 'id', type: 'integer', description: 'Supplier ID (required)' }
@@ -2053,7 +2211,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'DELETE',
       path: '/api/chat-history',
       description: 'Clear chat_history for a user',
-      category: 'Supabase - Chat',
+      category: 'Supabase',
+      subCategory: 'chat',
       requiresAuth: true,
       parameters: [
         { name: 'user_id', type: 'string', description: 'User ID (required)' }
@@ -2074,7 +2233,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'GET',
       path: '/api/reports/lead-time-analysis',
       description: 'Analyze booking lead time (days between booking date and travel date) with statistics and distribution',
-      category: 'MySQL - Reports',
+      category: 'MySQL Database',
+      subCategory: 'reports',
       requiresAuth: true,
       parameters: [
         { name: 'country_id', type: 'string', description: 'Single or comma-separated country IDs (e.g., "7" or "7,39,4")' },
@@ -2199,7 +2359,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'GET',
       path: '/api/locations/continents',
       description: 'ดึงรายการทวีปทั้งหมด (tw_locations_db_views)',
-      category: 'MySQL - Locations',
+      category: 'MySQL Database',
+      subCategory: 'locations',
       requiresAuth: true,
       parameters: [],
       curl: `curl "${apiUrl}/api/locations/continents" \\
@@ -2229,7 +2390,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'GET',
       path: '/api/locations/countries',
       description: 'ดึงรายการประเทศทั้งหมด พร้อม filter และ pagination (tw_locations_db_views)',
-      category: 'MySQL - Locations',
+      category: 'MySQL Database',
+      subCategory: 'locations',
       requiresAuth: true,
       parameters: [
         { name: 'continent_id', type: 'integer', description: 'Filter by continent ID' },
@@ -2270,7 +2432,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'GET',
       path: '/api/locations/regions',
       description: 'ดึงรายการภูมิภาคตาม country (tw_locations_db_views)',
-      category: 'MySQL - Locations',
+      category: 'MySQL Database',
+      subCategory: 'locations',
       requiresAuth: true,
       parameters: [
         { name: 'country_id', type: 'integer', description: 'Filter by country ID' },
@@ -2308,7 +2471,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'GET',
       path: '/api/locations/provinces',
       description: 'ดึงรายการจังหวัดตาม country หรือ region (tw_locations_db_views)',
-      category: 'MySQL - Locations',
+      category: 'MySQL Database',
+      subCategory: 'locations',
       requiresAuth: true,
       parameters: [
         { name: 'country_id', type: 'integer', description: 'Filter by country ID' },
@@ -2349,7 +2513,8 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
       method: 'GET',
       path: '/api/locations/airports',
       description: 'ดึงรายการสนามบินตาม country (tw_locations_db_views)',
-      category: 'MySQL - Locations',
+      category: 'MySQL Database',
+      subCategory: 'locations',
       requiresAuth: true,
       parameters: [
         { name: 'country_id', type: 'integer', description: 'Filter by country ID' },
@@ -2715,39 +2880,163 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" 
             {filteredEndpoints.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                 {!searchQuery ? (
-                  // Group by category when not searching
+                  // Group by category and subCategory when not searching
                   (() => {
+                    // Define category order
+                    const categoryOrder = ['API Reference', 'System', 'MySQL Database', 'Supabase']
+
+                    // Group by category first, then by subCategory
                     const grouped = filteredEndpoints.reduce((acc: any, endpoint) => {
                       const cat = endpoint.category || 'Other'
-                      if (!acc[cat]) acc[cat] = []
-                      acc[cat].push(endpoint)
+                      const subCat = endpoint.subCategory || 'other'
+                      if (!acc[cat]) acc[cat] = {}
+                      if (!acc[cat][subCat]) acc[cat][subCat] = []
+                      acc[cat][subCat].push(endpoint)
                       return acc
                     }, {})
-                    
-                    return Object.entries(grouped).map(([category, eps]: any) => (
-                      <div key={category} style={{ marginBottom: '1rem' }}>
-                        <div style={{
-                          fontSize: '0.75rem',
-                          fontWeight: '600',
-                          color: '#9ca3af',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          padding: '0.5rem 0.5rem 0.375rem',
-                          marginTop: category !== 'System' ? '0.5rem' : '0'
-                        }}>
-                          {category}
+
+                    // Sort endpoints alphabetically by path within each subCategory
+                    Object.keys(grouped).forEach(cat => {
+                      Object.keys(grouped[cat]).forEach(subCat => {
+                        grouped[cat][subCat].sort((a: any, b: any) => a.path.localeCompare(b.path))
+                      })
+                    })
+
+                    // Sort categories by defined order
+                    const sortedCategories = Object.keys(grouped).sort((a, b) => {
+                      const indexA = categoryOrder.indexOf(a)
+                      const indexB = categoryOrder.indexOf(b)
+                      if (indexA === -1 && indexB === -1) return a.localeCompare(b)
+                      if (indexA === -1) return 1
+                      if (indexB === -1) return -1
+                      return indexA - indexB
+                    })
+
+                    return sortedCategories.map((category) => {
+                      const subCategories = Object.keys(grouped[category]).sort()
+                      const hasMultipleSubCategories = subCategories.length > 1 ||
+                        (subCategories.length === 1 && subCategories[0] !== 'health' && subCategories[0] !== 'date-formats')
+
+                      return (
+                        <div key={category} style={{ marginBottom: '1rem' }}>
+                          {/* Category Header */}
+                          <div style={{
+                            fontSize: '0.75rem',
+                            fontWeight: '600',
+                            color: '#9ca3af',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px',
+                            padding: '0.5rem 0.5rem 0.375rem',
+                            marginTop: category !== 'API Reference' ? '0.5rem' : '0'
+                          }}>
+                            {category}
+                          </div>
+
+                          {/* SubCategories with Accordion */}
+                          {hasMultipleSubCategories ? (
+                            subCategories.map((subCat) => {
+                              const isExpanded = expandedSubCategory === `${category}-${subCat}`
+                              const endpointsInSubCat = grouped[category][subCat]
+
+                              return (
+                                <div key={subCat} style={{ marginBottom: '0.25rem' }}>
+                                  {/* SubCategory Header (Clickable) */}
+                                  <button
+                                    onClick={() => setExpandedSubCategory(isExpanded ? null : `${category}-${subCat}`)}
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      width: '100%',
+                                      padding: '0.625rem 0.75rem',
+                                      background: isExpanded ? '#f3f4f6' : 'transparent',
+                                      border: 'none',
+                                      borderLeft: isExpanded ? '3px solid #6366f1' : '3px solid transparent',
+                                      borderRadius: '4px',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.15s'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      if (!isExpanded) e.currentTarget.style.background = '#f9fafb'
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      if (!isExpanded) e.currentTarget.style.background = 'transparent'
+                                    }}
+                                  >
+                                    <span style={{
+                                      fontSize: '0.8125rem',
+                                      fontWeight: '600',
+                                      color: isExpanded ? '#4f46e5' : '#374151',
+                                      textTransform: 'capitalize'
+                                    }}>
+                                      {subCat}
+                                    </span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                      <span style={{
+                                        fontSize: '0.6875rem',
+                                        color: '#9ca3af',
+                                        background: '#f3f4f6',
+                                        padding: '0.125rem 0.5rem',
+                                        borderRadius: '10px'
+                                      }}>
+                                        {endpointsInSubCat.length}
+                                      </span>
+                                      <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="#9ca3af"
+                                        strokeWidth="2"
+                                        style={{
+                                          transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                                          transition: 'transform 0.2s'
+                                        }}
+                                      >
+                                        <polyline points="6 9 12 15 18 9"/>
+                                      </svg>
+                                    </div>
+                                  </button>
+
+                                  {/* Expanded Endpoints */}
+                                  {isExpanded && (
+                                    <div style={{
+                                      paddingLeft: '0.5rem',
+                                      borderLeft: '1px solid #e5e7eb',
+                                      marginLeft: '0.75rem',
+                                      marginTop: '0.25rem'
+                                    }}>
+                                      {endpointsInSubCat.map((endpoint: any) => (
+                                        <EndpointListItem
+                                          key={endpoint.id}
+                                          endpoint={endpoint}
+                                          isSelected={selectedEndpoint === endpoint.id}
+                                          onClick={() => setSelectedEndpoint(endpoint.id)}
+                                          searchQuery={searchQuery}
+                                        />
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })
+                          ) : (
+                            // For categories with single subCategory (like System, API Reference), show endpoints directly
+                            subCategories.map((subCat) => (
+                              grouped[category][subCat].map((endpoint: any) => (
+                                <EndpointListItem
+                                  key={endpoint.id}
+                                  endpoint={endpoint}
+                                  isSelected={selectedEndpoint === endpoint.id}
+                                  onClick={() => setSelectedEndpoint(endpoint.id)}
+                                  searchQuery={searchQuery}
+                                />
+                              ))
+                            ))
+                          )}
                         </div>
-                        {eps.map((endpoint: any) => (
-                          <EndpointListItem
-                            key={endpoint.id}
-                            endpoint={endpoint}
-                            isSelected={selectedEndpoint === endpoint.id}
-                            onClick={() => setSelectedEndpoint(endpoint.id)}
-                            searchQuery={searchQuery}
-                          />
-                        ))}
-                      </div>
-                    ))
+                      )
+                    })
                   })()
                 ) : (
                   // Show flat list when searching
