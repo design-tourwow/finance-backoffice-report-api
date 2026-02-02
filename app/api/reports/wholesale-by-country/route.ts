@@ -40,24 +40,49 @@ export async function GET(request: NextRequest) {
     const travelDateTo = searchParams.get('travel_date_to')
     const bookingDateFrom = searchParams.get('booking_date_from')
     const bookingDateTo = searchParams.get('booking_date_to')
+    const viewMode = searchParams.get('view_mode') || 'sales' // 'sales' or 'travelers'
 
     // Parse comma-separated IDs
     const countryIds = countryIdParam ? countryIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
     const supplierIds = supplierIdParam ? supplierIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
 
     // Query to get wholesale-country breakdown
-    let query = `
-      SELECT
-        o.product_owner_supplier_id as supplier_id,
-        s.name_th as supplier_name,
-        JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')) as country_name,
-        COUNT(*) as order_count
-      FROM v_Xqc7k7_orders o
-      LEFT JOIN tw_suppliers_db_views.v_GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
-      WHERE o.order_status != 'Canceled'
-        AND o.deleted_at IS NULL
-        AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
-    `
+    // view_mode=sales: SUM(net_amount), sorted by sales
+    // view_mode=travelers: SUM(quantity) from order_items where product_room_type_id IS NOT NULL
+    let query = ''
+
+    if (viewMode === 'travelers') {
+      // Travelers mode: count from order_items
+      query = `
+        SELECT
+          o.product_owner_supplier_id as supplier_id,
+          s.name_th as supplier_name,
+          JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')) as country_name,
+          COUNT(DISTINCT o.id) as order_count,
+          COALESCE(SUM(oi.quantity), 0) as total_value
+        FROM v_Xqc7k7_orders o
+        LEFT JOIN tw_suppliers_db_views.v_GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
+        LEFT JOIN v_Xqc7k7_order_items oi ON oi.order_id = o.id AND oi.product_room_type_id IS NOT NULL
+        WHERE o.order_status != 'Canceled'
+          AND o.deleted_at IS NULL
+          AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
+      `
+    } else {
+      // Sales mode (default): SUM(net_amount)
+      query = `
+        SELECT
+          o.product_owner_supplier_id as supplier_id,
+          s.name_th as supplier_name,
+          JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')) as country_name,
+          COUNT(*) as order_count,
+          COALESCE(SUM(o.net_amount), 0) as total_value
+        FROM v_Xqc7k7_orders o
+        LEFT JOIN tw_suppliers_db_views.v_GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
+        WHERE o.order_status != 'Canceled'
+          AND o.deleted_at IS NULL
+          AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
+      `
+    }
     const params: any[] = []
 
     // Filter by country_id (support multiple IDs)
@@ -91,7 +116,7 @@ export async function GET(request: NextRequest) {
       params.push(bookingDateTo)
     }
 
-    query += ` GROUP BY supplier_id, supplier_name, country_name ORDER BY supplier_id, order_count DESC`
+    query += ` GROUP BY supplier_id, supplier_name, country_name ORDER BY total_value DESC`
 
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(query, params)
 
@@ -101,16 +126,19 @@ export async function GET(request: NextRequest) {
       name: string
       countries: { [key: string]: number }
       total: number
+      order_count: number
     }>()
 
     const countryTotals: { [key: string]: number } = {}
-    let totalBookings = 0
+    let grandTotal = 0
+    let totalOrders = 0
 
     for (const row of rows) {
       const supplierId = parseInt(row.supplier_id) || 0
       const supplierName = row.supplier_name || 'ไม่ระบุ'
       const countryName = row.country_name || 'ไม่ระบุ'
       const orderCount = parseInt(row.order_count) || 0
+      const totalValue = parseFloat(row.total_value) || 0
 
       // Update wholesale map
       if (!wholesaleMap.has(supplierId)) {
@@ -118,20 +146,23 @@ export async function GET(request: NextRequest) {
           id: supplierId,
           name: supplierName,
           countries: {},
-          total: 0
+          total: 0,
+          order_count: 0
         })
       }
 
       const wholesale = wholesaleMap.get(supplierId)!
-      wholesale.countries[countryName] = (wholesale.countries[countryName] || 0) + orderCount
-      wholesale.total += orderCount
+      wholesale.countries[countryName] = (wholesale.countries[countryName] || 0) + totalValue
+      wholesale.total += totalValue
+      wholesale.order_count += orderCount
 
       // Update country totals
-      countryTotals[countryName] = (countryTotals[countryName] || 0) + orderCount
-      totalBookings += orderCount
+      countryTotals[countryName] = (countryTotals[countryName] || 0) + totalValue
+      grandTotal += totalValue
+      totalOrders += orderCount
     }
 
-    // Convert map to array and sort by total descending
+    // Convert map to array and sort by total descending (highest to lowest)
     const wholesales = Array.from(wholesaleMap.values()).sort((a, b) => b.total - a.total)
 
     // Find top wholesale
@@ -148,12 +179,15 @@ export async function GET(request: NextRequest) {
     const responseData = {
       wholesales,
       summary: {
-        total_bookings: totalBookings,
+        total_value: grandTotal,
+        total_orders: totalOrders,
         top_wholesale: topWholesale,
         top_country: topCountry,
-        total_partners: wholesales.length
+        total_partners: wholesales.length,
+        view_mode: viewMode
       },
-      country_totals: countryTotals
+      country_totals: countryTotals,
+      view_mode: viewMode
     }
 
     logApiRequest('GET', '/api/reports/wholesale-by-country', 200, apiKey)
