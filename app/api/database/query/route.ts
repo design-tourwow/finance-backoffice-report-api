@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
           usage: {
             required: {
               database: 'Database key (TOURWOW, LOCATIONS, SUPPLIERS)',
-              table: 'Table name (e.g., Xqc7k7_orders)'
+              table: 'Table name (e.g., v_Xqc7k7_orders)'
             },
             optional: {
               columns: 'Comma-separated column names (default: all)',

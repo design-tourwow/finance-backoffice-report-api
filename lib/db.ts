@@ -9,10 +9,11 @@ export const DB_NAMES = {
 }
 
 // Table prefixes for each database (based on actual database structure)
+// Tables are VIEWs with v_Xqc7k7_ prefix
 export const TABLE_PREFIXES = {
-  TOURWOW: 'Xqc7k7_',
-  LOCATIONS: 'Xqc7k7_',
-  SUPPLIERS: 'Xqc7k7_'
+  TOURWOW: 'v_Xqc7k7_',
+  LOCATIONS: 'v_Xqc7k7_',
+  SUPPLIERS: 'v_Xqc7k7_'
 }
 
 // Legacy alias for backward compatibility

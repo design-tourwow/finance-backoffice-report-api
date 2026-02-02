@@ -106,8 +106,8 @@ export async function GET(request: NextRequest) {
           DATE(CONVERT_TZ(o.created_at, '+00:00', '+07:00'))
         ) as lead_time_days,
         o.net_amount
-      FROM Xqc7k7_orders o
-      LEFT JOIN Xqc7k7_customers c ON o.customer_id = c.id
+      FROM v_Xqc7k7_orders o
+      LEFT JOIN v_Xqc7k7_customers c ON o.customer_id = c.id
       LEFT JOIN tw_suppliers_db_views.v_GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
       ${whereClause}
       ORDER BY lead_time_days DESC
@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
             DATE(CONVERT_TZ(o.created_at, '+00:00', '+07:00'))
           ) as lead_time_days,
           o.net_amount
-        FROM Xqc7k7_orders o
+        FROM v_Xqc7k7_orders o
         ${whereClause}
       ) as lead_times
     `
@@ -150,7 +150,7 @@ export async function GET(request: NextRequest) {
           ) as lead_time_days,
           @rownum := @rownum + 1 as row_num,
           @total_rows := @rownum
-        FROM Xqc7k7_orders o, (SELECT @rownum := 0) r
+        FROM v_Xqc7k7_orders o, (SELECT @rownum := 0) r
         ${whereClause}
         ORDER BY lead_time_days
       ) as sorted
@@ -170,7 +170,7 @@ export async function GET(request: NextRequest) {
         min_days,
         max_days,
         COUNT(*) as count,
-        ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM Xqc7k7_orders o ${whereClause}), 1) as percentage,
+        ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM v_Xqc7k7_orders o ${whereClause}), 1) as percentage,
         COALESCE(SUM(net_amount), 0) as total_net_amount,
         ROUND(AVG(net_amount), 0) as avg_net_amount
       FROM (
@@ -215,7 +215,7 @@ export async function GET(request: NextRequest) {
               DATE(CONVERT_TZ(o.created_at, '+00:00', '+07:00'))
             ) as lead_time_days,
             o.net_amount
-          FROM Xqc7k7_orders o
+          FROM v_Xqc7k7_orders o
           ${whereClause}
         ) as lead_times
       ) as categorized

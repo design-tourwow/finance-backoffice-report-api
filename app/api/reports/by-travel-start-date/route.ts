@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
         COUNT(DISTINCT customer_id) as total_customers,
         COALESCE(SUM(net_amount), 0) as total_net_amount,
         COALESCE(AVG(net_amount), 0) as avg_net_amount
-      FROM Xqc7k7_orders
+      FROM v_Xqc7k7_orders
       WHERE order_status != 'Canceled'
         AND deleted_at IS NULL
         AND JSON_EXTRACT(product_period_snapshot, '$.start_at') IS NOT NULL

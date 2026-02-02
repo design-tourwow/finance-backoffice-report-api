@@ -86,7 +86,7 @@ export async function GET(
           success: false,
           error: `Table not found: ${table}`,
           valid_tables: validTables.map(t => t.table_name),
-          hint: 'Use table name without prefix (e.g., "orders" not "Xqc7k7_orders")'
+          hint: 'Use table name without prefix (e.g., "orders" not "v_Xqc7k7_orders")'
         },
         { status: 404 }
       )

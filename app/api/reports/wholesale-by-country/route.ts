@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
         s.name_th as supplier_name,
         JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')) as country_name,
         COUNT(*) as order_count
-      FROM Xqc7k7_orders o
+      FROM v_Xqc7k7_orders o
       LEFT JOIN tw_suppliers_db_views.v_GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
       WHERE o.order_status != 'Canceled'
         AND o.deleted_at IS NULL

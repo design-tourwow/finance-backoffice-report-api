@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
 
     // Build query
-    let query = `SELECT * FROM Xqc7k7_order_items WHERE 1=1`
+    let query = `SELECT * FROM v_Xqc7k7_order_items WHERE 1=1`
     const params: any[] = []
 
     if (orderId) {
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(query, params)
 
     // Get total count
-    let countQuery = `SELECT COUNT(*) as total FROM Xqc7k7_order_items WHERE 1=1`
+    let countQuery = `SELECT COUNT(*) as total FROM v_Xqc7k7_order_items WHERE 1=1`
     const countParams: any[] = []
     if (orderId) {
       countQuery += ` AND order_id = ?`
