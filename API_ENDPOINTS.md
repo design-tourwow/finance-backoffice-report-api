@@ -449,6 +449,74 @@ curl -X GET "http://localhost:3001/api/database/tables?include_columns=true" \
 | `tw_locations_db_views` | `v_Hdz2WSB_` | ข้อมูล Locations (Countries, Provinces, etc.) |
 | `tw_suppliers_db_views` | `v_GsF2WeS_` | ข้อมูล Suppliers |
 
+### GET /api/database/schema
+ดึง Schema ครบถ้วนของทุก Database, ทุก Table และทุก Column
+
+**Query Parameters:**
+- `database` - กรองตาม Database (TOURWOW, LOCATIONS, SUPPLIERS)
+- `table` - กรองตามชื่อ Table (partial match)
+
+**Example:**
+```bash
+# ดึง schema ทั้งหมด (ทุก DB, ทุก Table, ทุก Column)
+curl "http://localhost:3001/api/database/schema" \
+  -H "Authorization: Bearer <token>"
+
+# ดึงเฉพาะ TOURWOW database
+curl "http://localhost:3001/api/database/schema?database=TOURWOW" \
+  -H "Authorization: Bearer <token>"
+```
+
+### GET /api/database/query
+Query ข้อมูลจาก Table ใดก็ได้ (Simple Query)
+
+**Query Parameters:**
+- `database` (required) - Database key (TOURWOW, LOCATIONS, SUPPLIERS)
+- `table` (required) - ชื่อ Table เต็ม (e.g., `v_Xqc7k7_orders`)
+- `columns` - Columns ที่ต้องการ (comma-separated)
+- `where_column` - Column สำหรับ WHERE
+- `where_value` - Value สำหรับ WHERE
+- `where_operator` - Operator (=, !=, >, <, >=, <=, LIKE)
+- `order_by` - Column สำหรับ ORDER BY
+- `order_dir` - Direction (ASC, DESC)
+- `limit` - จำนวน rows (default: 100, max: 1000)
+- `offset` - Offset for pagination
+
+**Example:**
+```bash
+# ดึง orders ทั้งหมด
+curl "http://localhost:3001/api/database/query?database=TOURWOW&table=v_Xqc7k7_orders" \
+  -H "Authorization: Bearer <token>"
+
+# ดึงพร้อม filter และ sorting
+curl "http://localhost:3001/api/database/query?database=TOURWOW&table=v_Xqc7k7_orders&where_column=order_status&where_value=approved&order_by=created_at&order_dir=DESC" \
+  -H "Authorization: Bearer <token>"
+
+# ดึงข้อมูล Countries
+curl "http://localhost:3001/api/database/query?database=LOCATIONS&table=v_Hdz2WSB_countries" \
+  -H "Authorization: Bearer <token>"
+```
+
+### POST /api/database/query
+Query ข้อมูลแบบ Advanced (Multiple WHERE conditions)
+
+**Request Body:**
+```json
+{
+  "database": "TOURWOW",
+  "table": "v_Xqc7k7_orders",
+  "columns": ["id", "order_code", "customer_name", "net_amount"],
+  "where": [
+    { "column": "order_status", "operator": "=", "value": "approved" },
+    { "column": "net_amount", "operator": ">=", "value": 10000 }
+  ],
+  "order_by": [{ "column": "created_at", "direction": "DESC" }],
+  "limit": 50
+}
+```
+
+> **📚 ดูเอกสารฉบับเต็มได้ที่ [DATABASE_API.md](./DATABASE_API.md)**
+
 ---
 
 ## Error Responses
