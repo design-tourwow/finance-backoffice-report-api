@@ -681,6 +681,26 @@ export default function Home() {
   const [apiUrl, setApiUrl] = useState('http://localhost:3000')
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedSubCategory, setExpandedSubCategory] = useState<string | null>(null)
+  const [databaseTables, setDatabaseTables] = useState<any>(null)
+  const [dbTablesLoading, setDbTablesLoading] = useState(true)
+
+  // Fetch database tables for dynamic documentation
+  useEffect(() => {
+    const fetchDatabaseTables = async () => {
+      try {
+        const res = await fetch('/api/docs/tables')
+        const data = await res.json()
+        if (data.success) {
+          setDatabaseTables(data.data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch database tables:', error)
+      } finally {
+        setDbTablesLoading(false)
+      }
+    }
+    fetchDatabaseTables()
+  }, [])
 
   // Check authentication
   useEffect(() => {
@@ -2744,6 +2764,20 @@ curl "\${apiUrl}/api/reports/summary?period=daily" \\
 
   const selectedEndpointData = endpoints.find(e => e.id === selectedEndpoint) || endpoints[0]
 
+  // Helper to find selected table from database schema
+  const getSelectedTable = () => {
+    if (!selectedEndpoint.startsWith('table-') || !databaseTables) return null
+    const parts = selectedEndpoint.split('-')
+    const dbKey = parts[1]
+    const tableName = parts.slice(2).join('-')
+    const db = databaseTables.databases.find((d: any) => d.database_key === dbKey)
+    if (!db) return null
+    const table = db.tables.find((t: any) => t.table_name === tableName)
+    if (!table) return null
+    return { ...table, database: db }
+  }
+  const selectedTable = getSelectedTable()
+
   useEffect(() => {
     fetch('/api/health')
       .then(res => res.json())
@@ -3220,7 +3254,140 @@ curl "\${apiUrl}/api/reports/summary?period=daily" \\
                       )
                     })
                   })()
-                ) : (
+                ) : null}
+
+                {/* Dynamic Database Schema Section */}
+                {!searchQuery && databaseTables && (
+                  <div style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+                    <div style={{
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      color: '#9ca3af',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      padding: '0.5rem 0.5rem 0.375rem',
+                      marginTop: '0.5rem'
+                    }}>
+                      📊 Database Schema (Live)
+                    </div>
+                    {databaseTables.databases.map((db: any) => {
+                      const isExpanded = expandedSubCategory === `db-${db.database_key}`
+                      return (
+                        <div key={db.database_key} style={{ marginBottom: '0.25rem' }}>
+                          <button
+                            onClick={() => setExpandedSubCategory(isExpanded ? null : `db-${db.database_key}`)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              width: '100%',
+                              padding: '0.625rem 0.75rem',
+                              background: isExpanded ? '#ecfdf5' : 'transparent',
+                              border: 'none',
+                              borderLeft: isExpanded ? '3px solid #10b981' : '3px solid transparent',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!isExpanded) e.currentTarget.style.background = '#f0fdf4'
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isExpanded) e.currentTarget.style.background = 'transparent'
+                            }}
+                          >
+                            <span style={{
+                              fontSize: '0.8125rem',
+                              fontWeight: '600',
+                              color: isExpanded ? '#059669' : '#374151'
+                            }}>
+                              {db.database_key}
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span style={{
+                                fontSize: '0.6875rem',
+                                color: '#059669',
+                                background: '#d1fae5',
+                                padding: '0.125rem 0.5rem',
+                                borderRadius: '10px'
+                              }}>
+                                {db.table_count} tables
+                              </span>
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#9ca3af"
+                                strokeWidth="2"
+                                style={{
+                                  transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                                  transition: 'transform 0.2s'
+                                }}
+                              >
+                                <polyline points="6 9 12 15 18 9"/>
+                              </svg>
+                            </div>
+                          </button>
+                          {isExpanded && (
+                            <div style={{
+                              paddingLeft: '0.5rem',
+                              borderLeft: '1px solid #d1fae5',
+                              marginLeft: '0.75rem',
+                              marginTop: '0.25rem',
+                              maxHeight: '300px',
+                              overflowY: 'auto'
+                            }}>
+                              {db.tables.map((table: any) => (
+                                <div
+                                  key={table.table_name}
+                                  onClick={() => setSelectedEndpoint(`table-${db.database_key}-${table.table_name}`)}
+                                  style={{
+                                    padding: '0.5rem',
+                                    cursor: 'pointer',
+                                    borderRadius: '4px',
+                                    background: selectedEndpoint === `table-${db.database_key}-${table.table_name}` ? '#ecfdf5' : 'transparent',
+                                    borderLeft: selectedEndpoint === `table-${db.database_key}-${table.table_name}` ? '2px solid #10b981' : '2px solid transparent',
+                                    marginBottom: '0.25rem'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    if (selectedEndpoint !== `table-${db.database_key}-${table.table_name}`) {
+                                      e.currentTarget.style.background = '#f0fdf4'
+                                    }
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    if (selectedEndpoint !== `table-${db.database_key}-${table.table_name}`) {
+                                      e.currentTarget.style.background = 'transparent'
+                                    }
+                                  }}
+                                >
+                                  <div style={{ fontSize: '0.75rem', fontWeight: '500', color: '#065f46', fontFamily: 'Monaco, Consolas, monospace' }}>
+                                    {table.table_name}
+                                  </div>
+                                  <div style={{ fontSize: '0.6875rem', color: '#6b7280', marginTop: '0.125rem' }}>
+                                    {table.column_count} columns • {table.table_rows || 0} rows
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                    <div style={{
+                      fontSize: '0.6875rem',
+                      color: '#9ca3af',
+                      padding: '0.5rem',
+                      textAlign: 'center',
+                      borderTop: '1px solid #e5e7eb',
+                      marginTop: '0.5rem'
+                    }}>
+                      {databaseTables.summary.total_tables} tables • {databaseTables.summary.total_columns} columns
+                    </div>
+                  </div>
+                )}
+
+                {searchQuery && filteredEndpoints.length > 0 && (
                   // Show flat list when searching
                   filteredEndpoints.map((endpoint) => (
                     <EndpointListItem
@@ -3264,7 +3431,7 @@ curl "\${apiUrl}/api/reports/summary?period=daily" \\
           </div>
         </div>
 
-        {/* Right Content - Selected Endpoint Detail */}
+        {/* Right Content - Selected Endpoint Detail or Table Detail */}
         <div style={{
           background: '#fafafa',
           overflowY: 'auto',
@@ -3272,7 +3439,123 @@ curl "\${apiUrl}/api/reports/summary?period=daily" \\
           scrollBehavior: 'smooth',
           WebkitOverflowScrolling: 'touch'
         }}>
-          <EndpointDetail endpoint={selectedEndpointData} />
+          {selectedTable ? (
+            <div style={{ padding: '2rem', maxWidth: '1000px' }}>
+              {/* Table Header */}
+              <div style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                  <span style={{
+                    display: 'inline-block',
+                    padding: '0.25rem 0.75rem',
+                    background: '#d1fae5',
+                    color: '#065f46',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600'
+                  }}>
+                    TABLE
+                  </span>
+                  <span style={{
+                    display: 'inline-block',
+                    padding: '0.25rem 0.5rem',
+                    background: '#f3f4f6',
+                    color: '#374151',
+                    borderRadius: '4px',
+                    fontSize: '0.6875rem',
+                    fontWeight: '500'
+                  }}>
+                    {selectedTable.database.database_key}
+                  </span>
+                </div>
+                <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700', color: '#111827', fontFamily: 'Monaco, Consolas, monospace' }}>
+                  {selectedTable.table_name}
+                </h1>
+                <p style={{ margin: '0.5rem 0 0', color: '#6b7280', fontSize: '0.875rem' }}>
+                  {selectedTable.table_comment || 'No description available'}
+                </p>
+                <div style={{ marginTop: '0.75rem', display: 'flex', gap: '1rem', fontSize: '0.75rem', color: '#9ca3af' }}>
+                  <span>{selectedTable.column_count} columns</span>
+                  <span>{selectedTable.table_rows?.toLocaleString() || 0} rows</span>
+                  <span>Database: {selectedTable.database.database_name}</span>
+                </div>
+              </div>
+
+              {/* Columns Table */}
+              <div style={{
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '12px',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  padding: '1rem 1.5rem',
+                  background: '#f9fafb',
+                  borderBottom: '1px solid #e5e7eb',
+                  fontWeight: '600',
+                  fontSize: '0.875rem',
+                  color: '#374151'
+                }}>
+                  Columns ({selectedTable.columns.length})
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
+                    <thead>
+                      <tr style={{ background: '#f9fafb' }}>
+                        <th style={{ padding: '0.75rem 1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#6b7280' }}>Column Name</th>
+                        <th style={{ padding: '0.75rem 1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#6b7280' }}>Type</th>
+                        <th style={{ padding: '0.75rem 1rem', textAlign: 'center', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#6b7280' }}>Key</th>
+                        <th style={{ padding: '0.75rem 1rem', textAlign: 'center', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#6b7280' }}>Nullable</th>
+                        <th style={{ padding: '0.75rem 1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#6b7280' }}>Default</th>
+                        <th style={{ padding: '0.75rem 1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#6b7280' }}>Comment</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedTable.columns.map((col: any, idx: number) => (
+                        <tr key={col.name} style={{ background: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
+                          <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#111827', fontWeight: '500' }}>
+                            {col.name}
+                          </td>
+                          <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#7c3aed', fontSize: '0.75rem' }}>
+                            {col.full_type}
+                          </td>
+                          <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', textAlign: 'center' }}>
+                            {col.key === 'PRI' && <span style={{ background: '#fef3c7', color: '#d97706', padding: '0.125rem 0.5rem', borderRadius: '4px', fontSize: '0.6875rem', fontWeight: '600' }}>PK</span>}
+                            {col.key === 'MUL' && <span style={{ background: '#dbeafe', color: '#2563eb', padding: '0.125rem 0.5rem', borderRadius: '4px', fontSize: '0.6875rem', fontWeight: '600' }}>FK</span>}
+                            {col.key === 'UNI' && <span style={{ background: '#f3e8ff', color: '#7c3aed', padding: '0.125rem 0.5rem', borderRadius: '4px', fontSize: '0.6875rem', fontWeight: '600' }}>UQ</span>}
+                          </td>
+                          <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', textAlign: 'center' }}>
+                            {col.nullable ? <span style={{ color: '#9ca3af' }}>YES</span> : <span style={{ color: '#ef4444', fontWeight: '500' }}>NO</span>}
+                          </td>
+                          <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#6b7280', fontSize: '0.75rem' }}>
+                            {col.default === null ? <span style={{ color: '#d1d5db' }}>NULL</span> : col.default || '-'}
+                          </td>
+                          <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#6b7280', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {col.comment || '-'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Database Info */}
+              <div style={{
+                marginTop: '1.5rem',
+                padding: '1rem 1.5rem',
+                background: '#f0fdf4',
+                border: '1px solid #bbf7d0',
+                borderRadius: '8px',
+                fontSize: '0.8125rem',
+                color: '#166534'
+              }}>
+                <strong>Database:</strong> {selectedTable.database.database_name}<br/>
+                <strong>Description:</strong> {selectedTable.database.description}
+              </div>
+            </div>
+          ) : (
+            <EndpointDetail endpoint={selectedEndpointData} />
+          )}
         </div>
       </div>
       </div>
