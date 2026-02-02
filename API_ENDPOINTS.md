@@ -316,6 +316,141 @@ curl -X POST "http://localhost:3000/api/suppliers" \
 
 ---
 
+## 5. Database Tables API
+
+### GET /api/database/tables
+ดึงรายการ Tables ทั้งหมดจากทุก Database
+
+**Query Parameters:**
+- `database` - กรองตาม Database (TOURWOW, LOCATIONS, SUPPLIERS)
+- `include_columns` - แสดงรายละเอียด Columns (`true`/`false`, default: `false`)
+
+**Example:**
+```bash
+# ดึงทุก tables จากทุก database
+curl -X GET "http://localhost:3001/api/database/tables" \
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
+
+# ดึงเฉพาะ TOURWOW database
+curl -X GET "http://localhost:3001/api/database/tables?database=TOURWOW" \
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
+
+# ดึงพร้อม column details
+curl -X GET "http://localhost:3001/api/database/tables?include_columns=true" \
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "databases": [
+      {
+        "database": "tw_tourwow_db_views",
+        "prefix": "v_Xqc7k7_",
+        "tables": [
+          {
+            "table_name": "v_Xqc7k7_orders",
+            "table_type": "VIEW",
+            "table_rows": null,
+            "create_time": "2026-01-01T00:00:00.000Z",
+            "update_time": null,
+            "table_comment": ""
+          },
+          {
+            "table_name": "v_Xqc7k7_customers",
+            "table_type": "VIEW",
+            "table_rows": null,
+            "create_time": "2026-01-01T00:00:00.000Z",
+            "update_time": null,
+            "table_comment": ""
+          }
+        ],
+        "table_count": 4
+      },
+      {
+        "database": "tw_locations_db_views",
+        "prefix": "v_Hdz2WSB_",
+        "tables": [...],
+        "table_count": 5
+      },
+      {
+        "database": "tw_suppliers_db_views",
+        "prefix": "v_GsF2WeS_",
+        "tables": [...],
+        "table_count": 1
+      }
+    ],
+    "summary": {
+      "total_databases": 3,
+      "total_tables": 10
+    }
+  }
+}
+```
+
+**Response with `include_columns=true`:**
+```json
+{
+  "success": true,
+  "data": {
+    "databases": [
+      {
+        "database": "tw_tourwow_db_views",
+        "prefix": "v_Xqc7k7_",
+        "tables": [
+          {
+            "table_name": "v_Xqc7k7_orders",
+            "table_type": "VIEW",
+            "table_rows": null,
+            "create_time": "2026-01-01T00:00:00.000Z",
+            "update_time": null,
+            "table_comment": "",
+            "columns": [
+              {
+                "column_name": "id",
+                "data_type": "int",
+                "column_type": "int(11)",
+                "is_nullable": false,
+                "column_key": "PRI",
+                "column_default": null,
+                "extra": "auto_increment",
+                "column_comment": ""
+              },
+              {
+                "column_name": "order_code",
+                "data_type": "varchar",
+                "column_type": "varchar(50)",
+                "is_nullable": true,
+                "column_key": null,
+                "column_default": null,
+                "extra": null,
+                "column_comment": ""
+              }
+            ]
+          }
+        ],
+        "table_count": 4
+      }
+    ],
+    "summary": {
+      "total_databases": 3,
+      "total_tables": 10
+    }
+  }
+}
+```
+
+**Databases:**
+| Database | Prefix | Description |
+|----------|--------|-------------|
+| `tw_tourwow_db_views` | `v_Xqc7k7_` | ข้อมูล Orders, Customers, Bookings, Installments |
+| `tw_locations_db_views` | `v_Hdz2WSB_` | ข้อมูล Locations (Countries, Provinces, etc.) |
+| `tw_suppliers_db_views` | `v_GsF2WeS_` | ข้อมูล Suppliers |
+
+---
+
 ## Error Responses
 
 ### 400 Bad Request
@@ -379,6 +514,10 @@ curl -X GET "http://localhost:3000/api/installments?limit=5" \
 
 # Test Suppliers API
 curl -X GET "http://localhost:3000/api/suppliers?limit=5" \
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
+
+# Test Database Tables API
+curl -X GET "http://localhost:3001/api/database/tables" \
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
 ```
 
