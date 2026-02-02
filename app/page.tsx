@@ -2198,6 +2198,145 @@ curl "\${apiUrl}/api/reports/summary?period=daily" \\
         { status: 500, description: 'Database error' }
       ]
     },
+    // Dynamic Table Endpoints
+    {
+      id: 'GET-/api/tables',
+      method: 'GET',
+      path: '/api/tables',
+      description: 'List all databases and their tables with direct access endpoints',
+      category: 'MySQL Database',
+      subCategory: 'tables-dynamic',
+      requiresAuth: true,
+      curl: `curl "${apiUrl}/api/tables" \\
+  -H "Authorization: Bearer YOUR_TOKEN"`,
+      response: `{
+  "success": true,
+  "data": {
+    "databases": [
+      {
+        "database_key": "tourwow",
+        "database_name": "tw_tourwow_db_views",
+        "description": "Orders, Customers, Bookings, Order Items, Installments",
+        "endpoint": "/api/tables/tourwow",
+        "tables": [
+          { "table_name": "orders", "endpoint": "/api/tables/tourwow/orders", "table_rows": 5000 },
+          { "table_name": "order_items", "endpoint": "/api/tables/tourwow/order_items", "table_rows": 15000 },
+          { "table_name": "customers", "endpoint": "/api/tables/tourwow/customers", "table_rows": 3000 }
+        ],
+        "table_count": 12
+      }
+    ]
+  },
+  "usage": {
+    "list_all": "/api/tables",
+    "list_database": "/api/tables/{database}",
+    "query_table": "/api/tables/{database}/{table}"
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 401, description: 'Unauthorized' }
+      ]
+    },
+    {
+      id: 'GET-/api/tables/tourwow',
+      method: 'GET',
+      path: '/api/tables/{database}',
+      description: 'List all tables in a specific database (tourwow, locations, suppliers)',
+      category: 'MySQL Database',
+      subCategory: 'tables-dynamic',
+      requiresAuth: true,
+      parameters: [
+        { name: 'database', type: 'string', description: 'Database key: tourwow, locations, or suppliers' }
+      ],
+      curl: `curl "${apiUrl}/api/tables/tourwow" \\
+  -H "Authorization: Bearer YOUR_TOKEN"`,
+      response: `{
+  "success": true,
+  "data": {
+    "database": "tw_tourwow_db_views",
+    "description": "Orders, Customers, Bookings, Order Items, Installments",
+    "tables": [
+      { "table_name": "orders", "endpoint": "/api/tables/tourwow/orders", "table_rows": 5000 },
+      { "table_name": "order_items", "endpoint": "/api/tables/tourwow/order_items", "table_rows": 15000 },
+      { "table_name": "customers", "endpoint": "/api/tables/tourwow/customers", "table_rows": 3000 }
+    ],
+    "table_count": 12
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 400, description: 'Invalid database key' },
+        { status: 401, description: 'Unauthorized' }
+      ]
+    },
+    {
+      id: 'GET-/api/tables/tourwow/orders',
+      method: 'GET',
+      path: '/api/tables/{database}/{table}',
+      description: 'Query any table directly by database and table name (LIVE data)',
+      category: 'MySQL Database',
+      subCategory: 'tables-dynamic',
+      requiresAuth: true,
+      parameters: [
+        { name: 'database', type: 'string', description: 'Database key: tourwow, locations, suppliers' },
+        { name: 'table', type: 'string', description: 'Table name without prefix (e.g., orders, order_items, customers)' },
+        { name: 'columns', type: 'string', description: 'Comma-separated column names' },
+        { name: 'where_column', type: 'string', description: 'Column for filtering' },
+        { name: 'where_value', type: 'string', description: 'Value to filter by' },
+        { name: 'where_operator', type: 'string', description: '=, !=, >, <, >=, <=, LIKE' },
+        { name: 'order_by', type: 'string', description: 'Column to sort by' },
+        { name: 'order_dir', type: 'string', description: 'ASC or DESC' },
+        { name: 'limit', type: 'integer', description: 'Max rows (default: 100, max: 1000)' },
+        { name: 'offset', type: 'integer', description: 'Offset for pagination' }
+      ],
+      curl: `# Query orders table
+curl "${apiUrl}/api/tables/tourwow/orders?limit=10" \\
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Query order_items with filter
+curl "${apiUrl}/api/tables/tourwow/order_items?where_column=order_id&where_value=1262&limit=50" \\
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Query customers by name
+curl "${apiUrl}/api/tables/tourwow/customers?where_column=name&where_value=john&where_operator=LIKE" \\
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Query countries from locations database
+curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
+  -H "Authorization: Bearer YOUR_TOKEN"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 5001,
+      "order_id": 1262,
+      "product_room_type_id": 15,
+      "quantity": 2,
+      "price": "25000.00"
+    }
+  ],
+  "meta": {
+    "database": "tw_tourwow_db_views",
+    "table": "Xqc7k7_order_items",
+    "endpoint": "/api/tables/tourwow/order_items"
+  },
+  "pagination": {
+    "total": 15000,
+    "limit": 100,
+    "offset": 0,
+    "returned": 100,
+    "has_more": true
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 400, description: 'Invalid database key' },
+        { status: 401, description: 'Unauthorized' },
+        { status: 404, description: 'Table not found' },
+        { status: 500, description: 'Database error' }
+      ]
+    },
     {
       id: 'GET-/api/suppliers',
       method: 'GET',
