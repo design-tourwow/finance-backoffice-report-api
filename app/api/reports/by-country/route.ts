@@ -45,49 +45,55 @@ export async function GET(request: NextRequest) {
     const countryIds = countryIdParam ? countryIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
     const supplierIds = supplierIdParam ? supplierIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
 
+    // Query with subquery to order_items for total_customers (travelers)
+    // total_customers = SUM(quantity) from order_items where product_room_type_id IS NOT NULL
     let query = `
-      SELECT 
-        JSON_EXTRACT(product_snapshot, '$.countries[0].id') as country_id,
-        JSON_UNQUOTE(JSON_EXTRACT(product_snapshot, '$.countries[0].name_th')) as country_name,
+      SELECT
+        JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') as country_id,
+        JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')) as country_name,
         COUNT(*) as total_orders,
-        COUNT(DISTINCT customer_id) as total_customers,
-        COALESCE(SUM(net_amount), 0) as total_net_amount,
-        COALESCE(AVG(net_amount), 0) as avg_net_amount
-      FROM v_Xqc7k7_orders
-      WHERE order_status != 'Canceled'
-        AND deleted_at IS NULL
-        AND JSON_EXTRACT(product_snapshot, '$.countries[0].id') IS NOT NULL
+        COALESCE(SUM(
+          (SELECT COALESCE(SUM(oi.quantity), 0)
+           FROM v_Xqc7k7_order_items oi
+           WHERE oi.order_id = o.id AND oi.product_room_type_id IS NOT NULL)
+        ), 0) as total_customers,
+        COALESCE(SUM(o.net_amount), 0) as total_net_amount,
+        COALESCE(AVG(o.net_amount), 0) as avg_net_amount
+      FROM v_Xqc7k7_orders o
+      WHERE o.order_status != 'Canceled'
+        AND o.deleted_at IS NULL
+        AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
     `
     const params: any[] = []
 
     // Filter by country_id (support multiple IDs)
     if (countryIds.length > 0) {
       const placeholders = countryIds.map(() => '?').join(',')
-      query += ` AND CAST(JSON_EXTRACT(product_snapshot, '$.countries[0].id') AS UNSIGNED) IN (${placeholders})`
+      query += ` AND CAST(JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') AS UNSIGNED) IN (${placeholders})`
       params.push(...countryIds)
     }
 
     if (travelDateFrom) {
-      query += ` AND JSON_EXTRACT(product_period_snapshot, '$.start_at') >= ?`
+      query += ` AND JSON_EXTRACT(o.product_period_snapshot, '$.start_at') >= ?`
       params.push(travelDateFrom)
     }
     if (travelDateTo) {
-      query += ` AND JSON_EXTRACT(product_period_snapshot, '$.start_at') <= ?`
+      query += ` AND JSON_EXTRACT(o.product_period_snapshot, '$.start_at') <= ?`
       params.push(travelDateTo)
     }
     if (bookingDateFrom) {
-      query += ` AND DATE(CONVERT_TZ(created_at, '+00:00', '+07:00')) >= ?`
+      query += ` AND DATE(CONVERT_TZ(o.created_at, '+00:00', '+07:00')) >= ?`
       params.push(bookingDateFrom)
     }
     if (bookingDateTo) {
-      query += ` AND DATE(CONVERT_TZ(created_at, '+00:00', '+07:00')) <= ?`
+      query += ` AND DATE(CONVERT_TZ(o.created_at, '+00:00', '+07:00')) <= ?`
       params.push(bookingDateTo)
     }
-    
+
     // Filter by supplier_id (support multiple IDs)
     if (supplierIds.length > 0) {
       const placeholders = supplierIds.map(() => '?').join(',')
-      query += ` AND product_owner_supplier_id IN (${placeholders})`
+      query += ` AND o.product_owner_supplier_id IN (${placeholders})`
       params.push(...supplierIds)
     }
 

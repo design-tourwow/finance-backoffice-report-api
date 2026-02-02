@@ -11,6 +11,7 @@ RENAME TABLE v_Xqc7k7_orders TO Xqc7k7_orders;
 RENAME TABLE v_Xqc7k7_customers TO Xqc7k7_customers;
 RENAME TABLE v_Xqc7k7_bookings TO Xqc7k7_bookings;
 RENAME TABLE v_Xqc7k7_customer_order_installments TO Xqc7k7_customer_order_installments;
+RENAME TABLE v_Xqc7k7_order_items TO Xqc7k7_order_items;
 
 -- Verify tables were renamed back
 SELECT 

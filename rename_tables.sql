@@ -18,7 +18,8 @@ AND TABLE_NAME IN (
     'Xqc7k7_orders',
     'Xqc7k7_customers',
     'Xqc7k7_bookings',
-    'Xqc7k7_customer_order_installments'
+    'Xqc7k7_customer_order_installments',
+    'Xqc7k7_order_items'
 );
 
 -- Rename tables
@@ -26,6 +27,7 @@ RENAME TABLE Xqc7k7_orders TO v_Xqc7k7_orders;
 RENAME TABLE Xqc7k7_customers TO v_Xqc7k7_customers;
 RENAME TABLE Xqc7k7_bookings TO v_Xqc7k7_bookings;
 RENAME TABLE Xqc7k7_customer_order_installments TO v_Xqc7k7_customer_order_installments;
+RENAME TABLE Xqc7k7_order_items TO v_Xqc7k7_order_items;
 
 -- Verify tables were renamed
 SELECT 
@@ -41,6 +43,7 @@ SELECT COUNT(*) as orders_count FROM v_Xqc7k7_orders;
 SELECT COUNT(*) as customers_count FROM v_Xqc7k7_customers;
 SELECT COUNT(*) as bookings_count FROM v_Xqc7k7_bookings;
 SELECT COUNT(*) as installments_count FROM v_Xqc7k7_customer_order_installments;
+SELECT COUNT(*) as order_items_count FROM v_Xqc7k7_order_items;
 
 -- ============================================
 -- Script completed successfully
