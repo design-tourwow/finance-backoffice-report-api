@@ -297,28 +297,85 @@ curl -X POST "https://staging-finance-backoffice-report-api.vercel.app/api/datab
 
 ### TOURWOW Database (`tw_tourwow_db_views`)
 
-| Table | Description |
-|-------|-------------|
-| `v_Xqc7k7_orders` | คำสั่งซื้อ/ออเดอร์ |
-| `v_Xqc7k7_customers` | ข้อมูลลูกค้า |
-| `v_Xqc7k7_bookings` | ข้อมูลการจอง |
-| `v_Xqc7k7_customer_order_installments` | งวดการชำระเงิน |
+| Table | Description | Key Columns |
+|-------|-------------|-------------|
+| `Xqc7k7_orders` | คำสั่งซื้อ/ออเดอร์ | `id`, `order_code`, `customer_id`, `order_status`, `net_amount`, `product_snapshot`, `product_period_snapshot` |
+| `Xqc7k7_order_items` | รายการสินค้าในออเดอร์ | `id`, `order_id`, `product_room_type_id`, `quantity`, `price` |
+| `Xqc7k7_customers` | ข้อมูลลูกค้า | `id`, `customer_code`, `name`, `phone_number`, `email` |
+| `Xqc7k7_bookings` | ข้อมูลการจอง | `id`, `booking_code`, `status` |
+| `Xqc7k7_customer_order_installments` | งวดการชำระเงินลูกค้า | `id`, `order_id`, `ordinal`, `amount`, `status`, `due_date` |
+| `Xqc7k7_customer_order_installment_files` | ไฟล์แนบงวดชำระเงิน | `id`, `installment_id`, `file_path` |
+| `Xqc7k7_supplier_order_installments` | งวดการชำระเงิน Supplier | `id`, `order_id`, `amount`, `status` |
+| `Xqc7k7_agencies` | บริษัททัวร์/Agency | `id`, `name`, `code` |
+| `Xqc7k7_products` | สินค้า/ทัวร์ | `id`, `name`, `supplier_id` |
+| `Xqc7k7_product_periods` | ช่วงเวลาของสินค้า | `id`, `product_id`, `start_at`, `end_at` |
+| `Xqc7k7_product_room_types` | ประเภทห้อง/ที่พัก | `id`, `product_id`, `name`, `price` |
+
+**หมายเหตุ:** ใช้ `/api/database/schema?database=TOURWOW` เพื่อดู columns ทั้งหมดของแต่ละ table
 
 ### LOCATIONS Database (`tw_locations_db_views`)
 
-| Table | Description |
-|-------|-------------|
-| `v_Hdz2WSB_countries` | ประเทศ |
-| `v_Hdz2WSB_provinces` | จังหวัด |
-| `v_Hdz2WSB_regions` | ภูมิภาค |
-| `v_Hdz2WSB_continents` | ทวีป |
-| `v_Hdz2WSB_airports` | สนามบิน |
+| Table | Description | Key Columns |
+|-------|-------------|-------------|
+| `Xqc7k7_countries` | ประเทศ | `id`, `name_th`, `name_en`, `code` |
+| `Xqc7k7_provinces` | จังหวัด | `id`, `country_id`, `name_th`, `name_en` |
+| `Xqc7k7_regions` | ภูมิภาค | `id`, `name_th`, `name_en` |
+| `Xqc7k7_continents` | ทวีป | `id`, `name_th`, `name_en` |
+| `Xqc7k7_airports` | สนามบิน | `id`, `country_id`, `name`, `code` |
 
 ### SUPPLIERS Database (`tw_suppliers_db_views`)
 
-| Table | Description |
-|-------|-------------|
-| `v_GsF2WeS_suppliers` | ซัพพลายเออร์/Wholesales |
+| Table | Description | Key Columns |
+|-------|-------------|-------------|
+| `Xqc7k7_suppliers` | ซัพพลายเออร์/Wholesales | `id`, `name_th`, `name_en`, `code`, `status_code` |
+
+---
+
+## order_items Table Detail
+
+Table `Xqc7k7_order_items` ใช้สำหรับคำนวณจำนวนผู้เดินทาง
+
+### Columns
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | int | Primary Key |
+| `order_id` | int | FK เชื่อมกับ orders.id |
+| `product_room_type_id` | int | FK เชื่อมกับ product_room_types.id (NULL = ไม่นับ) |
+| `quantity` | int | จำนวนผู้เดินทาง |
+| `price` | decimal | ราคา |
+| `created_at` | datetime | วันที่สร้าง |
+| `updated_at` | datetime | วันที่อัปเดต |
+
+### การคำนวณจำนวนผู้เดินทาง
+```sql
+SELECT SUM(quantity) as total_travelers
+FROM Xqc7k7_order_items
+WHERE order_id = ? AND product_room_type_id IS NOT NULL
+```
+
+### Example API Call
+```bash
+# ดึงข้อมูล order_items
+curl "https://staging-finance-backoffice-report-api.vercel.app/api/database/query?database=TOURWOW&table=Xqc7k7_order_items&limit=10" \
+  -H "Authorization: Bearer <token>"
+
+# ดึง order_items ของ order เฉพาะ
+curl "https://staging-finance-backoffice-report-api.vercel.app/api/database/query?database=TOURWOW&table=Xqc7k7_order_items&where_column=order_id&where_value=123" \
+  -H "Authorization: Bearer <token>"
+
+# ดึงเฉพาะที่มี product_room_type_id
+curl -X POST "https://staging-finance-backoffice-report-api.vercel.app/api/database/query" \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "database": "TOURWOW",
+    "table": "Xqc7k7_order_items",
+    "where": [
+      { "column": "product_room_type_id", "operator": "IS NOT NULL" }
+    ],
+    "limit": 100
+  }'
+```
 
 ---
 

@@ -8,12 +8,15 @@ export const DB_NAMES = {
   SUPPLIERS: process.env.DB_NAME_SUPPLIERS || 'tw_suppliers_db_views'
 }
 
-// View prefixes for each database
-export const VIEW_PREFIXES = {
-  TOURWOW: 'v_Xqc7k7_',
-  LOCATIONS: 'v_Hdz2WSB_',
-  SUPPLIERS: 'v_GsF2WeS_'
+// Table prefixes for each database (based on actual database structure)
+export const TABLE_PREFIXES = {
+  TOURWOW: 'Xqc7k7_',
+  LOCATIONS: 'Xqc7k7_',
+  SUPPLIERS: 'Xqc7k7_'
 }
+
+// Legacy alias for backward compatibility
+export const VIEW_PREFIXES = TABLE_PREFIXES
 
 // MySQL Database connection pool configuration (connects without specific database)
 const mysqlPool = mysql.createPool({

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type')
     
     // Query ข้อมูลจาก Database
-    let query = 'SELECT * FROM v_Xqc7k7_bookings'
+    let query = 'SELECT * FROM Xqc7k7_bookings'
     const params: any[] = []
     
     // ถ้ามีการ filter ตาม type
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     
     // Insert ข้อมูลลง Database
     const query = `
-      INSERT INTO v_Xqc7k7_bookings (title, type, created_at, status) 
+      INSERT INTO Xqc7k7_bookings (title, type, created_at, status) 
       VALUES (?, ?, NOW(), 'pending')
     `
     
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     
     // ดึงข้อมูลที่เพิ่งสร้างกลับมา
     const [newRows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM v_Xqc7k7_bookings WHERE id = ?',
+      'SELECT * FROM Xqc7k7_bookings WHERE id = ?',
       [result.insertId]
     )
     

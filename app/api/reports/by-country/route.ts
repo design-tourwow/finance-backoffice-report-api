@@ -54,12 +54,12 @@ export async function GET(request: NextRequest) {
         COUNT(*) as total_orders,
         COALESCE(SUM(
           (SELECT COALESCE(SUM(oi.quantity), 0)
-           FROM v_Xqc7k7_order_items oi
+           FROM Xqc7k7_order_items oi
            WHERE oi.order_id = o.id AND oi.product_room_type_id IS NOT NULL)
         ), 0) as total_customers,
         COALESCE(SUM(o.net_amount), 0) as total_net_amount,
         COALESCE(AVG(o.net_amount), 0) as avg_net_amount
-      FROM v_Xqc7k7_orders o
+      FROM Xqc7k7_orders o
       WHERE o.order_status != 'Canceled'
         AND o.deleted_at IS NULL
         AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL

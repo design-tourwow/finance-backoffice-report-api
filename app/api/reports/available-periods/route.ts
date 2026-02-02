@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
         QUARTER(CONVERT_TZ(created_at, '+00:00', '+07:00')) as quarter,
         MONTH(CONVERT_TZ(created_at, '+00:00', '+07:00')) as month,
         COUNT(*) as order_count
-      FROM v_Xqc7k7_orders
+      FROM Xqc7k7_orders
       WHERE order_status != 'Canceled'
         AND deleted_at IS NULL
       GROUP BY year_ce, quarter, month

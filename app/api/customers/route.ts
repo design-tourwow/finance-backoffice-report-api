@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    let query = 'SELECT * FROM v_Xqc7k7_customers WHERE 1=1'
+    let query = 'SELECT * FROM Xqc7k7_customers WHERE 1=1'
     const params: any[] = []
 
     if (customerId) {
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
     const placeholders = Object.keys(body).map(() => '?').join(', ')
     const values = Object.values(body)
 
-    const query = `INSERT INTO v_Xqc7k7_customers (${fields}, created_at, updated_at) VALUES (${placeholders}, NOW(), NOW())`
+    const query = `INSERT INTO Xqc7k7_customers (${fields}, created_at, updated_at) VALUES (${placeholders}, NOW(), NOW())`
 
     const [result] = await mysqlPool.execute<ResultSetHeader>(query, values)
 
@@ -182,7 +182,7 @@ export async function PUT(request: NextRequest) {
     const setClause = Object.keys(updateData).map(key => `${key} = ?`).join(', ')
     const values = [...Object.values(updateData), id]
 
-    const query = `UPDATE v_Xqc7k7_customers SET ${setClause}, updated_at = NOW() WHERE id = ?`
+    const query = `UPDATE Xqc7k7_customers SET ${setClause}, updated_at = NOW() WHERE id = ?`
 
     const [result] = await mysqlPool.execute<ResultSetHeader>(query, values)
 
@@ -231,7 +231,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    const query = 'DELETE FROM v_Xqc7k7_customers WHERE id = ?'
+    const query = 'DELETE FROM Xqc7k7_customers WHERE id = ?'
     const [result] = await mysqlPool.execute<ResultSetHeader>(query, [id])
 
     if (result.affectedRows === 0) {
