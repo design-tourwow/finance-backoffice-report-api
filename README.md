@@ -126,8 +126,44 @@ finance-backoffice-report-api/
 └── README.md
 ```
 
+## กฎการพัฒนา (Development Rules)
+
+### สร้าง API Endpoint ใหม่
+
+**เมื่อสร้าง API endpoint ใหม่ ต้องทำทั้ง 2 อย่างเสมอ:**
+
+1. **สร้าง Route File** - สร้างไฟล์ `route.ts` ใน `app/api/[endpoint-name]/`
+
+2. **เพิ่มใน API Documentation** - เพิ่ม endpoint ในไฟล์ `app/page.tsx` ใน array `endpoints` เพื่อให้แสดงบนหน้าเว็บ API Documentation
+
+```typescript
+// ตัวอย่างการเพิ่ม endpoint ใน page.tsx
+{
+  id: 'GET-/api/your-endpoint',
+  method: 'GET',
+  path: '/api/your-endpoint',
+  description: 'คำอธิบาย endpoint',
+  category: 'MySQL Database',
+  subCategory: 'your-category',
+  requiresAuth: true,
+  parameters: [
+    { name: 'param1', type: 'string', description: 'คำอธิบาย parameter' }
+  ],
+  curl: `curl "\${apiUrl}/api/your-endpoint" -H "Authorization: Bearer YOUR_TOKEN"`,
+  response: `{ "success": true, "data": [...] }`,
+  responses: [
+    { status: 200, description: 'Success' },
+    { status: 401, description: 'Unauthorized' }
+  ]
+}
+```
+
+**ห้ามสร้าง API endpoint โดยไม่เพิ่มใน API Documentation เด็ดขาด!**
+
+---
+
 ## หมายเหตุ
 
-- API นี้ยังไม่ได้เชื่อมต่อกับ frontend (finance-backoffice-report)
-- ใช้ mock data ในตอนนี้ ยังไม่ได้เชื่อมต่อกับ database
+- API Documentation อยู่ที่หน้าแรกของเว็บ (ต้อง login ก่อน)
+- ใช้ MySQL Database บน AWS RDS
 - พร้อมสำหรับการพัฒนาต่อยอด

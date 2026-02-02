@@ -1839,6 +1839,57 @@ curl "\${apiUrl}/api/reports/summary?period=daily" \\
       ]
     },
     {
+      id: 'GET-/api/order-items',
+      method: 'GET',
+      path: '/api/order-items',
+      description: 'ดึงข้อมูล order_items จาก Xqc7k7_order_items table',
+      category: 'MySQL Database',
+      subCategory: 'order-items',
+      requiresAuth: true,
+      parameters: [
+        { name: 'order_id', type: 'integer', description: 'Filter by order ID' },
+        { name: 'product_room_type_id_not_null', type: 'boolean', description: 'Filter only rows where product_room_type_id IS NOT NULL (true/false)' },
+        { name: 'limit', type: 'integer', description: 'Max records (default: 100, max: 1000)' },
+        { name: 'offset', type: 'integer', description: 'Skip records (default: 0)' }
+      ],
+      curl: `# ดึงข้อมูลทั้งหมด
+curl "${apiUrl}/api/order-items?limit=10" \\
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# ดึงตาม order_id
+curl "${apiUrl}/api/order-items?order_id=1262" \\
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# ดึงเฉพาะที่มี product_room_type_id (สำหรับนับจำนวนผู้เดินทาง)
+curl "${apiUrl}/api/order-items?order_id=1262&product_room_type_id_not_null=true" \\
+  -H "Authorization: Bearer YOUR_TOKEN"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 5001,
+      "order_id": 1262,
+      "product_room_type_id": 15,
+      "quantity": 2,
+      "price": "25000.00",
+      "created_at": "2026-01-15T10:30:00.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 3,
+    "limit": 100,
+    "offset": 0,
+    "returned": 3,
+    "has_more": false
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 401, description: 'Unauthorized' },
+        { status: 500, description: 'Database error' }
+      ]
+    },
+    {
       id: 'GET-/api/installments',
       method: 'GET',
       path: '/api/installments',
