@@ -45,21 +45,25 @@ export async function GET(request: NextRequest) {
     const countryIds = countryIdParam ? countryIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
     const supplierIds = supplierIdParam ? supplierIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
 
-    // Query with subquery to order_items for total_customers (travelers)
-    // total_customers = SUM(quantity) from order_items where product_room_type_id IS NOT NULL
+    // Query with JOIN to order_items for total_customers (travelers)
+    // Logic:
+    // 1. Order ที่มี 0 travelers จะไม่ถูกนับ
+    // 2. ประเทศที่มี total_customers = 0 จะไม่แสดง (HAVING clause)
     let query = `
       SELECT
         JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') as country_id,
         JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')) as country_name,
-        COUNT(*) as total_orders,
-        COALESCE(SUM(
-          (SELECT COALESCE(SUM(oi.quantity), 0)
-           FROM v_Xqc7k7_order_items oi
-           WHERE oi.order_id = o.id AND oi.product_room_type_id IS NOT NULL)
-        ), 0) as total_customers,
-        COALESCE(SUM(o.net_amount), 0) as total_net_amount,
-        COALESCE(AVG(o.net_amount), 0) as avg_net_amount
+        COUNT(DISTINCT CASE WHEN COALESCE(oi_sum.traveler_count, 0) > 0 THEN o.id END) as total_orders,
+        COALESCE(SUM(oi_sum.traveler_count), 0) as total_customers,
+        COALESCE(SUM(CASE WHEN COALESCE(oi_sum.traveler_count, 0) > 0 THEN o.net_amount ELSE 0 END), 0) as total_net_amount,
+        COALESCE(AVG(CASE WHEN COALESCE(oi_sum.traveler_count, 0) > 0 THEN o.net_amount END), 0) as avg_net_amount
       FROM v_Xqc7k7_orders o
+      LEFT JOIN (
+        SELECT order_id, SUM(quantity) as traveler_count
+        FROM v_Xqc7k7_order_items
+        WHERE product_room_type_id IS NOT NULL
+        GROUP BY order_id
+      ) oi_sum ON oi_sum.order_id = o.id
       WHERE o.order_status != 'Canceled'
         AND o.deleted_at IS NULL
         AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
@@ -97,7 +101,7 @@ export async function GET(request: NextRequest) {
       params.push(...supplierIds)
     }
 
-    query += ` GROUP BY country_id, country_name ORDER BY total_orders DESC`
+    query += ` GROUP BY country_id, country_name HAVING total_customers > 0 ORDER BY total_orders DESC`
 
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(query, params)
 
