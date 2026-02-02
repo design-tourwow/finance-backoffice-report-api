@@ -1997,6 +1997,188 @@ curl "\${apiUrl}/api/reports/summary?period=daily" \\
       ]
     },
     {
+      id: 'GET-/api/database/tables',
+      method: 'GET',
+      path: '/api/database/tables',
+      description: 'List all tables from all databases (TOURWOW, LOCATIONS, SUPPLIERS)',
+      category: 'MySQL Database',
+      subCategory: 'database',
+      requiresAuth: true,
+      parameters: [
+        { name: 'database', type: 'string', description: 'Filter by database (TOURWOW, LOCATIONS, SUPPLIERS)' },
+        { name: 'include_columns', type: 'boolean', description: 'Include column details (true/false)' }
+      ],
+      curl: `curl "${apiUrl}/api/database/tables?database=TOURWOW" \\
+  -H "Authorization: Bearer YOUR_TOKEN"`,
+      response: `{
+  "success": true,
+  "data": {
+    "databases": [
+      {
+        "database": "tw_tourwow_db_views",
+        "prefix": "Xqc7k7_",
+        "tables": [
+          { "table_name": "Xqc7k7_orders", "table_type": "BASE TABLE", "table_rows": 5000 },
+          { "table_name": "Xqc7k7_order_items", "table_type": "BASE TABLE", "table_rows": 15000 },
+          { "table_name": "Xqc7k7_customers", "table_type": "BASE TABLE", "table_rows": 3000 }
+        ],
+        "table_count": 12
+      }
+    ],
+    "summary": { "total_databases": 3, "total_tables": 20 }
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 401, description: 'Unauthorized' },
+        { status: 500, description: 'Database error' }
+      ]
+    },
+    {
+      id: 'GET-/api/database/schema',
+      method: 'GET',
+      path: '/api/database/schema',
+      description: 'Get complete schema of all databases, tables, and columns',
+      category: 'MySQL Database',
+      subCategory: 'database',
+      requiresAuth: true,
+      parameters: [
+        { name: 'database', type: 'string', description: 'Filter by database (TOURWOW, LOCATIONS, SUPPLIERS)' },
+        { name: 'table', type: 'string', description: 'Filter by table name (partial match)' }
+      ],
+      curl: `curl "${apiUrl}/api/database/schema?database=TOURWOW&table=order_items" \\
+  -H "Authorization: Bearer YOUR_TOKEN"`,
+      response: `{
+  "success": true,
+  "data": {
+    "databases": [
+      {
+        "database": "tw_tourwow_db_views",
+        "tables": [
+          {
+            "table_name": "Xqc7k7_order_items",
+            "columns": [
+              { "column_name": "id", "data_type": "int", "is_nullable": false, "column_key": "PRI" },
+              { "column_name": "order_id", "data_type": "int", "is_nullable": false, "column_key": "MUL" },
+              { "column_name": "product_room_type_id", "data_type": "int", "is_nullable": true },
+              { "column_name": "quantity", "data_type": "int", "is_nullable": false },
+              { "column_name": "price", "data_type": "decimal", "is_nullable": true }
+            ],
+            "column_count": 10
+          }
+        ]
+      }
+    ],
+    "summary": { "total_databases": 1, "total_tables": 1, "total_columns": 10 }
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 401, description: 'Unauthorized' },
+        { status: 500, description: 'Database error' }
+      ]
+    },
+    {
+      id: 'GET-/api/database/query',
+      method: 'GET',
+      path: '/api/database/query',
+      description: 'Query any table from any database with filtering, sorting, and pagination',
+      category: 'MySQL Database',
+      subCategory: 'database',
+      requiresAuth: true,
+      parameters: [
+        { name: 'database', type: 'string', description: 'Database key (TOURWOW, LOCATIONS, SUPPLIERS) - required' },
+        { name: 'table', type: 'string', description: 'Table name (e.g., Xqc7k7_order_items) - required' },
+        { name: 'columns', type: 'string', description: 'Comma-separated column names' },
+        { name: 'where_column', type: 'string', description: 'Column for WHERE clause' },
+        { name: 'where_value', type: 'string', description: 'Value for WHERE clause' },
+        { name: 'where_operator', type: 'string', description: 'Operator (=, !=, >, <, >=, <=, LIKE)' },
+        { name: 'order_by', type: 'string', description: 'Column for ORDER BY' },
+        { name: 'order_dir', type: 'string', description: 'ASC or DESC' },
+        { name: 'limit', type: 'integer', description: 'Max rows (default: 100, max: 1000)' },
+        { name: 'offset', type: 'integer', description: 'Offset for pagination' }
+      ],
+      curl: `curl "${apiUrl}/api/database/query?database=TOURWOW&table=Xqc7k7_order_items&where_column=order_id&where_value=1262&limit=10" \\
+  -H "Authorization: Bearer YOUR_TOKEN"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 5001,
+      "order_id": 1262,
+      "product_room_type_id": 15,
+      "quantity": 2,
+      "price": "25000.00"
+    }
+  ],
+  "meta": {
+    "database": "tw_tourwow_db_views",
+    "table": "Xqc7k7_order_items"
+  },
+  "pagination": {
+    "total": 3,
+    "limit": 10,
+    "offset": 0,
+    "returned": 3,
+    "has_more": false
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 400, description: 'Missing required parameters' },
+        { status: 401, description: 'Unauthorized' },
+        { status: 404, description: 'Table not found' },
+        { status: 500, description: 'Database error' }
+      ]
+    },
+    {
+      id: 'POST-/api/database/query',
+      method: 'POST',
+      path: '/api/database/query',
+      description: 'Advanced query with multiple WHERE conditions',
+      category: 'MySQL Database',
+      subCategory: 'database',
+      requiresAuth: true,
+      requestBody: {
+        database: { type: 'string', required: true, description: 'Database key (TOURWOW, LOCATIONS, SUPPLIERS)' },
+        table: { type: 'string', required: true, description: 'Table name (e.g., Xqc7k7_order_items)' },
+        columns: { type: 'array', required: false, description: 'Array of column names' },
+        where: { type: 'array', required: false, description: 'Array of WHERE conditions [{column, operator, value}]' },
+        order_by: { type: 'array', required: false, description: 'Array of ORDER BY [{column, direction}]' },
+        limit: { type: 'integer', required: false, description: 'Max rows (default: 100)' },
+        offset: { type: 'integer', required: false, description: 'Offset (default: 0)' }
+      },
+      curl: `curl -X POST "${apiUrl}/api/database/query" \\
+  -H "Authorization: Bearer YOUR_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "database": "TOURWOW",
+    "table": "Xqc7k7_order_items",
+    "columns": ["id", "order_id", "quantity", "price"],
+    "where": [
+      { "column": "product_room_type_id", "operator": "IS NOT NULL" },
+      { "column": "quantity", "operator": ">=", "value": 1 }
+    ],
+    "order_by": [{ "column": "order_id", "direction": "DESC" }],
+    "limit": 50
+  }'`,
+      response: `{
+  "success": true,
+  "data": [
+    { "id": 5001, "order_id": 1262, "quantity": 2, "price": "25000.00" },
+    { "id": 5002, "order_id": 1262, "quantity": 1, "price": "25000.00" }
+  ],
+  "pagination": { "total": 15000, "limit": 50, "offset": 0, "returned": 50, "has_more": true }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response' },
+        { status: 400, description: 'Invalid request body' },
+        { status: 401, description: 'Unauthorized' },
+        { status: 404, description: 'Table not found' },
+        { status: 500, description: 'Database error' }
+      ]
+    },
+    {
       id: 'GET-/api/suppliers',
       method: 'GET',
       path: '/api/suppliers',
