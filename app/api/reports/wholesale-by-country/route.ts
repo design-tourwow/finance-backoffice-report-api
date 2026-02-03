@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     const travelDateTo = searchParams.get('travel_date_to')
     const bookingDateFrom = searchParams.get('booking_date_from')
     const bookingDateTo = searchParams.get('booking_date_to')
-    const viewMode = searchParams.get('view_mode') || 'sales' // 'sales' or 'travelers'
+    const viewMode = searchParams.get('view_mode') || 'sales' // 'sales', 'travelers', 'orders', 'net_commission'
 
     // Parse comma-separated IDs
     const countryIds = countryIdParam ? countryIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
@@ -48,49 +48,46 @@ export async function GET(request: NextRequest) {
 
     // Query to get wholesale-country breakdown
     // Logic: นับเฉพาะ order ที่ไม่ยกเลิก + งวดแรก paid + supplier_commission > 0
-    let query = ''
-
-    if (viewMode === 'travelers') {
-      query = `
-        SELECT
-          o.product_owner_supplier_id as supplier_id,
-          s.name_th as supplier_name,
-          JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')) as country_name,
-          COUNT(DISTINCT o.id) as order_count,
-          COALESCE(SUM(oi_sum.traveler_count), 0) as total_value
-        FROM v_Xqc7k7_orders o
-        LEFT JOIN tw_suppliers_db_views.v_GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
-        LEFT JOIN (
-          SELECT order_id, SUM(quantity) as traveler_count
-          FROM v_Xqc7k7_order_items
-          WHERE product_room_type_id IS NOT NULL
-          GROUP BY order_id
-        ) oi_sum ON oi_sum.order_id = o.id
-        WHERE o.order_status != 'Canceled'
-          AND o.supplier_commission > 0
-          AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
-      `
-    } else {
-      query = `
-        SELECT
-          o.product_owner_supplier_id as supplier_id,
-          s.name_th as supplier_name,
-          JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')) as country_name,
-          COUNT(DISTINCT o.id) as order_count,
-          COALESCE(SUM(o.net_amount), 0) as total_value
-        FROM v_Xqc7k7_orders o
-        LEFT JOIN tw_suppliers_db_views.v_GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
-        LEFT JOIN (
-          SELECT order_id, SUM(quantity) as traveler_count
-          FROM v_Xqc7k7_order_items
-          WHERE product_room_type_id IS NOT NULL
-          GROUP BY order_id
-        ) oi_sum ON oi_sum.order_id = o.id
-        WHERE o.order_status != 'Canceled'
-          AND o.supplier_commission > 0
-          AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
-      `
+    // total_value ขึ้นอยู่กับ view_mode:
+    //   sales = SUM(net_amount)
+    //   travelers = SUM(traveler_count) from order_items
+    //   orders = COUNT(DISTINCT o.id)
+    //   net_commission = SUM((commission_company + commission_seller) - discount)
+    let totalValueExpr = ''
+    switch (viewMode) {
+      case 'travelers':
+        totalValueExpr = 'COALESCE(SUM(oi_sum.traveler_count), 0)'
+        break
+      case 'orders':
+        totalValueExpr = 'COUNT(DISTINCT o.id)'
+        break
+      case 'net_commission':
+        totalValueExpr = 'COALESCE(SUM((o.commission_company + o.commission_seller) - o.discount), 0)'
+        break
+      default: // sales
+        totalValueExpr = 'COALESCE(SUM(o.net_amount), 0)'
+        break
     }
+
+    let query = `
+      SELECT
+        o.product_owner_supplier_id as supplier_id,
+        s.name_th as supplier_name,
+        JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')) as country_name,
+        COUNT(DISTINCT o.id) as order_count,
+        ${totalValueExpr} as total_value
+      FROM v_Xqc7k7_orders o
+      LEFT JOIN tw_suppliers_db_views.v_GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
+      LEFT JOIN (
+        SELECT order_id, SUM(quantity) as traveler_count
+        FROM v_Xqc7k7_order_items
+        WHERE product_room_type_id IS NOT NULL
+        GROUP BY order_id
+      ) oi_sum ON oi_sum.order_id = o.id
+      WHERE o.order_status != 'Canceled'
+        AND o.supplier_commission > 0
+        AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
+    `
     const params: any[] = []
 
     // Filter by country_id (support multiple IDs)
