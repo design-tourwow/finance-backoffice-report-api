@@ -3874,12 +3874,42 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
                     <span style={{ display: 'inline-block', padding: '0.25rem 0.75rem', background: '#dbeafe', color: '#1e40af', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600' }}>PAGE</span>
+                    <span style={{ display: 'inline-block', padding: '0.25rem 0.75rem', background: '#fef3c7', color: '#92400e', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600' }}>EXTERNAL API</span>
                   </div>
                   <h1 style={{ margin: '0 0 0.25rem', fontSize: '1.5rem', fontWeight: '700', color: '#111827' }}>/tour-image-manager.html</h1>
-                  <p style={{ margin: '0 0 2rem', color: '#6b7280', fontSize: '0.875rem' }}>จัดการรูปภาพทัวร์ - ค้นหา, ดูรายละเอียด, Export</p>
+                  <p style={{ margin: '0 0 2rem', color: '#6b7280', fontSize: '0.875rem' }}>จัดการรูปภาพทัวร์ - ค้นหา, ดูรายละเอียด, Export CSV/PDF</p>
+
+                  <div style={{ padding: '1rem 1.5rem', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.8125rem', color: '#92400e' }}>
+                    <strong>หมายเหตุ:</strong> หน้านี้ใช้ API จาก <code style={{ background: '#fef3c7', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>fin-api.tourwow.com</code> (ไม่ใช่ finance-backoffice-report-api)
+                  </div>
 
                   <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem' }}>
-                    <div style={{ padding: '1rem 1.5rem', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', fontWeight: '600', fontSize: '0.875rem', color: '#374151' }}>Filters ที่ส่ง</div>
+                    <div style={{ padding: '1rem 1.5rem', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', fontWeight: '600', fontSize: '0.875rem', color: '#374151' }}>API Endpoints ที่ใช้ (fin-api.tourwow.com)</div>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
+                      <thead>
+                        <tr style={{ background: '#f9fafb' }}>
+                          <th style={{ padding: '0.75rem 1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#6b7280' }}>Endpoint</th>
+                          <th style={{ padding: '0.75rem 1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#6b7280' }}>ใช้ทำอะไร</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          ['GET /vibecode/pre_product_file_reports', 'ค้นหารูปภาพทัวร์ พร้อม pre_product_files'],
+                          ['POST /vibecode/pre_product_file_reports', 'Remake / สร้างรายงานใหม่ทั้งหมด'],
+                          ['GET /vibecode/pre_product_file_reports/countries', 'Dropdown เลือกประเทศ (sort_by)'],
+                          ['GET /vibecode/pre_product_file_reports/suppliers', 'Dropdown เลือก Wholesale'],
+                        ].map(([ep, desc], idx) => (
+                          <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#1e40af', fontWeight: '500', whiteSpace: 'nowrap' }}>{ep}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#374151' }}>{desc}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem' }}>
+                    <div style={{ padding: '1rem 1.5rem', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', fontWeight: '600', fontSize: '0.875rem', color: '#374151' }}>Filters ที่ส่ง (query parameter: filters=JSON)</div>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
                       <thead>
                         <tr style={{ background: '#f9fafb' }}>
@@ -3889,11 +3919,12 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                       </thead>
                       <tbody>
                         {[
-                          ['wholesale', 'Wholesale name/code'],
-                          ['country', 'Country name/code'],
-                          ['tourCode', 'Tour identifier'],
-                          ['imageName', 'Image filename'],
-                          ['dateRange', 'Date range for last update'],
+                          ['name', 'ชื่อไฟล์รูปภาพ'],
+                          ['product_tour_code', 'รหัสทัวร์'],
+                          ['supplier_id', 'ID Wholesale/Supplier'],
+                          ['country_id', 'ID ประเทศ'],
+                          ['min_file_count', 'จำนวนใช้ซ้ำขั้นต่ำ'],
+                          ['last_file_created_at_between', '{ min_date, max_date } ช่วงวันที่อัปเดต'],
                         ].map(([param, desc], idx) => (
                           <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
                             <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#7c3aed', fontWeight: '500' }}>{param}</td>
@@ -3903,10 +3934,29 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                       </tbody>
                     </table>
                   </div>
+
+                  <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem' }}>
+                    <div style={{ padding: '1rem 1.5rem', background: '#f0fdf4', borderBottom: '1px solid #bbf7d0', fontWeight: '600', fontSize: '0.875rem', color: '#065f46' }}>Client-side Features</div>
+                    <div style={{ padding: '1.5rem', fontSize: '0.8125rem', color: '#374151', lineHeight: '1.8' }}>
+                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                        <span style={{ background: '#dbeafe', color: '#1e40af', padding: '0.125rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', flexShrink: 0 }}>1</span>
+                        <span><strong>Checkbox &quot;แสดงเฉพาะโปรแกรม Banner ลำดับที่ 1&quot;</strong> — filter client-side จาก <code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>pre_product_files</code> เฉพาะ <code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>slug === 'banner' && ordinal === 1</code></span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                        <span style={{ background: '#dbeafe', color: '#1e40af', padding: '0.125rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', flexShrink: 0 }}>2</span>
+                        <span><strong>Export CSV/PDF</strong> — แสดงข้อมูลตาม filter checkbox ปัจจุบัน (ติ๊ก = เฉพาะ Banner 1, ไม่ติ๊ก = ทั้งหมด)</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <span style={{ background: '#dbeafe', color: '#1e40af', padding: '0.125rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', flexShrink: 0 }}>3</span>
+                        <span><strong>Sorting</strong> — เรียงตาม จำนวนใช้ซ้ำ, Banner 1, Banner 2+, รายละเอียด, วันที่อัปเดต</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* Query Conditions - shared for all pages */}
+              {/* Query Conditions - only for finance report pages */}
+              {selectedEndpoint !== 'fe-tour-image-manager' && (<>
               <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem' }}>
                 <div style={{ padding: '1rem 1.5rem', background: '#fef3c7', borderBottom: '1px solid #fde68a', fontWeight: '600', fontSize: '0.875rem', color: '#92400e' }}>
                   เงื่อนไข Query ปัจจุบัน (Endpoints หลัก: summary, by-country, by-supplier, wholesale-by-country)
@@ -3980,6 +4030,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                   </p>
                 </div>
               </div>
+              </>)}
             </div>
           ) : selectedTable ? (
             <div style={{ padding: '2rem', maxWidth: '1000px' }}>
