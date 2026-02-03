@@ -45,49 +45,57 @@ export async function GET(request: NextRequest) {
     const countryIds = countryIdParam ? countryIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
     const supplierIds = supplierIdParam ? supplierIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
 
+    // Query with JOIN to order_items for travelers count
+    // Logic: Only count orders with travelers > 0 (consistent with /by-country)
     let query = `
-      SELECT 
-        COUNT(*) as total_orders,
-        COUNT(DISTINCT customer_id) as total_customers,
-        COALESCE(SUM(net_amount), 0) as total_net_amount,
-        COALESCE(AVG(net_amount), 0) as avg_net_amount
-      FROM v_Xqc7k7_orders
-      WHERE order_status != 'Canceled'
-        AND deleted_at IS NULL
+      SELECT
+        COUNT(DISTINCT CASE WHEN COALESCE(oi_sum.traveler_count, 0) > 0 THEN o.id END) as total_orders,
+        COALESCE(SUM(oi_sum.traveler_count), 0) as total_customers,
+        COALESCE(SUM(CASE WHEN COALESCE(oi_sum.traveler_count, 0) > 0 THEN o.net_amount ELSE 0 END), 0) as total_net_amount,
+        COALESCE(AVG(CASE WHEN COALESCE(oi_sum.traveler_count, 0) > 0 THEN o.net_amount END), 0) as avg_net_amount
+      FROM v_Xqc7k7_orders o
+      LEFT JOIN (
+        SELECT order_id, SUM(quantity) as traveler_count
+        FROM v_Xqc7k7_order_items
+        WHERE product_room_type_id IS NOT NULL
+        GROUP BY order_id
+      ) oi_sum ON oi_sum.order_id = o.id
+      WHERE o.order_status != 'Canceled'
+        AND o.deleted_at IS NULL
     `
     const params: any[] = []
 
     // Filter by travel date (from product_period_snapshot)
     if (travelDateFrom) {
-      query += ` AND JSON_EXTRACT(product_period_snapshot, '$.start_at') >= ?`
+      query += ` AND JSON_EXTRACT(o.product_period_snapshot, '$.start_at') >= ?`
       params.push(travelDateFrom)
     }
     if (travelDateTo) {
-      query += ` AND JSON_EXTRACT(product_period_snapshot, '$.start_at') <= ?`
+      query += ` AND JSON_EXTRACT(o.product_period_snapshot, '$.start_at') <= ?`
       params.push(travelDateTo)
     }
 
     // Filter by booking date (created_at)
     if (bookingDateFrom) {
-      query += ` AND DATE(CONVERT_TZ(created_at, '+00:00', '+07:00')) >= ?`
+      query += ` AND DATE(CONVERT_TZ(o.created_at, '+00:00', '+07:00')) >= ?`
       params.push(bookingDateFrom)
     }
     if (bookingDateTo) {
-      query += ` AND DATE(CONVERT_TZ(created_at, '+00:00', '+07:00')) <= ?`
+      query += ` AND DATE(CONVERT_TZ(o.created_at, '+00:00', '+07:00')) <= ?`
       params.push(bookingDateTo)
     }
 
     // Filter by country_id (support multiple IDs)
     if (countryIds.length > 0) {
       const placeholders = countryIds.map(() => '?').join(',')
-      query += ` AND CAST(JSON_EXTRACT(product_snapshot, '$.countries[0].id') AS UNSIGNED) IN (${placeholders})`
+      query += ` AND CAST(JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') AS UNSIGNED) IN (${placeholders})`
       params.push(...countryIds)
     }
 
     // Filter by supplier_id (support multiple IDs)
     if (supplierIds.length > 0) {
       const placeholders = supplierIds.map(() => '?').join(',')
-      query += ` AND product_owner_supplier_id IN (${placeholders})`
+      query += ` AND o.product_owner_supplier_id IN (${placeholders})`
       params.push(...supplierIds)
     }
 
