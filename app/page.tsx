@@ -2620,6 +2620,313 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
         { status: 400, description: 'Missing user_id' }
       ]
     },
+    // ==================== REPORTS ====================
+    {
+      id: 'GET-/api/reports/summary',
+      method: 'GET',
+      path: '/api/reports/summary',
+      description: 'สรุปภาพรวม orders ทั้งหมด (จำนวน orders, ลูกค้า, ยอดรวม, ยอดเฉลี่ย)',
+      category: 'MySQL Database',
+      subCategory: 'reports',
+      requiresAuth: true,
+      parameters: [
+        { name: 'country_id', type: 'string', description: 'Comma-separated country IDs (e.g., "7,39")' },
+        { name: 'supplier_id', type: 'string', description: 'Comma-separated supplier IDs (e.g., "1,5")' },
+        { name: 'travel_date_from', type: 'date', description: 'Start travel date (YYYY-MM-DD)' },
+        { name: 'travel_date_to', type: 'date', description: 'End travel date (YYYY-MM-DD)' },
+        { name: 'booking_date_from', type: 'date', description: 'Start booking date (YYYY-MM-DD)' },
+        { name: 'booking_date_to', type: 'date', description: 'End booking date (YYYY-MM-DD)' }
+      ],
+      curl: `curl "${apiUrl}/api/reports/summary?booking_date_from=2025-01-01&booking_date_to=2025-12-31" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": {
+    "total_orders": 1689,
+    "total_customers": 1520,
+    "total_net_amount": 85000000,
+    "avg_net_amount": 50325
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response with summary data' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'GET-/api/reports/by-country',
+      method: 'GET',
+      path: '/api/reports/by-country',
+      description: 'รายงานยอดขายแยกตามประเทศปลายทาง (จำนวน orders, ลูกค้า, ยอดรวม)',
+      category: 'MySQL Database',
+      subCategory: 'reports',
+      requiresAuth: true,
+      parameters: [
+        { name: 'country_id', type: 'string', description: 'Comma-separated country IDs' },
+        { name: 'supplier_id', type: 'string', description: 'Comma-separated supplier IDs' },
+        { name: 'travel_date_from', type: 'date', description: 'Start travel date (YYYY-MM-DD)' },
+        { name: 'travel_date_to', type: 'date', description: 'End travel date (YYYY-MM-DD)' },
+        { name: 'booking_date_from', type: 'date', description: 'Start booking date (YYYY-MM-DD)' },
+        { name: 'booking_date_to', type: 'date', description: 'End booking date (YYYY-MM-DD)' }
+      ],
+      curl: `curl "${apiUrl}/api/reports/by-country?booking_date_from=2025-01-01&booking_date_to=2025-12-31" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "country_id": 7,
+      "country_name": "ญี่ปุ่น",
+      "total_orders": 520,
+      "total_customers": 480,
+      "total_net_amount": 28000000,
+      "avg_net_amount": 53846
+    },
+    {
+      "country_id": 39,
+      "country_name": "เกาหลี",
+      "total_orders": 310,
+      "total_customers": 290,
+      "total_net_amount": 15000000,
+      "avg_net_amount": 48387
+    }
+  ]
+}`,
+      responses: [
+        { status: 200, description: 'Successful response with country breakdown' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'GET-/api/reports/by-supplier',
+      method: 'GET',
+      path: '/api/reports/by-supplier',
+      description: 'รายงานยอดขายแยกตาม Supplier/Wholesale (จำนวน orders, ลูกค้า, ยอดรวม)',
+      category: 'MySQL Database',
+      subCategory: 'reports',
+      requiresAuth: true,
+      parameters: [
+        { name: 'country_id', type: 'string', description: 'Comma-separated country IDs' },
+        { name: 'supplier_id', type: 'string', description: 'Comma-separated supplier IDs' },
+        { name: 'travel_date_from', type: 'date', description: 'Start travel date (YYYY-MM-DD)' },
+        { name: 'travel_date_to', type: 'date', description: 'End travel date (YYYY-MM-DD)' },
+        { name: 'booking_date_from', type: 'date', description: 'Start booking date (YYYY-MM-DD)' },
+        { name: 'booking_date_to', type: 'date', description: 'End booking date (YYYY-MM-DD)' }
+      ],
+      curl: `curl "${apiUrl}/api/reports/by-supplier?booking_date_from=2025-01-01&booking_date_to=2025-12-31" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "supplier_id": 1,
+      "supplier_name": "Sabaidee Tour",
+      "total_orders": 180,
+      "total_customers": 165,
+      "total_net_amount": 9500000,
+      "avg_net_amount": 52778
+    }
+  ]
+}`,
+      responses: [
+        { status: 200, description: 'Successful response with supplier breakdown' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'GET-/api/reports/available-periods',
+      method: 'GET',
+      path: '/api/reports/available-periods',
+      description: 'ดึงปี/ไตรมาส/เดือนที่มีข้อมูลในระบบ สำหรับ Dropdown เลือกช่วงเวลา (พ.ศ. + ค.ศ.)',
+      category: 'MySQL Database',
+      subCategory: 'reports',
+      requiresAuth: true,
+      parameters: [],
+      curl: `curl "${apiUrl}/api/reports/available-periods" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": {
+    "years": [
+      {
+        "year_ce": 2025,
+        "year_be": 2568,
+        "label": "2568",
+        "quarters": [
+          { "quarter": 1, "label": "Q1", "start_month": 1, "end_month": 3 }
+        ],
+        "months": [
+          { "month": 1, "label": "มกราคม", "label_short": "ม.ค." }
+        ],
+        "total_orders": 1689
+      }
+    ],
+    "summary": {
+      "total_years": 3,
+      "earliest_year_ce": 2023,
+      "latest_year_ce": 2025
+    }
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response with available periods' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'GET-/api/reports/countries',
+      method: 'GET',
+      path: '/api/reports/countries',
+      description: 'ดึงรายชื่อประเทศปลายทางทั้งหมดที่มีใน orders (สำหรับ Dropdown เลือกประเทศ)',
+      category: 'MySQL Database',
+      subCategory: 'reports',
+      requiresAuth: true,
+      parameters: [],
+      curl: `curl "${apiUrl}/api/reports/countries" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    { "id": 7, "name_th": "ญี่ปุ่น", "name_en": "Japan" },
+    { "id": 39, "name_th": "เกาหลี", "name_en": "Korea" },
+    { "id": 4, "name_th": "จีน", "name_en": "China" }
+  ]
+}`,
+      responses: [
+        { status: 200, description: 'Successful response with countries list' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'GET-/api/reports/wholesale-by-country',
+      method: 'GET',
+      path: '/api/reports/wholesale-by-country',
+      description: 'ตาราง Pivot — Wholesale x ประเทศ รองรับ 2 modes: sales (ยอดขาย) และ travelers (จำนวนคน)',
+      category: 'MySQL Database',
+      subCategory: 'reports',
+      requiresAuth: true,
+      parameters: [
+        { name: 'country_id', type: 'string', description: 'Comma-separated country IDs' },
+        { name: 'supplier_id', type: 'string', description: 'Comma-separated supplier IDs' },
+        { name: 'travel_date_from', type: 'date', description: 'Start travel date (YYYY-MM-DD)' },
+        { name: 'travel_date_to', type: 'date', description: 'End travel date (YYYY-MM-DD)' },
+        { name: 'booking_date_from', type: 'date', description: 'Start booking date (YYYY-MM-DD)' },
+        { name: 'booking_date_to', type: 'date', description: 'End booking date (YYYY-MM-DD)' },
+        { name: 'view_mode', type: 'string', description: '"sales" (default) or "travelers"' }
+      ],
+      curl: `curl "${apiUrl}/api/reports/wholesale-by-country?booking_date_from=2025-01-01&booking_date_to=2025-12-31&view_mode=sales" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": {
+    "wholesales": [
+      {
+        "id": 1,
+        "name": "Sabaidee Tour",
+        "countries": { "ญี่ปุ่น": 5200000, "เกาหลี": 3100000 },
+        "total": 8300000,
+        "order_count": 180
+      }
+    ],
+    "summary": {
+      "total_value": 85000000,
+      "total_orders": 1689,
+      "top_wholesale": { "name": "Sabaidee Tour", "count": 180 },
+      "top_country": { "name": "ญี่ปุ่น", "count": 520 },
+      "total_partners": 25,
+      "view_mode": "sales"
+    },
+    "country_totals": { "ญี่ปุ่น": 28000000, "เกาหลี": 15000000 },
+    "view_mode": "sales"
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response with pivot data' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'GET-/api/reports/by-travel-start-date',
+      method: 'GET',
+      path: '/api/reports/by-travel-start-date',
+      description: 'รายงานยอดขายรายวัน แยกตามวันเดินทาง (travel start date)',
+      category: 'MySQL Database',
+      subCategory: 'reports',
+      requiresAuth: true,
+      parameters: [
+        { name: 'country_id', type: 'string', description: 'Comma-separated country IDs' },
+        { name: 'supplier_id', type: 'string', description: 'Comma-separated supplier IDs' },
+        { name: 'travel_date_from', type: 'date', description: 'Start travel date (YYYY-MM-DD)' },
+        { name: 'travel_date_to', type: 'date', description: 'End travel date (YYYY-MM-DD)' },
+        { name: 'booking_date_from', type: 'date', description: 'Start booking date (YYYY-MM-DD)' },
+        { name: 'booking_date_to', type: 'date', description: 'End booking date (YYYY-MM-DD)' },
+        { name: 'date_format', type: 'string', description: 'Date label format (default: "numeric_full")' }
+      ],
+      curl: `curl "${apiUrl}/api/reports/by-travel-start-date?booking_date_from=2025-01-01&booking_date_to=2025-03-31" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "travel_start_date": "2025-01-15",
+      "travel_start_date_label": "15/01/2568",
+      "total_orders": 12,
+      "total_customers": 10,
+      "total_net_amount": 620000,
+      "avg_net_amount": 51667
+    }
+  ]
+}`,
+      responses: [
+        { status: 200, description: 'Successful response with daily travel date breakdown' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'GET-/api/reports/by-created-date',
+      method: 'GET',
+      path: '/api/reports/by-created-date',
+      description: 'รายงานยอดขายรายวัน แยกตามวันจอง (created_at / booking date)',
+      category: 'MySQL Database',
+      subCategory: 'reports',
+      requiresAuth: true,
+      parameters: [
+        { name: 'country_id', type: 'string', description: 'Comma-separated country IDs' },
+        { name: 'supplier_id', type: 'string', description: 'Comma-separated supplier IDs' },
+        { name: 'travel_date_from', type: 'date', description: 'Start travel date (YYYY-MM-DD)' },
+        { name: 'travel_date_to', type: 'date', description: 'End travel date (YYYY-MM-DD)' },
+        { name: 'booking_date_from', type: 'date', description: 'Start booking date (YYYY-MM-DD)' },
+        { name: 'booking_date_to', type: 'date', description: 'End booking date (YYYY-MM-DD)' },
+        { name: 'date_format', type: 'string', description: 'Date label format (default: "numeric_full")' }
+      ],
+      curl: `curl "${apiUrl}/api/reports/by-created-date?booking_date_from=2025-01-01&booking_date_to=2025-03-31" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "created_date": "2025-01-05",
+      "created_date_label": "05/01/2568",
+      "total_orders": 8,
+      "total_customers": 7,
+      "total_net_amount": 420000,
+      "avg_net_amount": 52500
+    }
+  ]
+}`,
+      responses: [
+        { status: 200, description: 'Successful response with daily booking date breakdown' },
+        { status: 401, description: 'Invalid API key' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
     {
       id: 'GET-/api/reports/lead-time-analysis',
       method: 'GET',
