@@ -66,11 +66,12 @@ export async function GET(request: NextRequest) {
         LEFT JOIN (
           SELECT order_id, SUM(quantity) as traveler_count
           FROM v_Xqc7k7_order_items
-          WHERE product_room_type_id IS NOT NULL
+          WHERE product_room_type_id IN (1, 2, 3, 7)
           GROUP BY order_id
         ) oi_sum ON oi_sum.order_id = o.id
         WHERE o.order_status != 'Canceled'
           AND o.deleted_at IS NULL
+          AND o.commission_seller > 0
           AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
       `
     } else {
@@ -87,11 +88,12 @@ export async function GET(request: NextRequest) {
         LEFT JOIN (
           SELECT order_id, SUM(quantity) as traveler_count
           FROM v_Xqc7k7_order_items
-          WHERE product_room_type_id IS NOT NULL
+          WHERE product_room_type_id IN (1, 2, 3, 7)
           GROUP BY order_id
         ) oi_sum ON oi_sum.order_id = o.id
         WHERE o.order_status != 'Canceled'
           AND o.deleted_at IS NULL
+          AND o.commission_seller > 0
           AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
       `
     }
