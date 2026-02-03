@@ -65,7 +65,6 @@ export async function GET(request: NextRequest) {
         COUNT(*) as order_count
       FROM v_Xqc7k7_orders
       WHERE order_status != 'Canceled'
-        AND deleted_at IS NULL
       GROUP BY year_ce, quarter, month
       ORDER BY year_ce DESC, month DESC
     `

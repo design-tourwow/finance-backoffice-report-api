@@ -40,7 +40,6 @@ export async function GET(request: NextRequest) {
         JSON_UNQUOTE(JSON_EXTRACT(product_snapshot, '$.countries[0].name_en')) as name_en
       FROM v_Xqc7k7_orders
       WHERE order_status != 'Canceled'
-        AND deleted_at IS NULL
         AND JSON_EXTRACT(product_snapshot, '$.countries[0].id') IS NOT NULL
       ORDER BY name_th ASC
     `

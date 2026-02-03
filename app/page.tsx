@@ -4268,7 +4268,6 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                     fontFamily: 'Monaco, Consolas, monospace',
                     overflow: 'auto'
                   }}>{`WHERE o.order_status != 'Canceled'
-  AND o.deleted_at IS NULL
   AND o.supplier_commission > 0
   AND EXISTS (
     SELECT 1
@@ -4279,7 +4278,6 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
   )`}</pre>
                   <div style={{ marginTop: '1rem', fontSize: '0.8125rem', color: '#6b7280', lineHeight: '2' }}>
                     <div><code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>order_status != Canceled</code> — ไม่นับ order ที่ยกเลิก</div>
-                    <div><code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>deleted_at IS NULL</code> — ไม่นับ order ที่ถูกลบ</div>
                     <div><code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>supplier_commission &gt; 0</code> — เฉพาะ order ที่มีค่าคอมมิชชั่น</div>
                     <div><code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>installments.ordinal=1, status=paid</code> — งวดแรกต้องชำระแล้ว</div>
                   </div>

@@ -67,7 +67,6 @@ export async function GET(request: NextRequest) {
           GROUP BY order_id
         ) oi_sum ON oi_sum.order_id = o.id
         WHERE o.order_status != 'Canceled'
-          AND o.deleted_at IS NULL
           AND o.supplier_commission > 0
           AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
       `
@@ -88,7 +87,6 @@ export async function GET(request: NextRequest) {
           GROUP BY order_id
         ) oi_sum ON oi_sum.order_id = o.id
         WHERE o.order_status != 'Canceled'
-          AND o.deleted_at IS NULL
           AND o.supplier_commission > 0
           AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
       `
