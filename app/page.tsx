@@ -3604,8 +3604,8 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                           padding: '0.5rem 0.75rem',
                           cursor: 'pointer',
                           borderRadius: '4px',
-                          background: selectedEndpoint === page.id ? '#eff6ff' : 'transparent',
-                          borderLeft: selectedEndpoint === page.id ? '3px solid #3b82f6' : '3px solid transparent',
+                          background: selectedEndpoint === page.id ? '#f3f4f6' : 'transparent',
+                          borderLeft: selectedEndpoint === page.id ? '3px solid #6b7280' : '3px solid transparent',
                           marginBottom: '0.25rem',
                           transition: 'all 0.15s'
                         }}
@@ -3616,7 +3616,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                           if (selectedEndpoint !== page.id) e.currentTarget.style.background = 'transparent'
                         }}
                       >
-                        <div style={{ fontSize: '0.8125rem', fontWeight: '500', color: '#1e40af', fontFamily: 'Monaco, Consolas, monospace' }}>
+                        <div style={{ fontSize: '0.8125rem', fontWeight: '500', color: '#374151', fontFamily: 'Monaco, Consolas, monospace' }}>
                           {page.label}
                         </div>
                         <div style={{ fontSize: '0.6875rem', color: '#6b7280', marginTop: '0.125rem' }}>
@@ -3685,7 +3685,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
               {selectedEndpoint === 'fe-sales-by-country' && (
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                    <span style={{ display: 'inline-block', padding: '0.25rem 0.75rem', background: '#dbeafe', color: '#1e40af', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600' }}>PAGE</span>
+                    <span style={{ display: 'inline-block', padding: '0.25rem 0.75rem', background: '#f3f4f6', color: '#374151', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600' }}>PAGE</span>
                   </div>
                   <h1 style={{ margin: '0 0 0.25rem', fontSize: '1.5rem', fontWeight: '700', color: '#111827' }}>/sales-by-country.html</h1>
                   <p style={{ margin: '0 0 2rem', color: '#6b7280', fontSize: '0.875rem' }}>รายงานยอดขายตามประเทศ - KPI Cards, ตารางประเทศ, ตาราง Supplier</p>
@@ -3708,8 +3708,8 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                           ['GET /api/reports/countries', 'Dropdown เลือกประเทศ'],
                         ].map(([ep, desc], idx) => (
                           <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#1e40af', fontWeight: '500', whiteSpace: 'nowrap' }}>{ep}</td>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#374151' }}>{desc}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#374151', fontWeight: '500', whiteSpace: 'nowrap' }}>{ep}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#6b7280' }}>{desc}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -3733,8 +3733,8 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                           ['supplier_id', 'ID Supplier (comma-separated)'],
                         ].map(([param, desc], idx) => (
                           <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#7c3aed', fontWeight: '500' }}>{param}</td>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#374151' }}>{desc}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#374151', fontWeight: '500' }}>{param}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#6b7280' }}>{desc}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -3746,7 +3746,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
               {selectedEndpoint === 'fe-wholesale-destinations' && (
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                    <span style={{ display: 'inline-block', padding: '0.25rem 0.75rem', background: '#dbeafe', color: '#1e40af', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600' }}>PAGE</span>
+                    <span style={{ display: 'inline-block', padding: '0.25rem 0.75rem', background: '#f3f4f6', color: '#374151', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600' }}>PAGE</span>
                   </div>
                   <h1 style={{ margin: '0 0 0.25rem', fontSize: '1.5rem', fontWeight: '700', color: '#111827' }}>/wholesale-destinations.html</h1>
                   <p style={{ margin: '0 0 2rem', color: '#6b7280', fontSize: '0.875rem' }}>รายงาน Wholesale แยกตามประเทศปลายทาง (Pivot Table)</p>
@@ -3768,8 +3768,8 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                           ['GET /api/suppliers', 'Dropdown เลือก Wholesale'],
                         ].map(([ep, desc], idx) => (
                           <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#1e40af', fontWeight: '500', whiteSpace: 'nowrap' }}>{ep}</td>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#374151' }}>{desc}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#374151', fontWeight: '500', whiteSpace: 'nowrap' }}>{ep}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#6b7280' }}>{desc}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -3794,8 +3794,8 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                           ['view_mode', 'sales (ยอดขาย) หรือ travelers (จำนวนคน)'],
                         ].map(([param, desc], idx) => (
                           <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#7c3aed', fontWeight: '500' }}>{param}</td>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#374151' }}>{desc}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#374151', fontWeight: '500' }}>{param}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#6b7280' }}>{desc}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -3807,7 +3807,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
               {selectedEndpoint === 'fe-order-report' && (
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                    <span style={{ display: 'inline-block', padding: '0.25rem 0.75rem', background: '#dbeafe', color: '#1e40af', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600' }}>PAGE</span>
+                    <span style={{ display: 'inline-block', padding: '0.25rem 0.75rem', background: '#f3f4f6', color: '#374151', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600' }}>PAGE</span>
                   </div>
                   <h1 style={{ margin: '0 0 0.25rem', fontSize: '1.5rem', fontWeight: '700', color: '#111827' }}>/order-report.html</h1>
                   <p style={{ margin: '0 0 2rem', color: '#6b7280', fontSize: '0.875rem' }}>Order Report - 5 Tabs (ประเทศ, Supplier, วันเดินทาง, วันจอง, Lead Time)</p>
@@ -3833,8 +3833,8 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                           ['GET /api/suppliers', 'Dropdown เลือก Supplier'],
                         ].map(([ep, desc], idx) => (
                           <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#1e40af', fontWeight: '500', whiteSpace: 'nowrap' }}>{ep}</td>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#374151' }}>{desc}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#374151', fontWeight: '500', whiteSpace: 'nowrap' }}>{ep}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#6b7280' }}>{desc}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -3860,8 +3860,8 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                           ['supplier_id', 'ID Supplier (comma-separated)'],
                         ].map(([param, desc], idx) => (
                           <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#7c3aed', fontWeight: '500' }}>{param}</td>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#374151' }}>{desc}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#374151', fontWeight: '500' }}>{param}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#6b7280' }}>{desc}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -3873,35 +3873,31 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
               {selectedEndpoint === 'fe-tour-image-manager' && (
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                    <span style={{ display: 'inline-block', padding: '0.25rem 0.75rem', background: '#dbeafe', color: '#1e40af', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600' }}>PAGE</span>
-                    <span style={{ display: 'inline-block', padding: '0.25rem 0.75rem', background: '#fef3c7', color: '#92400e', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600' }}>EXTERNAL API</span>
+                    <span style={{ display: 'inline-block', padding: '0.25rem 0.75rem', background: '#f3f4f6', color: '#374151', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600' }}>PAGE</span>
                   </div>
                   <h1 style={{ margin: '0 0 0.25rem', fontSize: '1.5rem', fontWeight: '700', color: '#111827' }}>/tour-image-manager.html</h1>
-                  <p style={{ margin: '0 0 2rem', color: '#6b7280', fontSize: '0.875rem' }}>จัดการรูปภาพทัวร์ - ค้นหา, ดูรายละเอียด, Export CSV/PDF</p>
-
-                  <div style={{ padding: '1rem 1.5rem', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.8125rem', color: '#92400e' }}>
-                    <strong>หมายเหตุ:</strong> หน้านี้ใช้ API จาก <code style={{ background: '#fef3c7', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>fin-api.tourwow.com</code> (ไม่ใช่ finance-backoffice-report-api)
-                  </div>
+                  <p style={{ margin: '0 0 0.75rem', color: '#6b7280', fontSize: '0.875rem' }}>จัดการรูปภาพทัวร์ - ค้นหา, ดูรายละเอียด, Export CSV/PDF</p>
+                  <p style={{ margin: '0 0 2rem', color: '#9ca3af', fontSize: '0.8125rem' }}>API Base: <code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>fin-api.tourwow.com</code></p>
 
                   <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem' }}>
-                    <div style={{ padding: '1rem 1.5rem', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', fontWeight: '600', fontSize: '0.875rem', color: '#374151' }}>API Endpoints ที่ใช้ (fin-api.tourwow.com)</div>
+                    <div style={{ padding: '1rem 1.5rem', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', fontWeight: '600', fontSize: '0.875rem', color: '#374151' }}>API Endpoints</div>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
                       <thead>
                         <tr style={{ background: '#f9fafb' }}>
                           <th style={{ padding: '0.75rem 1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#6b7280' }}>Endpoint</th>
-                          <th style={{ padding: '0.75rem 1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#6b7280' }}>ใช้ทำอะไร</th>
+                          <th style={{ padding: '0.75rem 1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#6b7280' }}>Description</th>
                         </tr>
                       </thead>
                       <tbody>
                         {[
                           ['GET /vibecode/pre_product_file_reports', 'ค้นหารูปภาพทัวร์ พร้อม pre_product_files'],
                           ['POST /vibecode/pre_product_file_reports', 'Remake / สร้างรายงานใหม่ทั้งหมด'],
-                          ['GET /vibecode/pre_product_file_reports/countries', 'Dropdown เลือกประเทศ (sort_by)'],
-                          ['GET /vibecode/pre_product_file_reports/suppliers', 'Dropdown เลือก Wholesale'],
+                          ['GET .../countries', 'Dropdown เลือกประเทศ'],
+                          ['GET .../suppliers', 'Dropdown เลือก Wholesale'],
                         ].map(([ep, desc], idx) => (
                           <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#1e40af', fontWeight: '500', whiteSpace: 'nowrap' }}>{ep}</td>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#374151' }}>{desc}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#374151', fontWeight: '500', whiteSpace: 'nowrap' }}>{ep}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#6b7280' }}>{desc}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -3909,7 +3905,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                   </div>
 
                   <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem' }}>
-                    <div style={{ padding: '1rem 1.5rem', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', fontWeight: '600', fontSize: '0.875rem', color: '#374151' }}>Filters ที่ส่ง (query parameter: filters=JSON)</div>
+                    <div style={{ padding: '1rem 1.5rem', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', fontWeight: '600', fontSize: '0.875rem', color: '#374151' }}>Filters (query parameter: filters=JSON)</div>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
                       <thead>
                         <tr style={{ background: '#f9fafb' }}>
@@ -3927,8 +3923,8 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                           ['last_file_created_at_between', '{ min_date, max_date } ช่วงวันที่อัปเดต'],
                         ].map(([param, desc], idx) => (
                           <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#7c3aed', fontWeight: '500' }}>{param}</td>
-                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#374151' }}>{desc}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#374151', fontWeight: '500' }}>{param}</td>
+                            <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', color: '#6b7280' }}>{desc}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -3936,20 +3932,11 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                   </div>
 
                   <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem' }}>
-                    <div style={{ padding: '1rem 1.5rem', background: '#f0fdf4', borderBottom: '1px solid #bbf7d0', fontWeight: '600', fontSize: '0.875rem', color: '#065f46' }}>Client-side Features</div>
-                    <div style={{ padding: '1.5rem', fontSize: '0.8125rem', color: '#374151', lineHeight: '1.8' }}>
-                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                        <span style={{ background: '#dbeafe', color: '#1e40af', padding: '0.125rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', flexShrink: 0 }}>1</span>
-                        <span><strong>Checkbox &quot;แสดงเฉพาะโปรแกรม Banner ลำดับที่ 1&quot;</strong> — filter client-side จาก <code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>pre_product_files</code> เฉพาะ <code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>slug === 'banner' && ordinal === 1</code></span>
-                      </div>
-                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                        <span style={{ background: '#dbeafe', color: '#1e40af', padding: '0.125rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', flexShrink: 0 }}>2</span>
-                        <span><strong>Export CSV/PDF</strong> — แสดงข้อมูลตาม filter checkbox ปัจจุบัน (ติ๊ก = เฉพาะ Banner 1, ไม่ติ๊ก = ทั้งหมด)</span>
-                      </div>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <span style={{ background: '#dbeafe', color: '#1e40af', padding: '0.125rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', flexShrink: 0 }}>3</span>
-                        <span><strong>Sorting</strong> — เรียงตาม จำนวนใช้ซ้ำ, Banner 1, Banner 2+, รายละเอียด, วันที่อัปเดต</span>
-                      </div>
+                    <div style={{ padding: '1rem 1.5rem', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', fontWeight: '600', fontSize: '0.875rem', color: '#374151' }}>Client-side Features</div>
+                    <div style={{ padding: '1.5rem', fontSize: '0.8125rem', color: '#6b7280', lineHeight: '2' }}>
+                      <div>Checkbox &quot;แสดงเฉพาะโปรแกรม Banner ลำดับที่ 1&quot; — filter <code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>pre_product_files</code> เฉพาะ <code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>slug=banner, ordinal=1</code></div>
+                      <div>Export CSV/PDF — แสดงข้อมูลตาม filter checkbox ปัจจุบัน</div>
+                      <div>Sorting — เรียงตาม จำนวนใช้ซ้ำ, Banner 1, Banner 2+, รายละเอียด, วันที่อัปเดต</div>
                     </div>
                   </div>
                 </div>
@@ -3958,16 +3945,17 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
               {/* Query Conditions - only for finance report pages */}
               {selectedEndpoint !== 'fe-tour-image-manager' && (<>
               <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem' }}>
-                <div style={{ padding: '1rem 1.5rem', background: '#fef3c7', borderBottom: '1px solid #fde68a', fontWeight: '600', fontSize: '0.875rem', color: '#92400e' }}>
-                  เงื่อนไข Query ปัจจุบัน (Endpoints หลัก: summary, by-country, by-supplier, wholesale-by-country)
+                <div style={{ padding: '1rem 1.5rem', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', fontWeight: '600', fontSize: '0.875rem', color: '#374151' }}>
+                  Query Conditions
                 </div>
                 <div style={{ padding: '1.5rem' }}>
                   <pre style={{
                     margin: 0,
                     padding: '1rem',
-                    background: '#1e293b',
-                    color: '#e2e8f0',
+                    background: '#f9fafb',
+                    color: '#374151',
                     borderRadius: '8px',
+                    border: '1px solid #e5e7eb',
                     fontSize: '0.8125rem',
                     lineHeight: '1.8',
                     fontFamily: 'Monaco, Consolas, monospace',
@@ -3982,39 +3970,28 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
       AND ci.ordinal = 1
       AND ci.status = 'paid'
   )`}</pre>
-                  <div style={{ marginTop: '1rem', fontSize: '0.8125rem', color: '#374151', lineHeight: '1.8' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                      <span style={{ background: '#fee2e2', color: '#991b1b', padding: '0.125rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', flexShrink: 0 }}>1</span>
-                      <span><code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>order_status != Canceled</code> — ไม่นับ order ที่ยกเลิก</span>
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                      <span style={{ background: '#fee2e2', color: '#991b1b', padding: '0.125rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', flexShrink: 0 }}>2</span>
-                      <span><code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>deleted_at IS NULL</code> — ไม่นับ order ที่ถูกลบ</span>
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                      <span style={{ background: '#fee2e2', color: '#991b1b', padding: '0.125rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', flexShrink: 0 }}>3</span>
-                      <span><code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>supplier_commission &gt; 0</code> — เฉพาะ order ที่มีค่าคอมมิชชั่น</span>
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <span style={{ background: '#fee2e2', color: '#991b1b', padding: '0.125rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600', flexShrink: 0 }}>4</span>
-                      <span><code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>installments.ordinal=1, status=paid</code> — งวดแรกต้องชำระแล้ว</span>
-                    </div>
+                  <div style={{ marginTop: '1rem', fontSize: '0.8125rem', color: '#6b7280', lineHeight: '2' }}>
+                    <div><code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>order_status != Canceled</code> — ไม่นับ order ที่ยกเลิก</div>
+                    <div><code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>deleted_at IS NULL</code> — ไม่นับ order ที่ถูกลบ</div>
+                    <div><code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>supplier_commission &gt; 0</code> — เฉพาะ order ที่มีค่าคอมมิชชั่น</div>
+                    <div><code style={{ background: '#f3f4f6', padding: '0.125rem 0.375rem', borderRadius: '3px', fontFamily: 'Monaco, Consolas, monospace', fontSize: '0.75rem' }}>installments.ordinal=1, status=paid</code> — งวดแรกต้องชำระแล้ว</div>
                   </div>
                 </div>
               </div>
 
               {/* Traveler counting */}
               <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden' }}>
-                <div style={{ padding: '1rem 1.5rem', background: '#ecfdf5', borderBottom: '1px solid #bbf7d0', fontWeight: '600', fontSize: '0.875rem', color: '#065f46' }}>
-                  การนับจำนวนนักท่องเที่ยว (Travelers)
+                <div style={{ padding: '1rem 1.5rem', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', fontWeight: '600', fontSize: '0.875rem', color: '#374151' }}>
+                  Traveler Counting
                 </div>
                 <div style={{ padding: '1.5rem' }}>
                   <pre style={{
                     margin: 0,
                     padding: '1rem',
-                    background: '#1e293b',
-                    color: '#e2e8f0',
+                    background: '#f9fafb',
+                    color: '#374151',
                     borderRadius: '8px',
+                    border: '1px solid #e5e7eb',
                     fontSize: '0.8125rem',
                     lineHeight: '1.8',
                     fontFamily: 'Monaco, Consolas, monospace',
