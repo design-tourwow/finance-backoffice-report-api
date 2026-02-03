@@ -4098,7 +4098,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                           ['booking_date_to', 'วันจองสิ้นสุด (YYYY-MM-DD)'],
                           ['supplier_id', 'ID Wholesale (comma-separated)'],
                           ['country_id', 'ID ประเทศ (comma-separated)'],
-                          ['view_mode', 'sales (ยอดขาย) หรือ travelers (จำนวนคน)'],
+                          ['view_mode', 'sales (ยอดขาย), travelers (จำนวนคน), orders (จำนวนออเดอร์), net_commission (ค่าคอมสุทธิ = commission_company + commission_seller - discount)'],
                         ].map(([param, desc], idx) => (
                           <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
                             <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#374151', fontWeight: '500' }}>{param}</td>
