@@ -160,6 +160,25 @@ finance-backoffice-report-api/
 
 **ห้ามสร้าง API endpoint โดยไม่เพิ่มใน API Documentation เด็ดขาด!**
 
+### Frontend เรียกใช้ API Endpoint
+
+**เมื่อฝั่ง Frontend หยิบ API endpoint ไปใช้งาน ต้องตรวจสอบและอัปเดต 2 จุดเสมอ:**
+
+1. **ตรวจสอบ API Documentation** — เปิดหน้า API Documentation (`app/page.tsx` > array `endpoints`) ตรวจว่า endpoint ที่จะใช้มีอยู่แล้วหรือยัง ถ้ายังไม่มีให้เพิ่มตามรูปแบบด้านบน
+
+2. **อัปเดต Frontend Pages** — ในไฟล์ `app/page.tsx` ส่วน "Frontend Pages" (sidebar) ให้อัปเดตหน้าที่เกี่ยวข้อง:
+   - เพิ่ม endpoint ใหม่ในตาราง "API Endpoints ที่ใช้"
+   - อัปเดต Filters ถ้ามี parameter ใหม่
+   - อัปเดต Client-side Features ถ้ามี feature ใหม่
+
+```
+ตัวอย่าง: Frontend หน้า /sales-by-country เรียก GET /api/reports/summary
+  -> ตรวจว่า GET /api/reports/summary มีใน endpoints array หรือยัง
+  -> ตรวจว่า Frontend Pages > /sales-by-country มี endpoint นี้ในตารางหรือยัง
+```
+
+**ทุกครั้งที่ Frontend เพิ่มหรือเปลี่ยน API endpoint ที่ใช้ ต้องอัปเดตทั้ง API Documentation และ Frontend Pages เสมอ!**
+
 ---
 
 ## หมายเหตุ
