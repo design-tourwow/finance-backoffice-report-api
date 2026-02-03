@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     const supplierIds = supplierIdParam ? supplierIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
 
     // Query with JOIN to order_items for total_customers (travelers)
-    // Logic: นับเฉพาะ order ที่ไม่ยกเลิก + ชำระเงินงวดแรกแล้ว (paid_at +3 วัน)
+    // Logic: นับเฉพาะ order ที่ไม่ยกเลิก + งวดแรก paid + supplier_commission > 0
     let query = `
       SELECT
         JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') as country_id,
@@ -64,6 +64,7 @@ export async function GET(request: NextRequest) {
       ) oi_sum ON oi_sum.order_id = o.id
       WHERE o.order_status != 'Canceled'
         AND o.deleted_at IS NULL
+        AND o.supplier_commission > 0
         AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
     `
     const params: any[] = []
@@ -99,22 +100,11 @@ export async function GET(request: NextRequest) {
       params.push(...supplierIds)
     }
 
-    // First installment must be paid (payment_status = 'successful') with +3 day grace period
-    let paidAtCondition = ''
-    if (bookingDateFrom) {
-      paidAtCondition += ` AND DATE(CONVERT_TZ(p.paid_at, '+00:00', '+07:00')) >= ?`
-      params.push(bookingDateFrom)
-    }
-    if (bookingDateTo) {
-      paidAtCondition += ` AND DATE(CONVERT_TZ(p.paid_at, '+00:00', '+07:00')) <= DATE_ADD(?, INTERVAL 3 DAY)`
-      params.push(bookingDateTo)
-    }
+    // First installment must be paid (ordinal = 1, status = 'paid')
     query += `
       AND EXISTS (
         SELECT 1 FROM v_Xqc7k7_customer_order_installments ci
-        JOIN v_Xqc7k7_customer_order_installments_has_payments ihp ON ihp.customer_order_installment_id = ci.id
-        JOIN v_Xqc7k7_payments p ON p.id = ihp.payment_id
-        WHERE ci.order_id = o.id AND ci.ordinal = 1 AND p.payment_status = 'successful'${paidAtCondition}
+        WHERE ci.order_id = o.id AND ci.ordinal = 1 AND ci.status = 'paid'
       )`
 
     query += ` GROUP BY country_id, country_name HAVING total_orders > 0 ORDER BY total_orders DESC`
