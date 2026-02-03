@@ -2806,7 +2806,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
       id: 'GET-/api/reports/wholesale-by-country',
       method: 'GET',
       path: '/api/reports/wholesale-by-country',
-      description: 'ตาราง Pivot — Wholesale x ประเทศ รองรับ 2 modes: sales (ยอดขาย) และ travelers (จำนวนคน)',
+      description: 'ตาราง Pivot — Wholesale x ประเทศ รองรับ 4 modes: sales (ยอดขาย), travelers (จำนวนคน), orders (จำนวนออเดอร์), net_commission (ค่าคอมสุทธิ)',
       category: 'MySQL Database',
       subCategory: 'reports',
       requiresAuth: true,
@@ -2817,7 +2817,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
         { name: 'travel_date_to', type: 'date', description: 'End travel date (YYYY-MM-DD)' },
         { name: 'booking_date_from', type: 'date', description: 'Start booking date (YYYY-MM-DD)' },
         { name: 'booking_date_to', type: 'date', description: 'End booking date (YYYY-MM-DD)' },
-        { name: 'view_mode', type: 'string', description: '"sales" (default) or "travelers"' }
+        { name: 'view_mode', type: 'string', description: '"sales" (default), "travelers", "orders", "net_commission" — sales=SUM(net_amount), travelers=SUM(traveler_count), orders=COUNT(order), net_commission=SUM((commission_company+commission_seller)-discount)' }
       ],
       curl: `curl "${apiUrl}/api/reports/wholesale-by-country?booking_date_from=2025-01-01&booking_date_to=2025-12-31&view_mode=sales" \\
   -H "x-api-key: YOUR_API_KEY"`,
