@@ -47,53 +47,47 @@ export async function GET(request: NextRequest) {
     const supplierIds = supplierIdParam ? supplierIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
 
     // Query to get wholesale-country breakdown
-    // Logic: Only count orders with travelers > 0 (consistent with /by-country)
-    // view_mode=sales: SUM(net_amount), sorted by sales
-    // view_mode=travelers: SUM(quantity) from order_items where product_room_type_id IS NOT NULL
+    // Logic: นับเฉพาะ order ที่ไม่ยกเลิก + ชำระเงินงวดแรกแล้ว (paid_at +3 วัน)
     let query = ''
 
     if (viewMode === 'travelers') {
-      // Travelers mode: count from order_items (only orders with travelers > 0)
       query = `
         SELECT
           o.product_owner_supplier_id as supplier_id,
           s.name_th as supplier_name,
           JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')) as country_name,
-          COUNT(DISTINCT CASE WHEN COALESCE(oi_sum.traveler_count, 0) > 0 THEN o.id END) as order_count,
+          COUNT(DISTINCT o.id) as order_count,
           COALESCE(SUM(oi_sum.traveler_count), 0) as total_value
         FROM v_Xqc7k7_orders o
         LEFT JOIN tw_suppliers_db_views.v_GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
         LEFT JOIN (
           SELECT order_id, SUM(quantity) as traveler_count
           FROM v_Xqc7k7_order_items
-          WHERE product_room_type_id IN (1, 2, 3, 7)
+          WHERE product_room_type_id IS NOT NULL
           GROUP BY order_id
         ) oi_sum ON oi_sum.order_id = o.id
         WHERE o.order_status != 'Canceled'
           AND o.deleted_at IS NULL
-          AND o.commission_seller > 0
           AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
       `
     } else {
-      // Sales mode (default): SUM(net_amount) - only orders with travelers > 0
       query = `
         SELECT
           o.product_owner_supplier_id as supplier_id,
           s.name_th as supplier_name,
           JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')) as country_name,
-          COUNT(DISTINCT CASE WHEN COALESCE(oi_sum.traveler_count, 0) > 0 THEN o.id END) as order_count,
-          COALESCE(SUM(CASE WHEN COALESCE(oi_sum.traveler_count, 0) > 0 THEN o.net_amount ELSE 0 END), 0) as total_value
+          COUNT(DISTINCT o.id) as order_count,
+          COALESCE(SUM(o.net_amount), 0) as total_value
         FROM v_Xqc7k7_orders o
         LEFT JOIN tw_suppliers_db_views.v_GsF2WeS_suppliers s ON o.product_owner_supplier_id = s.id
         LEFT JOIN (
           SELECT order_id, SUM(quantity) as traveler_count
           FROM v_Xqc7k7_order_items
-          WHERE product_room_type_id IN (1, 2, 3, 7)
+          WHERE product_room_type_id IS NOT NULL
           GROUP BY order_id
         ) oi_sum ON oi_sum.order_id = o.id
         WHERE o.order_status != 'Canceled'
           AND o.deleted_at IS NULL
-          AND o.commission_seller > 0
           AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
       `
     }
@@ -129,6 +123,24 @@ export async function GET(request: NextRequest) {
       query += ` AND DATE(CONVERT_TZ(o.created_at, '+00:00', '+07:00')) <= ?`
       params.push(bookingDateTo)
     }
+
+    // First installment must be paid (payment_status = 'successful') with +3 day grace period
+    let paidAtCondition = ''
+    if (bookingDateFrom) {
+      paidAtCondition += ` AND DATE(CONVERT_TZ(p.paid_at, '+00:00', '+07:00')) >= ?`
+      params.push(bookingDateFrom)
+    }
+    if (bookingDateTo) {
+      paidAtCondition += ` AND DATE(CONVERT_TZ(p.paid_at, '+00:00', '+07:00')) <= DATE_ADD(?, INTERVAL 3 DAY)`
+      params.push(bookingDateTo)
+    }
+    query += `
+      AND EXISTS (
+        SELECT 1 FROM v_Xqc7k7_customer_order_installments ci
+        JOIN v_Xqc7k7_customer_order_installments_has_payments ihp ON ihp.customer_order_installment_id = ci.id
+        JOIN v_Xqc7k7_payments p ON p.id = ihp.payment_id
+        WHERE ci.order_id = o.id AND ci.ordinal = 1 AND p.payment_status = 'successful'${paidAtCondition}
+      )`
 
     query += ` GROUP BY supplier_id, supplier_name, country_name ORDER BY total_value DESC`
 

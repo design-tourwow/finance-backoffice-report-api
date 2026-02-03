@@ -46,23 +46,22 @@ export async function GET(request: NextRequest) {
     const supplierIds = supplierIdParam ? supplierIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
 
     // Query with JOIN to order_items for travelers count
-    // Logic: Only count orders with travelers > 0 (consistent with /by-country)
+    // Logic: นับเฉพาะ order ที่ไม่ยกเลิก + ชำระเงินงวดแรกแล้ว (paid_at +3 วัน)
     let query = `
       SELECT
-        COUNT(DISTINCT CASE WHEN COALESCE(oi_sum.traveler_count, 0) > 0 THEN o.id END) as total_orders,
+        COUNT(DISTINCT o.id) as total_orders,
         COALESCE(SUM(oi_sum.traveler_count), 0) as total_customers,
-        COALESCE(SUM(CASE WHEN COALESCE(oi_sum.traveler_count, 0) > 0 THEN o.net_amount ELSE 0 END), 0) as total_net_amount,
-        COALESCE(AVG(CASE WHEN COALESCE(oi_sum.traveler_count, 0) > 0 THEN o.net_amount END), 0) as avg_net_amount
+        COALESCE(SUM(o.net_amount), 0) as total_net_amount,
+        COALESCE(AVG(o.net_amount), 0) as avg_net_amount
       FROM v_Xqc7k7_orders o
       LEFT JOIN (
         SELECT order_id, SUM(quantity) as traveler_count
         FROM v_Xqc7k7_order_items
-        WHERE product_room_type_id IN (1, 2, 3, 7)
+        WHERE product_room_type_id IS NOT NULL
         GROUP BY order_id
       ) oi_sum ON oi_sum.order_id = o.id
       WHERE o.order_status != 'Canceled'
         AND o.deleted_at IS NULL
-        AND o.commission_seller > 0
     `
     const params: any[] = []
 
@@ -99,6 +98,24 @@ export async function GET(request: NextRequest) {
       query += ` AND o.product_owner_supplier_id IN (${placeholders})`
       params.push(...supplierIds)
     }
+
+    // First installment must be paid (payment_status = 'successful') with +3 day grace period
+    let paidAtCondition = ''
+    if (bookingDateFrom) {
+      paidAtCondition += ` AND DATE(CONVERT_TZ(p.paid_at, '+00:00', '+07:00')) >= ?`
+      params.push(bookingDateFrom)
+    }
+    if (bookingDateTo) {
+      paidAtCondition += ` AND DATE(CONVERT_TZ(p.paid_at, '+00:00', '+07:00')) <= DATE_ADD(?, INTERVAL 3 DAY)`
+      params.push(bookingDateTo)
+    }
+    query += `
+      AND EXISTS (
+        SELECT 1 FROM v_Xqc7k7_customer_order_installments ci
+        JOIN v_Xqc7k7_customer_order_installments_has_payments ihp ON ihp.customer_order_installment_id = ci.id
+        JOIN v_Xqc7k7_payments p ON p.id = ihp.payment_id
+        WHERE ci.order_id = o.id AND ci.ordinal = 1 AND p.payment_status = 'successful'${paidAtCondition}
+      )`
 
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(query, params)
     const result = rows[0]
