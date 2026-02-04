@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     //   sales = SUM(net_amount)
     //   travelers = SUM(traveler_count) from order_items
     //   orders = COUNT(DISTINCT o.id)
-    //   net_commission = SUM((commission_company + commission_seller) - discount)
+    //   net_commission = SUM(supplier_commission - discount)
     let totalValueExpr = ''
     switch (viewMode) {
       case 'travelers':
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
         totalValueExpr = 'COUNT(DISTINCT o.id)'
         break
       case 'net_commission':
-        totalValueExpr = 'COALESCE(SUM((o.commission_company + o.commission_seller) - o.discount), 0)'
+        totalValueExpr = 'COALESCE(SUM(o.supplier_commission - o.discount), 0)'
         break
       default: // sales
         totalValueExpr = 'COALESCE(SUM(o.net_amount), 0)'

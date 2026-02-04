@@ -2817,7 +2817,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
         { name: 'travel_date_to', type: 'date', description: 'End travel date (YYYY-MM-DD)' },
         { name: 'booking_date_from', type: 'date', description: 'Start booking date (YYYY-MM-DD)' },
         { name: 'booking_date_to', type: 'date', description: 'End booking date (YYYY-MM-DD)' },
-        { name: 'view_mode', type: 'string', description: '"sales" (default), "travelers", "orders", "net_commission" — sales=SUM(net_amount), travelers=SUM(traveler_count), orders=COUNT(order), net_commission=SUM((commission_company+commission_seller)-discount)' }
+        { name: 'view_mode', type: 'string', description: '"sales" (default), "travelers", "orders", "net_commission" — sales=SUM(net_amount), travelers=SUM(traveler_count), orders=COUNT(order), net_commission=SUM(supplier_commission-discount)' }
       ],
       curl: `curl "${apiUrl}/api/reports/wholesale-by-country?booking_date_from=2025-01-01&booking_date_to=2025-12-31&view_mode=sales" \\
   -H "x-api-key: YOUR_API_KEY"`,
@@ -4098,7 +4098,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                           ['booking_date_to', 'วันจองสิ้นสุด (YYYY-MM-DD)'],
                           ['supplier_id', 'ID Wholesale (comma-separated)'],
                           ['country_id', 'ID ประเทศ (comma-separated)'],
-                          ['view_mode', 'sales (ยอดขาย), travelers (จำนวนคน), orders (จำนวนออเดอร์), net_commission (ค่าคอมสุทธิ = commission_company + commission_seller - discount)'],
+                          ['view_mode', 'sales (ยอดขาย), travelers (จำนวนคน), orders (จำนวนออเดอร์), net_commission (ค่าคอมสุทธิ = supplier_commission - discount)'],
                         ].map(([param, desc], idx) => (
                           <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
                             <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#374151', fontWeight: '500' }}>{param}</td>
