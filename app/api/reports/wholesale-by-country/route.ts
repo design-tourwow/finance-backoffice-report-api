@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
         totalValueExpr = 'COUNT(DISTINCT o.id)'
         break
       case 'net_commission':
-        totalValueExpr = 'COALESCE(SUM(o.supplier_commission - o.discount), 0)'
+        totalValueExpr = 'COALESCE(SUM(COALESCE(o.supplier_commission, 0) - COALESCE(o.discount, 0)), 0)'
         break
       default: // sales
         totalValueExpr = 'COALESCE(SUM(o.net_amount), 0)'
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
         GROUP BY order_id
       ) oi_sum ON oi_sum.order_id = o.id
       WHERE o.order_status != 'Canceled'
-        AND o.supplier_commission > 0
+        ${viewMode !== 'net_commission' ? 'AND o.supplier_commission > 0' : ''}
         AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
     `
     const params: any[] = []
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
     query += `
       AND EXISTS (
         SELECT 1 FROM v_Xqc7k7_customer_order_installments ci
-        WHERE ci.order_id = o.id AND ci.ordinal = 1 AND ci.status = 'paid'
+        WHERE ci.order_id = o.id AND ci.ordinal = 1 AND LOWER(ci.status) = 'paid'
       )`
 
     query += ` GROUP BY supplier_id, supplier_name, country_name ORDER BY total_value DESC`
