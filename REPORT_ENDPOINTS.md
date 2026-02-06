@@ -343,9 +343,39 @@ curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/count
 
 รายงาน Wholesale (Supplier) แยกตามประเทศปลายทาง - สำหรับหน้า Wholesale Destinations
 
+### Query Parameters:
+| Parameter | Type | Description |
+|---|---|---|
+| `country_id` | string | ID ประเทศ (comma-separated) |
+| `supplier_id` | string | ID Supplier (comma-separated) |
+| `travel_date_from` | string | วันเดินทางเริ่มต้น (YYYY-MM-DD) |
+| `travel_date_to` | string | วันเดินทางสิ้นสุด (YYYY-MM-DD) |
+| `booking_date_from` | string | วันจองเริ่มต้น (YYYY-MM-DD) |
+| `booking_date_to` | string | วันจองสิ้นสุด (YYYY-MM-DD) |
+| `view_mode` | string | โหมดการแสดงผล: `sales` / `travelers` / `orders` / `net_commission` (default: sales) |
+
+### การคำนวณตาม view_mode:
+
+| view_mode | ค่าที่คำนวณ | สูตร |
+|---|---|---|
+| `sales` | ยอดขายรวม | `SUM(net_amount)` |
+| `travelers` | จำนวนผู้เดินทาง | `SUM(traveler_count)` จาก order_items |
+| `orders` | จำนวนออเดอร์ | `COUNT(DISTINCT order_id)` |
+| `net_commission` | ค่าคอมสุทธิ | `SUM(COALESCE(supplier_commission, 0) - COALESCE(discount, 0))` |
+
+### เงื่อนไขพิเศษสำหรับ `net_commission`:
+- **ไม่ใช้** เงื่อนไข `supplier_commission > 0` (mode อื่นใช้)
+- ใช้ `LOWER(ci.status) = 'paid'` (case-insensitive)
+- สูตร: `COALESCE(supplier_commission, 0) - COALESCE(discount, 0)` เพื่อจัดการค่า NULL
+
 ### Request Example:
 ```bash
-curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/wholesale-by-country" \
+# ดูค่าคอมสุทธิ
+curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/wholesale-by-country?view_mode=net_commission" \
+  -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
+
+# ดูยอดขาย (default)
+curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/wholesale-by-country?view_mode=sales" \
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
 ```
 
@@ -363,20 +393,13 @@ curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/whole
           "เวียดนาม": 80,
           "จีน": 45
         },
-        "total": 275
-      },
-      {
-        "id": 12,
-        "name": "ABC Travel",
-        "countries": {
-          "ญี่ปุ่น": 100,
-          "เกาหลีใต้": 50
-        },
-        "total": 150
+        "total": 275,
+        "order_count": 50
       }
     ],
     "summary": {
-      "total_bookings": 425,
+      "total_value": 425,
+      "total_orders": 1696,
       "top_wholesale": {
         "name": "บริษัท โปร บุ๊คกิ้ง เซนเตอร์ จำกัด",
         "count": 275
@@ -385,14 +408,15 @@ curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/whole
         "name": "ญี่ปุ่น",
         "count": 250
       },
-      "total_partners": 2
+      "total_partners": 15,
+      "view_mode": "net_commission"
     },
     "country_totals": {
       "ญี่ปุ่น": 250,
       "เวียดนาม": 80,
-      "เกาหลีใต้": 50,
       "จีน": 45
-    }
+    },
+    "view_mode": "net_commission"
   }
 }
 ```
@@ -402,17 +426,20 @@ curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/whole
 **wholesales** (array):
 - `id` - ID Supplier/Wholesale
 - `name` - ชื่อ Supplier (ภาษาไทย)
-- `countries` - Object แสดงจำนวน orders แยกตามประเทศ `{ "ชื่อประเทศ": จำนวน }`
-- `total` - จำนวน orders ทั้งหมดของ Wholesale นี้
+- `countries` - Object แสดงค่าแยกตามประเทศ `{ "ชื่อประเทศ": ค่า }` (ค่าเปลี่ยนตาม view_mode)
+- `total` - ค่ารวมทั้งหมดของ Wholesale นี้ (เปลี่ยนตาม view_mode)
+- `order_count` - จำนวน orders
 
 **summary**:
-- `total_bookings` - จำนวน orders ทั้งหมด
+- `total_value` - ค่ารวมทั้งหมด (เปลี่ยนตาม view_mode)
+- `total_orders` - จำนวน orders ทั้งหมด
 - `top_wholesale` - Wholesale ที่มียอดสูงสุด
 - `top_country` - ประเทศที่มียอดสูงสุด
 - `total_partners` - จำนวน Wholesale ทั้งหมด
+- `view_mode` - โหมดที่ใช้แสดงผล
 
 **country_totals**:
-- Object แสดงยอดรวมของแต่ละประเทศ `{ "ชื่อประเทศ": ยอดรวม }`
+- Object แสดงยอดรวมของแต่ละประเทศ `{ "ชื่อประเทศ": ยอดรวม }` (เปลี่ยนตาม view_mode)
 
 **หมายเหตุ**:
 - เรียงลำดับ wholesales ตาม `total` มากไปน้อย
