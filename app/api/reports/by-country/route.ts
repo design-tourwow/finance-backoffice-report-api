@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
     const bookingDateFrom = searchParams.get('booking_date_from')
     const bookingDateTo = searchParams.get('booking_date_to')
     const supplierIdParam = searchParams.get('supplier_id')
+    const viewMode = searchParams.get('view_mode') || 'travelers' // 'sales', 'travelers', 'orders', 'net_commission'
 
     // Parse comma-separated IDs
     const countryIds = countryIdParam ? countryIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
@@ -54,7 +55,8 @@ export async function GET(request: NextRequest) {
         COUNT(DISTINCT o.id) as total_orders,
         COALESCE(SUM(oi_sum.traveler_count), 0) as total_customers,
         COALESCE(SUM(o.net_amount), 0) as total_net_amount,
-        COALESCE(AVG(o.net_amount), 0) as avg_net_amount
+        COALESCE(AVG(o.net_amount), 0) as avg_net_amount,
+        COALESCE(SUM(COALESCE(o.supplier_commission, 0) - COALESCE(o.discount, 0)), 0) as net_commission
       FROM v_Xqc7k7_orders o
       LEFT JOIN (
         SELECT order_id, SUM(quantity) as traveler_count
@@ -63,7 +65,7 @@ export async function GET(request: NextRequest) {
         GROUP BY order_id
       ) oi_sum ON oi_sum.order_id = o.id
       WHERE o.order_status != 'Canceled'
-        AND o.supplier_commission > 0
+        ${viewMode !== 'net_commission' ? 'AND o.supplier_commission > 0' : ''}
         AND JSON_EXTRACT(o.product_snapshot, '$.countries[0].id') IS NOT NULL
     `
     const params: any[] = []
@@ -103,7 +105,7 @@ export async function GET(request: NextRequest) {
     query += `
       AND EXISTS (
         SELECT 1 FROM v_Xqc7k7_customer_order_installments ci
-        WHERE ci.order_id = o.id AND ci.ordinal = 1 AND ci.status = 'paid'
+        WHERE ci.order_id = o.id AND ci.ordinal = 1 AND LOWER(ci.status) = 'paid'
       )`
 
     query += ` GROUP BY country_id, country_name HAVING total_orders > 0 ORDER BY total_orders DESC`
@@ -116,13 +118,15 @@ export async function GET(request: NextRequest) {
       total_orders: parseInt(row.total_orders) || 0,
       total_customers: parseInt(row.total_customers) || 0,
       total_net_amount: parseFloat(row.total_net_amount) || 0,
-      avg_net_amount: parseFloat(row.avg_net_amount) || 0
+      avg_net_amount: parseFloat(row.avg_net_amount) || 0,
+      net_commission: parseFloat(row.net_commission) || 0
     }))
 
     logApiRequest('GET', '/api/reports/by-country', 200, apiKey)
     return NextResponse.json({
       success: true,
-      data
+      data,
+      view_mode: viewMode
     })
   } catch (error: any) {
     logApiRequest('GET', '/api/reports/by-country', 500, apiKey, error.message)
