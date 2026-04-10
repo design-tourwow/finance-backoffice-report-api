@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     params.push(paidAtFrom)
   }
   if (paidAtTo) {
-    conditions.push(`DATE(CONVERT_TZ(p.paid_at, '+00:00', '+07:00')) <= DATE_ADD(?, INTERVAL 3 DAY)`)
+    conditions.push(`DATE(CONVERT_TZ(p.paid_at, '+00:00', '+07:00')) <= ?`)
     params.push(paidAtTo)
   }
 
