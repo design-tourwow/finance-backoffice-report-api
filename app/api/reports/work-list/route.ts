@@ -75,10 +75,14 @@ export async function GET(request: NextRequest) {
       SELECT
         t.id AS task_id,
         t.date AS task_date_raw,
+        t.task_type_id,
         tt.name AS task_type_name,
         o.order_code,
         o.customer_name,
         o.customer_phone_number,
+        o.order_status,
+        o.seller_agency_member_id,
+        o.crm_agency_member_id,
         t.order_created_at AS order_created_at_raw,
         JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.start_at')) AS period_start_raw,
         JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.end_at')) AS period_end_raw,
@@ -99,6 +103,7 @@ export async function GET(request: NextRequest) {
         ON oi_sum.order_id = o.id
       ${agencyJoins}
       WHERE LOWER(COALESCE(t.status, '')) = 'to_do'
+        AND LOWER(COALESCE(o.order_status, '')) != 'canceled'
         AND (
           (? = 'finance' AND JSON_CONTAINS(COALESCE(tt.for_roles, JSON_ARRAY()), JSON_QUOTE('finance')))
           OR
@@ -117,14 +122,18 @@ export async function GET(request: NextRequest) {
       task_id: row.task_id,
       task_date: formatThaiDate(row.task_date_raw),
       task_date_raw: row.task_date_raw,
+      task_type_id: row.task_type_id,
       task_type_name: row.task_type_name || '-',
       order_code: row.order_code || '-',
+      order_status: row.order_status || '-',
       customer_name: row.customer_name || '-',
       customer_phone_number: row.customer_phone_number || '-',
       travel_period_text: formatTravelPeriod(row.period_start_raw, row.period_end_raw),
       traveler_count: parseInt(row.traveler_count, 10) || 0,
       order_created_at: formatThaiDate(row.order_created_at_raw),
       order_created_at_raw: row.order_created_at_raw,
+      seller_agency_member_id: row.seller_agency_member_id || null,
+      crm_agency_member_id: row.crm_agency_member_id || null,
       seller_nick_name: row.seller_nick_name || '-',
       crm_nick_name: row.crm_nick_name || '-',
     }))
