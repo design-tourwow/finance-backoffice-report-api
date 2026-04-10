@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
         o.order_code,
         o.customer_name,
         o.customer_phone_number,
-        o.created_at AS order_created_at_raw,
+        t.order_created_at AS order_created_at_raw,
         JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.start_at')) AS period_start_raw,
         JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.end_at')) AS period_end_raw,
         COALESCE(oi_sum.traveler_count, 0) AS traveler_count,
@@ -100,12 +100,12 @@ export async function GET(request: NextRequest) {
       ${agencyJoins}
       WHERE LOWER(COALESCE(t.status, '')) = 'to_do'
         AND (
-          (? = 'finance' AND JSON_CONTAINS(COALESCE(tt.for_rolse, JSON_ARRAY()), JSON_QUOTE('finance')))
+          (? = 'finance' AND JSON_CONTAINS(COALESCE(tt.for_roles, JSON_ARRAY()), JSON_QUOTE('finance')))
           OR
           (? = 'general' AND (
-            JSON_CONTAINS(COALESCE(tt.for_rolse, JSON_ARRAY()), JSON_QUOTE('admin'))
-            OR JSON_CONTAINS(COALESCE(tt.for_rolse, JSON_ARRAY()), JSON_QUOTE('sale'))
-            OR JSON_CONTAINS(COALESCE(tt.for_rolse, JSON_ARRAY()), JSON_QUOTE('telesales'))
+            JSON_CONTAINS(COALESCE(tt.for_roles, JSON_ARRAY()), JSON_QUOTE('admin'))
+            OR JSON_CONTAINS(COALESCE(tt.for_roles, JSON_ARRAY()), JSON_QUOTE('sale'))
+            OR JSON_CONTAINS(COALESCE(tt.for_roles, JSON_ARRAY()), JSON_QUOTE('telesales'))
           ))
         )
       ORDER BY t.date ASC, t.id ASC
