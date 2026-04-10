@@ -123,7 +123,7 @@ export async function GET(request: NextRequest) {
       AND ci.ordinal = 1
       AND LOWER(ci.status) = 'paid'
     INNER JOIN v_Xqc7k7_customer_order_installments_has_payments cohp
-      ON cohp.customer_order_installments_id = ci.id
+      ON cohp.customer_order_installment_id = ci.id
     INNER JOIN v_Xqc7k7_payments p
       ON p.id = cohp.payment_id
     ${amJoin}
