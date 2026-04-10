@@ -3247,6 +3247,98 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
         { status: 401, description: 'Invalid API key' },
         { status: 500, description: 'Database query failed' }
       ]
+    },
+    {
+      id: 'GET-/api/reports/commission-plus',
+      method: 'GET',
+      path: '/api/reports/commission-plus',
+      description: 'Commission Report Plus — รายงานค่าคอมมิชชั่นแยกตาม Order พร้อม seller nick_name, ยอดจอง, คอมรวม, ส่วนลด และวันชำระงวดแรก',
+      category: 'MySQL Database',
+      subCategory: 'reports',
+      requiresAuth: true,
+      parameters: [
+        { name: 'created_at_from', type: 'date', description: 'วันที่สร้าง Order เริ่มต้น (YYYY-MM-DD)' },
+        { name: 'created_at_to', type: 'date', description: 'วันที่สร้าง Order สิ้นสุด (YYYY-MM-DD)' },
+        { name: 'paid_at_from', type: 'date', description: 'วันชำระงวด 1 เริ่มต้น (YYYY-MM-DD)' },
+        { name: 'paid_at_to', type: 'date', description: 'วันชำระงวด 1 สิ้นสุด (YYYY-MM-DD) — ระบบบวก +3 วันอัตโนมัติ' },
+        { name: 'job_position', type: 'string', description: '"ts" (is_old_customer=0), "crm" (is_old_customer=1), "admin" (ทั้งหมด) — default: admin' },
+        { name: 'seller_id', type: 'integer', description: 'กรอง seller_agency_member_id — ถ้าไม่ส่งจะแสดงทั้งหมด' },
+        { name: 'order_status', type: 'string', description: '"all" (ทั้งหมด), "not_canceled" (ไม่ยกเลิก), "canceled" (ยกเลิก) — default: all' }
+      ],
+      curl: `curl "${apiUrl}/api/reports/commission-plus?created_at_from=2025-04-01&created_at_to=2025-04-30&job_position=admin&order_status=not_canceled" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": {
+    "orders": [
+      {
+        "id": 1234,
+        "order_code": "ORD-2025-001",
+        "created_at": "2025-04-05 09:30",
+        "customer_name": "สมชาย ใจดี",
+        "product_period_snapshot": "05/04/2568 – 08/04/2568",
+        "net_amount": 48000,
+        "supplier_commission": 4800,
+        "discount": 500,
+        "seller_agency_member_id": 555,
+        "seller_nick_name": "GAP",
+        "first_paid_at": "2025-04-05",
+        "room_quantity": 2
+      }
+    ],
+    "summary": {
+      "total_orders": 1,
+      "total_net_amount": 48000,
+      "total_commission": 4800,
+      "total_discount": 500,
+      "total_net_commission": 4300
+    },
+    "meta": { "agency_db_found": true }
+  }
+}`,
+      responses: [
+        { status: 200, description: 'Successful response with orders and summary' },
+        { status: 401, description: 'Unauthorized — missing or invalid API key' },
+        { status: 429, description: 'Rate limit exceeded' },
+        { status: 500, description: 'Database query failed' }
+      ]
+    },
+    {
+      id: 'GET-/api/reports/commission-plus/sellers',
+      method: 'GET',
+      path: '/api/reports/commission-plus/sellers',
+      description: 'Commission Report Plus — ดึงรายชื่อ Seller (agency members) ที่มีออเดอร์ในระบบ พร้อม nick_name สำหรับ dropdown',
+      category: 'MySQL Database',
+      subCategory: 'reports',
+      requiresAuth: true,
+      parameters: [],
+      curl: `curl "${apiUrl}/api/reports/commission-plus/sellers" \\
+  -H "x-api-key: YOUR_API_KEY"`,
+      response: `{
+  "success": true,
+  "data": [
+    {
+      "id": 555,
+      "nick_name": "GAP",
+      "first_name": "Nutthaphon",
+      "last_name": "T",
+      "job_position": "crm"
+    },
+    {
+      "id": 556,
+      "nick_name": "BEAM",
+      "first_name": "Beam",
+      "last_name": "S",
+      "job_position": "ts"
+    }
+  ]
+}`,
+      responses: [
+        { status: 200, description: 'Successful response with seller list' },
+        { status: 401, description: 'Unauthorized — missing or invalid API key' },
+        { status: 429, description: 'Rate limit exceeded' },
+        { status: 500, description: 'Database query failed' }
+      ]
     }
   ]
 
@@ -3255,7 +3347,10 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
     const query = searchQuery.toLowerCase()
     return (
       endpoint.method.toLowerCase().includes(query) ||
-      endpoint.path.toLowerCase().includes(query)
+      endpoint.path.toLowerCase().includes(query) ||
+      (endpoint.description && endpoint.description.toLowerCase().includes(query)) ||
+      (endpoint.subCategory && endpoint.subCategory.toLowerCase().includes(query)) ||
+      (endpoint.category && endpoint.category.toLowerCase().includes(query))
     )
   })
 
