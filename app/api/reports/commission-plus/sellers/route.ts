@@ -4,6 +4,18 @@ import { logApiRequest, checkRateLimit } from '@/lib/logger'
 import { authenticate } from '@/lib/auth'
 import { RowDataPacket } from 'mysql2'
 
+async function getAgencyDb(): Promise<string | null> {
+  try {
+    const [rows] = await mysqlPool.execute<RowDataPacket[]>(
+      `SELECT TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES
+       WHERE TABLE_NAME = 'v_6kMWFc_agcy_agency_members' LIMIT 1`
+    )
+    return rows[0]?.TABLE_SCHEMA ?? null
+  } catch {
+    return null
+  }
+}
+
 export async function GET(request: NextRequest) {
   const apiKey = request.headers.get('x-api-key') || request.headers.get('authorization') || ''
   const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
@@ -18,17 +30,37 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Return agency members who have at least one order
-  const query = `
-    SELECT DISTINCT
-      am.id,
-      COALESCE(am.nick_name, '') AS nick_name,
-      COALESCE(am.first_name, '') AS first_name,
-      COALESCE(am.last_name, '') AS last_name
-    FROM v_6kMWFc_agcy_agency_members am
-    INNER JOIN v_Xqc7k7_orders o ON o.seller_agency_member_id = am.id
-    ORDER BY am.nick_name ASC
-  `
+  const agencyDb = await getAgencyDb()
+
+  let query: string
+  if (agencyDb) {
+    const amTable = `\`${agencyDb}\`.v_6kMWFc_agcy_agency_members`
+    query = `
+      SELECT DISTINCT
+        o.seller_agency_member_id AS id,
+        COALESCE(am.nick_name, CAST(o.seller_agency_member_id AS CHAR)) AS nick_name,
+        COALESCE(am.first_name, '') AS first_name,
+        COALESCE(am.last_name, '')  AS last_name,
+        COALESCE(am.job_position, '') AS job_position
+      FROM v_Xqc7k7_orders o
+      LEFT JOIN ${amTable} am ON am.id = o.seller_agency_member_id
+      WHERE o.seller_agency_member_id IS NOT NULL
+      ORDER BY nick_name ASC
+    `
+  } else {
+    // Fallback: return distinct IDs only (no name lookup)
+    query = `
+      SELECT DISTINCT
+        o.seller_agency_member_id AS id,
+        CAST(o.seller_agency_member_id AS CHAR) AS nick_name,
+        '' AS first_name,
+        '' AS last_name,
+        '' AS job_position
+      FROM v_Xqc7k7_orders o
+      WHERE o.seller_agency_member_id IS NOT NULL
+      ORDER BY o.seller_agency_member_id ASC
+    `
+  }
 
   try {
     const [rows] = await mysqlPool.execute<RowDataPacket[]>(query)
