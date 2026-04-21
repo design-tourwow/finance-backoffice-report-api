@@ -112,6 +112,8 @@ export async function GET(request: NextRequest) {
       o.seller_agency_member_id,
       o.is_old_customer,
       ${sellerName}                        AS seller_nick_name,
+      ${amTable ? 'COALESCE(LOWER(am.job_position), \'\')' : '\'\''} AS seller_job_position,
+      ${amTable ? 'COALESCE(LOWER(am.job_position), \'\')' : '\'\''} AS seller_job_position,
       DATE_FORMAT(CONVERT_TZ(MIN(p.paid_at), '+00:00', '+07:00'), '%Y-%m-%d') AS first_paid_at,
       COALESCE((
         SELECT SUM(oi.quantity)
@@ -133,7 +135,7 @@ export async function GET(request: NextRequest) {
     GROUP BY
       o.id, o.order_code, o.created_at, o.customer_name,
       o.product_period_snapshot, o.net_amount, o.supplier_commission,
-      o.discount, o.seller_agency_member_id, o.is_old_customer, seller_nick_name
+      o.discount, o.seller_agency_member_id, o.is_old_customer, seller_nick_name, seller_job_position, seller_job_position
     ORDER BY o.created_at DESC
   `
 
