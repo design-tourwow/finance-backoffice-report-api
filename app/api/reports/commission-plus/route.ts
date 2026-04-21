@@ -110,6 +110,7 @@ export async function GET(request: NextRequest) {
       COALESCE(o.supplier_commission, 0)   AS supplier_commission,
       COALESCE(o.discount, 0)              AS discount,
       o.seller_agency_member_id,
+      o.is_old_customer,
       ${sellerName}                        AS seller_nick_name,
       DATE_FORMAT(CONVERT_TZ(MIN(p.paid_at), '+00:00', '+07:00'), '%Y-%m-%d') AS first_paid_at,
       COALESCE((
@@ -132,7 +133,7 @@ export async function GET(request: NextRequest) {
     GROUP BY
       o.id, o.order_code, o.created_at, o.customer_name,
       o.product_period_snapshot, o.net_amount, o.supplier_commission,
-      o.discount, o.seller_agency_member_id, seller_nick_name
+      o.discount, o.seller_agency_member_id, o.is_old_customer, seller_nick_name
     ORDER BY o.created_at DESC
   `
 
