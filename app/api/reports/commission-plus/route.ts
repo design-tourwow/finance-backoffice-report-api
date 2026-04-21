@@ -105,6 +105,7 @@ export async function GET(request: NextRequest) {
       o.customer_name,
       JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.start_at')) AS period_start_raw,
       JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.end_at'))   AS period_end_raw,
+      COALESCE(JSON_UNQUOTE(JSON_EXTRACT(o.product_snapshot, '$.countries[0].name_th')), '-') AS country_name_th,
       COALESCE(o.net_amount, 0)            AS net_amount,
       COALESCE(o.supplier_commission, 0)   AS supplier_commission,
       COALESCE(o.discount, 0)              AS discount,
