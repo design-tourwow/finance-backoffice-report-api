@@ -53,10 +53,46 @@ export async function GET(request: NextRequest) {
     )
   }
 
+  // Optional country_id / supplier_id filters — both accept a single int or
+  // a csv "1,2,3". Available periods are then restricted to orders that
+  // match the selected country/supplier, mirroring the filter shape used by
+  // /api/reports/by-country and /api/reports/wholesale-by-country.
+  const { searchParams } = new URL(request.url)
+  const parseIdCsv = (value: string | null): number[] => {
+    if (!value || value.trim() === '') return []
+    return value
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s !== '')
+      .map((s) => Number(s))
+      .filter((n) => Number.isFinite(n) && Number.isInteger(n) && n > 0)
+  }
+  const countryIds = parseIdCsv(searchParams.get('country_id'))
+  const supplierIds = parseIdCsv(searchParams.get('supplier_id'))
+
   try {
     // Query to get available years, quarters, and months from orders
     // Using created_at (booking date) as the reference
     // Only get year_ce from database, convert to BE in TypeScript using dateFormatter pattern
+    const whereClauses: string[] = [`order_status != 'Canceled'`]
+    const params: (number | string)[] = []
+
+    if (countryIds.length > 0) {
+      const orCountry = countryIds
+        .map(() => `JSON_CONTAINS(JSON_EXTRACT(product_snapshot, '$.countries'), JSON_OBJECT('id', ?))`)
+        .join(' OR ')
+      whereClauses.push(
+        `product_snapshot IS NOT NULL AND product_snapshot != '' AND JSON_VALID(product_snapshot) = 1 AND JSON_TYPE(JSON_EXTRACT(product_snapshot, '$.countries')) = 'ARRAY' AND (${orCountry})`
+      )
+      for (const id of countryIds) params.push(id)
+    }
+
+    if (supplierIds.length > 0) {
+      const placeholders = supplierIds.map(() => '?').join(',')
+      whereClauses.push(`product_owner_supplier_id IN (${placeholders})`)
+      for (const id of supplierIds) params.push(id)
+    }
+
     const query = `
       SELECT
         YEAR(CONVERT_TZ(created_at, '+00:00', '+07:00')) as year_ce,
@@ -64,12 +100,12 @@ export async function GET(request: NextRequest) {
         MONTH(CONVERT_TZ(created_at, '+00:00', '+07:00')) as month,
         COUNT(*) as order_count
       FROM v_Xqc7k7_orders
-      WHERE order_status != 'Canceled'
+      WHERE ${whereClauses.join(' AND ')}
       GROUP BY year_ce, quarter, month
       ORDER BY year_ce DESC, month DESC
     `
 
-    const [rows] = await mysqlPool.execute<RowDataPacket[]>(query)
+    const [rows] = await mysqlPool.execute<RowDataPacket[]>(query, params)
 
     // Process data to group by year
     const yearsMap = new Map<number, {
