@@ -30,7 +30,7 @@ type Filters = {
   year?: number
   quarter?: number
   month?: number
-  country_id?: number
+  country_ids?: number[]
   job_position?: string
   team_number?: number
   user_id?: number
@@ -41,6 +41,20 @@ function parseIntParam(value: string | null): number | undefined {
   const n = Number(value)
   if (!Number.isFinite(n) || !Number.isInteger(n)) return undefined
   return n
+}
+
+/** Parse a comma-separated list of positive integers. */
+function parseIntListParam(value: string | null): number[] | undefined | 'invalid' {
+  if (value === null || value.trim() === '') return undefined
+  const parts = value.split(',').map((s) => s.trim()).filter((s) => s !== '')
+  if (parts.length === 0) return undefined
+  const out: number[] = []
+  for (const p of parts) {
+    const n = Number(p)
+    if (!Number.isFinite(n) || !Number.isInteger(n) || n <= 0) return 'invalid'
+    out.push(n)
+  }
+  return out
 }
 
 function parseFilters(searchParams: URLSearchParams): {
@@ -73,12 +87,12 @@ function parseFilters(searchParams: URLSearchParams): {
     filters.month = month
   }
 
-  const country_id = parseIntParam(searchParams.get('country_id'))
-  if (country_id !== undefined) {
-    if (country_id <= 0) {
-      return { filters, error: 'Country ID parameter must be a positive integer' }
-    }
-    filters.country_id = country_id
+  const country_ids = parseIntListParam(searchParams.get('country_id'))
+  if (country_ids === 'invalid') {
+    return { filters, error: 'Country ID parameter must be positive integers (comma-separated for multi)' }
+  }
+  if (country_ids !== undefined) {
+    filters.country_ids = country_ids
   }
 
   const job_position = searchParams.get('job_position')
@@ -118,13 +132,18 @@ function parseFilters(searchParams: URLSearchParams): {
   return { filters }
 }
 
-/** Build the same JSON_CONTAINS condition be-2-report uses for country filtering. */
-function jsonCountryCondition(column: string): string {
+/** Build the same JSON_CONTAINS condition be-2-report uses for country
+ * filtering. When multiple country ids are passed, the `(A OR B OR …)`
+ * disjunction is assembled; the caller must push one param per id. */
+function jsonCountryCondition(column: string, count: number): string {
+  const orClauses = new Array(count)
+    .fill(`JSON_CONTAINS(JSON_EXTRACT(${column}, '$.countries'), JSON_OBJECT('id', ?))`)
+    .join(' OR ')
   return (
     `${column} IS NOT NULL AND ${column} != '' ` +
     `AND JSON_VALID(${column}) = 1 ` +
     `AND JSON_TYPE(JSON_EXTRACT(${column}, '$.countries')) = 'ARRAY' ` +
-    `AND JSON_CONTAINS(JSON_EXTRACT(${column}, '$.countries'), JSON_OBJECT('id', ?))`
+    `AND (${orClauses})`
   )
 }
 
@@ -154,9 +173,9 @@ function buildCountryFilter(
   params: any[],
   tableAlias = 'o'
 ): string | null {
-  if (filters.country_id === undefined) return null
-  params.push(filters.country_id)
-  return jsonCountryCondition(`${tableAlias}.product_snapshot`)
+  if (filters.country_ids === undefined || filters.country_ids.length === 0) return null
+  for (const id of filters.country_ids) params.push(id)
+  return jsonCountryCondition(`${tableAlias}.product_snapshot`, filters.country_ids.length)
 }
 
 function buildUserFilters(

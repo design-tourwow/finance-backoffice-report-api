@@ -30,7 +30,7 @@ type Filters = {
   year?: number
   quarter?: number
   month?: number
-  country_id?: number
+  country_ids?: number[]
   job_position?: string
   team_number?: number
   user_id?: number
@@ -41,6 +41,22 @@ function parseIntParam(value: string | null): number | undefined {
   const n = Number(value)
   if (!Number.isFinite(n) || !Number.isInteger(n)) return undefined
   return n
+}
+
+/** Parse a comma-separated list of positive integers. Accepts a single
+ * integer, a CSV like "1,2,3", or null/empty → undefined. Returns undefined
+ * on any invalid token so the caller can reject the request. */
+function parseIntListParam(value: string | null): number[] | undefined | 'invalid' {
+  if (value === null || value.trim() === '') return undefined
+  const parts = value.split(',').map((s) => s.trim()).filter((s) => s !== '')
+  if (parts.length === 0) return undefined
+  const out: number[] = []
+  for (const p of parts) {
+    const n = Number(p)
+    if (!Number.isFinite(n) || !Number.isInteger(n) || n <= 0) return 'invalid'
+    out.push(n)
+  }
+  return out
 }
 
 function parseFilters(searchParams: URLSearchParams): {
@@ -70,12 +86,12 @@ function parseFilters(searchParams: URLSearchParams): {
     }
     filters.month = month
   }
-  const country_id = parseIntParam(searchParams.get('country_id'))
-  if (country_id !== undefined) {
-    if (country_id <= 0) {
-      return { filters, error: 'Country ID parameter must be a positive integer' }
-    }
-    filters.country_id = country_id
+  const country_ids = parseIntListParam(searchParams.get('country_id'))
+  if (country_ids === 'invalid') {
+    return { filters, error: 'Country ID parameter must be positive integers (comma-separated for multi)' }
+  }
+  if (country_ids !== undefined) {
+    filters.country_ids = country_ids
   }
   const job_position = searchParams.get('job_position')
   if (job_position !== null && job_position.trim() !== '') {
@@ -148,13 +164,16 @@ function buildQuery(filters: Filters): { sql: string; params: any[] } {
     params.push(filters.month)
   }
 
-  if (filters.country_id !== undefined) {
+  if (filters.country_ids !== undefined && filters.country_ids.length > 0) {
+    const orClauses = filters.country_ids
+      .map(() => `JSON_CONTAINS(JSON_EXTRACT(o.product_snapshot, '$.countries'), JSON_OBJECT('id', ?))`)
+      .join(' OR ')
     sql += ` AND o.product_snapshot IS NOT NULL
              AND o.product_snapshot != ''
              AND JSON_VALID(o.product_snapshot) = 1
              AND JSON_TYPE(JSON_EXTRACT(o.product_snapshot, '$.countries')) = 'ARRAY'
-             AND JSON_CONTAINS(JSON_EXTRACT(o.product_snapshot, '$.countries'), JSON_OBJECT('id', ?))`
-    params.push(filters.country_id)
+             AND (${orClauses})`
+    for (const id of filters.country_ids) params.push(id)
   }
 
   if (filters.job_position !== undefined) {
