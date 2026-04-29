@@ -270,4 +270,99 @@ Both repositories use `npx vercel --prod` for deploy (not git-push auto-deploy).
 
 ---
 
-_End of PRD v1.0_
+## 11. Maintenance Contract — Field-by-Field Parity (Standing Policy)
+
+### 11.1 The contract
+
+Every future change to a page accessible by ts/crm — or to any shared
+component, helper, or API endpoint that those pages depend on — **must**
+include a field-by-field parity verification before merge. This is the
+standing product policy for the view-as feature, owned by the product
+manager and enforced at PR review time.
+
+### 11.2 Why this is non-negotiable
+
+The view-as feature's value proposition is "God mode 100%": admin id=555
+sees and behaves exactly like the impersonated user. The dominant bug
+class observed during initial development was **subtle UI leaks** — a
+single hardcoded `isAdmin()` guard, a direct `currentUser.nick_name`
+read, an unguarded export button — any one of which silently breaks the
+parity guarantee while everything else looks fine. These bugs are hard
+to spot in passive code review and require explicit comparison against
+a real ts/crm session to catch. A formal SOP makes verification a
+non-skippable gate rather than developer judgment.
+
+### 11.3 Scope of the policy
+
+The verification is mandatory whenever a PR modifies any of:
+
+| Surface | Examples |
+|---------|----------|
+| ts/crm-accessible routes | `/dashboard`, `/sales-report-by-seller`, plus any future routes whose `ROLE_ACCESS` entry grants ts or crm access |
+| Shared UI components | filter dropdowns, KPI cards, table renderers, export buttons, search boxes, period selectors, sortable header, trophy rank, table search, table count, filter actions |
+| Shared frontend helpers | `menu-component.js`, `shared-http.js`, `token-utils.js`, `shared-filter-service.js`, `shared-export-button.js`, `shared-trophy-rank.js`, `shared-utils.js` |
+| Auth/role helpers | `lib/auth.ts`, `lib/jwt.ts`, `lib/api-guard.ts`, `middleware.js` |
+| API endpoints reachable by ts/crm | `/api/reports/commission-plus`, `/api/reports/commission-plus/sellers`, `/api/agency-members`, `/api/customers/search`, `/api/reports/available-periods`, `/api/reports/commission-plus/pdf` |
+
+### 11.4 Sign-off criteria
+
+A PR is mergeable only when **every** condition below is met:
+
+1. The pre-merge checklist in `view-as-parity-sop.md` Section 6 is
+   filled out and attached to the PR description.
+2. Every row in the field-by-field checklist for the affected page(s)
+   is marked ✓ (match) — or marked ✗ with an explicit note that the
+   product owner has approved the divergence as intentional.
+3. Both axes were tested:
+   - Real ts user logged in directly vs admin id=555 viewing-as-ts/<same id>
+   - Real crm user logged in directly vs admin id=555 viewing-as-crm/<same id>
+4. Console verification: a single `[ViewAs] God-mode active` log appears
+   when impersonating; no warnings about token-patch failures or
+   `X-Effective-Role` mismatch are present.
+5. Network verification: every `/api/*` request during impersonation
+   carries both `X-View-As-Role` and `X-View-As-User-Id` headers; every
+   response carries `X-Effective-Role` matching the impersonated role.
+6. Export verification: PDF and Excel files were generated in both
+   modes and compared (file content, not just buttons).
+
+### 11.5 Roles
+
+| Role | Responsibility |
+|------|----------------|
+| **Author of the change** | Fills out the parity checklist; runs both modes; attaches comparison evidence (screenshots / file diffs) to PR |
+| **Reviewer** | Refuses to approve a PR that lacks a completed checklist; spot-checks at least one row by re-running the test independently |
+| **Product owner** (admin id=555) | Final sign-off on any ✗ rows that author and reviewer agree are intentional divergences; veto authority on parity disputes |
+
+### 11.6 Where the SOP lives
+
+`docs/view-as-parity-sop.md` is the canonical procedural reference. It
+contains:
+
+- Full field-by-field checklist template (pre-filled from
+  `test/qa/view-as-field-parity-audit.md`)
+- The six-step process for running the verification
+- Common patterns that break parity (with code examples for each)
+- Copy-paste pre-merge form
+
+The SOP is cross-referenced from this PRD, the architecture document
+(`architecture-rbac-view-as.md`), the test strategy
+(`test-strategy-rbac-view-as.md`), the stories index, and the API
+repository README so it cannot be missed during onboarding.
+
+### 11.7 Failure mode
+
+A merge that lands without this verification is a regression by
+definition. The owning team (FE + API maintainers) is responsible for
+opening a follow-up PR within **one business day** to:
+
+- (a) Run the missed verification.
+- (b) Fix any divergences uncovered.
+- (c) Update the SOP to add a new "common pattern" entry if the missed
+  bug represents a class of mistake worth flagging for future authors.
+
+The retrospective entry should also surface in the next sprint's "what
+slipped through" review so the team can adjust review processes.
+
+---
+
+_End of PRD v1.1 — Maintenance Contract section expanded 2026-04-29 alongside SOP publication_

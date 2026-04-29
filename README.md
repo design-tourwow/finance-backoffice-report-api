@@ -181,6 +181,19 @@ finance-backoffice-report-api/
 
 ---
 
+### View-As Parity Verification (ข้อบังคับ)
+
+**ทุกครั้งที่แก้ไขหน้าที่ ts/crm เข้าถึงได้ (`/dashboard`, `/sales-report-by-seller`) หรือ shared component ที่ใช้ในหน้าเหล่านั้น ต้องทำ field-by-field parity verification ก่อน merge เสมอ**
+
+ขั้นตอน:
+1. เปิด 2 sessions พร้อมกัน: (A) login เป็น ts/crm จริง และ (B) admin id=555 view-as ts/crm นั้น
+2. ตรวจสอบทุก field ใน checklist จาก SOP
+3. แนบผลการตรวจสอบใน PR description
+
+Reference: `docs/view-as-parity-sop.md`
+
+---
+
 ## หมายเหตุ
 
 - API Documentation อยู่ที่หน้าแรกของเว็บ (ต้อง login ก่อน)
