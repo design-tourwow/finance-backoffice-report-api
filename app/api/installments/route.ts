@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { mysqlPool } from '@/lib/db'
 import { logApiRequest, checkRateLimit } from '@/lib/logger'
-import { authenticate } from '@/lib/auth'
+import { authenticate, requireRole } from '@/lib/auth'
 import { RowDataPacket, ResultSetHeader } from 'mysql2'
 
 // GET /api/installments - Get customer order installments
@@ -30,6 +30,9 @@ export async function GET(request: NextRequest) {
       { status: 401 }
     )
   }
+  const jwtPayload = auth.method === 'jwt' ? auth.user ?? null : null
+  const guard = requireRole(['admin'], request, jwtPayload)
+  if (!guard.ok) return guard.response
 
   try {
     const { searchParams } = new URL(request.url)
@@ -123,6 +126,9 @@ export async function POST(request: NextRequest) {
       { status: 401 }
     )
   }
+  const jwtPayload = auth.method === 'jwt' ? auth.user ?? null : null
+  const guard = requireRole(['admin'], request, jwtPayload)
+  if (!guard.ok) return guard.response
 
   try {
     const body = await request.json()
@@ -178,6 +184,9 @@ export async function PUT(request: NextRequest) {
       { status: 401 }
     )
   }
+  const jwtPayload = auth.method === 'jwt' ? auth.user ?? null : null
+  const guard = requireRole(['admin'], request, jwtPayload)
+  if (!guard.ok) return guard.response
 
   try {
     const body = await request.json()
@@ -230,6 +239,9 @@ export async function DELETE(request: NextRequest) {
       { status: 401 }
     )
   }
+  const jwtPayload = auth.method === 'jwt' ? auth.user ?? null : null
+  const guard = requireRole(['admin'], request, jwtPayload)
+  if (!guard.ok) return guard.response
 
   try {
     const { searchParams } = new URL(request.url)

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { mysqlPool, DB_NAMES, TABLE_PREFIXES } from '@/lib/db'
 import { logApiRequest, checkRateLimit } from '@/lib/logger'
-import { authenticate } from '@/lib/auth'
+import { authenticate, requireRole } from '@/lib/auth'
 import { RowDataPacket } from 'mysql2'
 
 // Database configurations
@@ -52,6 +52,12 @@ export async function GET(request: NextRequest) {
       { success: false, error: 'Unauthorized - ' + (auth.error || 'Invalid token or API key') },
       { status: 401 }
     )
+  }
+  const jwtPayload = auth.method === 'jwt' ? auth.user ?? null : null
+  const guard = requireRole(['admin'], request, jwtPayload)
+  if (!guard.ok) {
+    logApiRequest('GET', '/api/tables', 403, apiKey, 'Forbidden')
+    return guard.response
   }
 
   try {

@@ -517,7 +517,7 @@ function EndpointDetail({ endpoint }: any) {
               display: 'block',
               marginBottom: '0.5rem'
             }}>
-              Authorization: Bearer YOUR_API_KEY
+              x-api-key: YOUR_API_KEY
             </code>
             <div style={{
               fontSize: '0.6875rem',
@@ -744,27 +744,27 @@ export default function Home() {
 
 # 1. Default format (Thai full month + Buddhist Era full year)
 curl "${apiUrl}/api/reports/by-travel-date" \\
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "x-api-key: YOUR_API_KEY"
 # Returns: "th_full_be_full" format
 
 # 2. English short month + Christian Era short year (for charts)
 curl "${apiUrl}/api/reports/by-travel-date?date_format=en_short_ad_short" \\
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "x-api-key: YOUR_API_KEY"
 # Returns: "Jan 25"
 
 # 3. English full month + Buddhist Era full year
 curl "${apiUrl}/api/reports/by-travel-date?date_format=en_full_be_full" \\
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "x-api-key: YOUR_API_KEY"
 # Returns: "January 2568"
 
 # 4. Numeric MM/YYYY format (recommended for frontend)
 curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_month_year_full" \\
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "x-api-key: YOUR_API_KEY"
 # Returns: "01/2568"
 
 # 5. Numeric compact MM/YY format (for charts)
 curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_short" \\
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "x-api-key: YOUR_API_KEY"
 # Returns: "01/68"`,
       response: `{
   "formats": {
@@ -929,23 +929,23 @@ curl "${apiUrl}/api/reports/by-travel-date?date_format=numeric_short" \\
 
 # 1. Yearly aggregation
 curl "\${apiUrl}/api/reports/summary?period=yearly" \\
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "x-api-key: YOUR_API_KEY"
 
 # 2. Quarterly aggregation
 curl "\${apiUrl}/api/reports/summary?period=quarterly" \\
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "x-api-key: YOUR_API_KEY"
 
 # 3. Monthly aggregation (default)
 curl "\${apiUrl}/api/reports/summary?period=monthly" \\
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "x-api-key: YOUR_API_KEY"
 
 # 4. Weekly aggregation
 curl "\${apiUrl}/api/reports/summary?period=weekly" \\
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "x-api-key: YOUR_API_KEY"
 
 # 5. Daily aggregation
 curl "\${apiUrl}/api/reports/summary?period=daily" \\
-  -H "Authorization: Bearer YOUR_API_KEY"`,
+  -H "x-api-key: YOUR_API_KEY"`,
       response: `{
   "periods": {
     "long_term": {

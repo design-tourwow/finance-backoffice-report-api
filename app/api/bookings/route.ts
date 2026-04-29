@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authenticate } from '@/lib/auth'
+import { authenticate, requireRole } from '@/lib/auth'
 import pool from '@/lib/db'
 import { RowDataPacket } from 'mysql2'
 
@@ -12,6 +12,9 @@ export async function GET(request: NextRequest) {
       { status: 401 }
     )
   }
+  const jwtPayload = auth.method === 'jwt' ? auth.user ?? null : null
+  const guard = requireRole(['admin'], request, jwtPayload)
+  if (!guard.ok) return guard.response
 
   try {
     const searchParams = request.nextUrl.searchParams
@@ -60,6 +63,9 @@ export async function POST(request: NextRequest) {
       { status: 401 }
     )
   }
+  const jwtPayload = auth.method === 'jwt' ? auth.user ?? null : null
+  const guard = requireRole(['admin'], request, jwtPayload)
+  if (!guard.ok) return guard.response
   
   try {
     const body = await request.json()

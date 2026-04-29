@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { mysqlPool } from '@/lib/db'
-import { authenticate } from '@/lib/auth'
+import { withApiGuard } from '@/lib/api-guard'
 import { RowDataPacket } from 'mysql2'
 
 /**
@@ -211,15 +211,7 @@ function toISO(value: any): any {
   return value
 }
 
-export async function GET(request: NextRequest) {
-  const auth = authenticate(request)
-  if (!auth.authenticated) {
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized', message: auth.error ?? 'Invalid token' },
-      { status: 401 }
-    )
-  }
-
+export const GET = withApiGuard('/api/reports/order-external-summary', async (request) => {
   const { searchParams } = new URL(request.url)
   const { filters, error } = parseFilters(searchParams)
   if (error) {
@@ -253,4 +245,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+}, { roles: ['admin'] })

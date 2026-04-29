@@ -1,38 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { mysqlPool } from '@/lib/db'
-import { logApiRequest, checkRateLimit } from '@/lib/logger'
-import { authenticate } from '@/lib/auth'
+import { withApiGuard } from '@/lib/api-guard'
 import { RowDataPacket } from 'mysql2'
 import { formatDateLabel, isValidDateFormat, DateFormatType } from '@/lib/dateFormatter'
 
 // GET /api/reports/by-travel-start-date - รายงาน Orders แยกตามวันเริ่มเดินทาง (รายวัน)
-export async function GET(request: NextRequest) {
-  const apiKey = request.headers.get('x-api-key') || request.headers.get('authorization') || ''
-  const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
-  
-  const rateLimit = checkRateLimit(apiKey || clientIp, 100, 60000)
-  if (!rateLimit.allowed) {
-    logApiRequest('GET', '/api/reports/by-travel-start-date', 429, apiKey, 'Rate limit exceeded')
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Rate limit exceeded. Try again later.',
-        retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000)
-      },
-      { status: 429 }
-    )
-  }
-
-  // Authenticate using JWT or API Key
-  const auth = authenticate(request)
-  if (!auth.authenticated) {
-    logApiRequest('GET', '/api/reports/by-travel-start-date', 401, apiKey, auth.error || 'Authentication failed')
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized - ' + (auth.error || 'Invalid token or API key') },
-      { status: 401 }
-    )
-  }
-
+export const GET = withApiGuard('/api/reports/by-travel-start-date', async (request) => {
   try {
     const { searchParams } = new URL(request.url)
     const countryIdParam = searchParams.get('country_id')
@@ -112,16 +85,14 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    logApiRequest('GET', '/api/reports/by-travel-start-date', 200, apiKey)
     return NextResponse.json({
       success: true,
       data
     })
   } catch (error: any) {
-    logApiRequest('GET', '/api/reports/by-travel-start-date', 500, apiKey, error.message)
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }
     )
   }
-}
+}, { roles: ['admin'] })

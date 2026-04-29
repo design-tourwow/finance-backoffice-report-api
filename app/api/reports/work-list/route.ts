@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { mysqlPool } from '@/lib/db'
-import { logApiRequest, checkRateLimit } from '@/lib/logger'
-import { authenticate } from '@/lib/auth'
+import { withApiGuard } from '@/lib/api-guard'
 import { RowDataPacket } from 'mysql2'
 
 async function getAgencyDb(): Promise<string | null> {
@@ -35,22 +34,7 @@ function formatTravelPeriod(startRaw?: string | null, endRaw?: string | null) {
   return `${start} - ${end}`
 }
 
-export async function GET(request: NextRequest) {
-  const apiKey = request.headers.get('x-api-key') || request.headers.get('authorization') || ''
-  const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
-
-  const rateLimit = checkRateLimit(apiKey || clientIp, 100, 60000)
-  if (!rateLimit.allowed) {
-    logApiRequest('GET', '/api/reports/work-list', 429, apiKey, 'Rate limit exceeded')
-    return NextResponse.json({ success: false, error: 'Rate limit exceeded' }, { status: 429 })
-  }
-
-  const auth = authenticate(request)
-  if (!auth.authenticated) {
-    logApiRequest('GET', '/api/reports/work-list', 401, apiKey, 'Unauthorized')
-    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
-  }
-
+export const GET = withApiGuard('/api/reports/work-list', async (request) => {
   try {
     const { searchParams } = new URL(request.url)
     const roleGroup = searchParams.get('role_group') === 'finance' ? 'finance' : 'general'
@@ -138,7 +122,6 @@ export async function GET(request: NextRequest) {
       crm_nick_name: row.crm_nick_name || '-',
     }))
 
-    logApiRequest('GET', '/api/reports/work-list', 200, apiKey)
     return NextResponse.json({
       success: true,
       data: {
@@ -150,7 +133,6 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error: any) {
-    logApiRequest('GET', '/api/reports/work-list', 500, apiKey, error.message)
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })
   }
-}
+}, { roles: ['admin'] })
