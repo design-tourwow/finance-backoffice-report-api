@@ -61,16 +61,19 @@ export const GET = withApiGuard('/api/reports/commission-plus', async (request, 
   }
 
   // job_position / seller scoping.
-  // ts/crm: backend forces the filter — ignores frontend params entirely.
+  //
+  // ts/crm: backend forces the role gate (is_old_customer = 0/1 by
+  // job_position) but RETURNS ROLE-WIDE ROWS so the page-level ranking
+  // summary can show their position relative to peers. Frontend masks
+  // peer names client-side ("************") while keeping aggregate
+  // numbers visible. Frontend's `seller_id` param is ignored — the user
+  // cannot ask the backend to scope to anyone else's id.
+  //
   // admin (not impersonating): respects frontend params as before.
   if (effectiveRole === 'ts') {
     conditions.push(`o.is_old_customer = 0`)
-    conditions.push(`o.seller_agency_member_id = ?`)
-    params.push(effectiveUserId)
   } else if (effectiveRole === 'crm') {
     conditions.push(`o.is_old_customer = 1`)
-    conditions.push(`o.seller_agency_member_id = ?`)
-    params.push(effectiveUserId)
   } else {
     // admin
     if (jobPosition === 'ts') {
