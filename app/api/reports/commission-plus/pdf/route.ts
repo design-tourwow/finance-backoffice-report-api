@@ -91,5 +91,9 @@ export const POST = withApiGuard(
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })
   }
 },
-  { rateLimit: { max: 20, windowMs: 60_000 }, roles: ['admin'] }
+  // Allow ts/crm so the server-side PDF endpoint also works during view-as
+  // (effectiveRole becomes 'ts' or 'crm' for admin id=555 when impersonating).
+  // Currently the page renders PDF client-side via jsPDF, but this gate
+  // future-proofs any switch to server-side rendering.
+  { rateLimit: { max: 20, windowMs: 60_000 }, roles: ['admin', 'ts', 'crm'] }
 )
