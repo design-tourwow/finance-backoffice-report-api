@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { mysqlPool } from '@/lib/db'
-import { logApiRequest, checkRateLimit } from '@/lib/logger'
-import { authenticate } from '@/lib/auth'
+import { withApiGuard } from '@/lib/api-guard'
 import { RowDataPacket } from 'mysql2'
 
 // Discover which database contains v_6kMWFc_agcy_agency_members
@@ -17,22 +16,7 @@ async function getAgencyDb(): Promise<string | null> {
   }
 }
 
-export async function GET(request: NextRequest) {
-  const apiKey = request.headers.get('x-api-key') || request.headers.get('authorization') || ''
-  const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
-
-  const rateLimit = checkRateLimit(apiKey || clientIp, 100, 60000)
-  if (!rateLimit.allowed) {
-    logApiRequest('GET', '/api/reports/commission-plus', 429, apiKey, 'Rate limit exceeded')
-    return NextResponse.json({ success: false, error: 'Rate limit exceeded' }, { status: 429 })
-  }
-
-  const auth = authenticate(request)
-  if (!auth.authenticated) {
-    logApiRequest('GET', '/api/reports/commission-plus', 401, apiKey, 'Unauthorized')
-    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
-  }
-
+export const GET = withApiGuard('/api/reports/commission-plus', async (request, auth) => {
   const { searchParams } = new URL(request.url)
   const createdAtFrom = searchParams.get('created_at_from') || ''
   const createdAtTo   = searchParams.get('created_at_to')   || ''
@@ -41,6 +25,14 @@ export async function GET(request: NextRequest) {
   const jobPosition   = searchParams.get('job_position')    || 'admin'
   const sellerId      = searchParams.get('seller_id')       || ''
   const orderStatus   = searchParams.get('order_status')    || 'all'
+
+  // Effective identity from auth context — derived from JWT (and optionally
+  // view-as headers honored only for admin id=555). For ts/crm callers we
+  // ignore the frontend's job_position / seller_id params and force the
+  // filter to their own seller id, so a tampered request can't expose
+  // another seller's data.
+  const effectiveRole   = auth.effectiveRole
+  const effectiveUserId = auth.effectiveUserId
 
   // Discover agency DB for seller name lookup
   const agencyDb = await getAgencyDb()
@@ -68,16 +60,28 @@ export async function GET(request: NextRequest) {
     params.push(paidAtTo)
   }
 
-  // job_position → is_old_customer mapping
-  if (jobPosition === 'ts') {
+  // job_position / seller scoping.
+  // ts/crm: backend forces the filter — ignores frontend params entirely.
+  // admin (not impersonating): respects frontend params as before.
+  if (effectiveRole === 'ts') {
     conditions.push(`o.is_old_customer = 0`)
-  } else if (jobPosition === 'crm') {
-    conditions.push(`o.is_old_customer = 1`)
-  }
-
-  if (sellerId) {
     conditions.push(`o.seller_agency_member_id = ?`)
-    params.push(parseInt(sellerId, 10))
+    params.push(effectiveUserId)
+  } else if (effectiveRole === 'crm') {
+    conditions.push(`o.is_old_customer = 1`)
+    conditions.push(`o.seller_agency_member_id = ?`)
+    params.push(effectiveUserId)
+  } else {
+    // admin
+    if (jobPosition === 'ts') {
+      conditions.push(`o.is_old_customer = 0`)
+    } else if (jobPosition === 'crm') {
+      conditions.push(`o.is_old_customer = 1`)
+    }
+    if (sellerId) {
+      conditions.push(`o.seller_agency_member_id = ?`)
+      params.push(parseInt(sellerId, 10))
+    }
   }
 
   if (orderStatus === 'not_canceled') {
@@ -169,7 +173,6 @@ export async function GET(request: NextRequest) {
     const totalDiscount     = orders.reduce((s, r) => s + parseFloat(r.discount      || 0), 0)
     const totalNetCommission = totalCommission - totalDiscount
 
-    logApiRequest('GET', '/api/reports/commission-plus', 200, apiKey)
     return NextResponse.json({
       success: true,
       data: {
@@ -183,9 +186,12 @@ export async function GET(request: NextRequest) {
         },
         meta: { agency_db_found: !!agencyDb }
       }
+    }, {
+      // Per-user data — never let a shared cache (Vercel edge, browser back/fwd)
+      // serve one user's response to another.
+      headers: { 'Cache-Control': 'private, no-store' }
     })
   } catch (error: any) {
-    logApiRequest('GET', '/api/reports/commission-plus', 500, apiKey, error.message)
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })
   }
-}
+}, { roles: ['admin', 'ts', 'crm'] })

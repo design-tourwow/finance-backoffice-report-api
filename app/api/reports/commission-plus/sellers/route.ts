@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { mysqlPool } from '@/lib/db'
-import { logApiRequest, checkRateLimit } from '@/lib/logger'
-import { authenticate } from '@/lib/auth'
+import { withApiGuard } from '@/lib/api-guard'
 import { RowDataPacket } from 'mysql2'
 
 async function getAgencyDb(): Promise<string | null> {
@@ -16,21 +15,14 @@ async function getAgencyDb(): Promise<string | null> {
   }
 }
 
-export async function GET(request: NextRequest) {
-  const apiKey = request.headers.get('x-api-key') || request.headers.get('authorization') || ''
-  const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
-
-  const rateLimit = checkRateLimit(apiKey || clientIp, 100, 60000)
-  if (!rateLimit.allowed) {
-    return NextResponse.json({ success: false, error: 'Rate limit exceeded' }, { status: 429 })
-  }
-
-  const auth = authenticate(request)
-  if (!auth.authenticated) {
-    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
-  }
-
+export const GET = withApiGuard('/api/reports/commission-plus/sellers', async (request, auth) => {
   const agencyDb = await getAgencyDb()
+
+  // ts/crm only see themselves in the seller dropdown — admin sees the full list.
+  const sellerScopeClause = auth.effectiveRole === 'admin'
+    ? ''
+    : 'AND o.seller_agency_member_id = ?'
+  const queryParams: any[] = auth.effectiveRole === 'admin' ? [] : [auth.effectiveUserId]
 
   let query: string
   if (agencyDb) {
@@ -45,6 +37,7 @@ export async function GET(request: NextRequest) {
       FROM v_Xqc7k7_orders o
       LEFT JOIN ${amTable} am ON am.id = o.seller_agency_member_id
       WHERE o.seller_agency_member_id IS NOT NULL
+        ${sellerScopeClause}
       ORDER BY nick_name ASC
     `
   } else {
@@ -58,16 +51,18 @@ export async function GET(request: NextRequest) {
         '' AS job_position
       FROM v_Xqc7k7_orders o
       WHERE o.seller_agency_member_id IS NOT NULL
+        ${sellerScopeClause}
       ORDER BY o.seller_agency_member_id ASC
     `
   }
 
   try {
-    const [rows] = await mysqlPool.execute<RowDataPacket[]>(query)
-    logApiRequest('GET', '/api/reports/commission-plus/sellers', 200, apiKey)
-    return NextResponse.json({ success: true, data: rows })
+    const [rows] = await mysqlPool.execute<RowDataPacket[]>(query, queryParams)
+    return NextResponse.json(
+      { success: true, data: rows },
+      { headers: { 'Cache-Control': 'private, no-store' } }
+    )
   } catch (error: any) {
-    logApiRequest('GET', '/api/reports/commission-plus/sellers', 500, apiKey, error.message)
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })
   }
-}
+}, { roles: ['admin', 'ts', 'crm'] })
