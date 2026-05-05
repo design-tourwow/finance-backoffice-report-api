@@ -36,8 +36,10 @@ status: open
 
 Per `ROLE_ACCESS` in `menu-component.js` lines 34–72, ts/crm have `false` for:
 `/tour-image-manager`, `/sales-by-country`, `/wholesale-destinations`, `/sales-report`,
-`/canceled-orders`, `/work-list`, `/supplier-commission`, `/discount-sales`,
+`/work-list`, `/supplier-commission`, `/discount-sales`,
 `/order-external-summary`, `/request-discount`, `/order-report`, `/repeated-customer-report`.
+
+`/canceled-orders` was admin-only in v1.0 but opened to ts/crm 2026-05-05 — it now renders for all three roles with the same client-side scoping pattern as `/sales-report-by-seller` (ตำแหน่ง / เซลล์ผู้จอง dropdowns disabled and locked to the user's own seller, seller summary section admin-only).
 
 `initMenuComponent()` calls `canAccessPath(getCurrentPath())` on load, redirecting to `/403` for any of the above. During view-as-ts the same guard runs because `getCurrentUserRole()` returns `'ts'` (from sessionStorage, not the JWT).
 
@@ -758,9 +760,10 @@ Each item: check (A) real ts/<user> vs (B) admin view-as-ts/<user> must produce 
 | # | Scenario | Expected result | Status |
 |---|----------|-----------------|--------|
 | 7.21 | Admin view-as-ts navigates to `/sales-report` | Redirected to `/403` | PASS |
-| 7.22 | Admin view-as-ts navigates to `/canceled-orders` | Redirected to `/403` | PASS |
+| 7.22 | Admin view-as-ts navigates to `/canceled-orders` | ~~Redirected to `/403`~~ → **Renders page** (access opened 2026-05-05) | PASS — re-verify after access change |
 | 7.23 | Admin view-as-ts navigates to `/dashboard` | Renders dashboard | PASS |
 | 7.24 | Admin view-as-ts navigates to `/sales-report-by-seller` | Renders page | PASS |
+| 7.25 | Admin view-as-crm navigates to `/canceled-orders` | Renders page (access opened 2026-05-05) | PASS — re-verify after access change |
 
 ---
 

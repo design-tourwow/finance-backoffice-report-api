@@ -409,3 +409,43 @@ Still 0 incidents. The metric measures *another role's* data leaking — e.g., a
 If the CRM team grows large enough that members no longer want full peer visibility, the change is purely frontend: flip `shouldMask = !isSelf && myRole === 'ts'` to `shouldMask = !isSelf && (myRole === 'ts' || myRole === 'crm')` in `sales-report-by-seller.js#buildGroupTable`. No backend or PRD-structure change needed.
 
 _End of PRD v1.2 — Addendum A added 2026-05-05 alongside the CRM ranking visibility shift._
+
+---
+
+## Addendum B — `/canceled-orders` Access Expansion (v1.3, 2026-05-05)
+
+### Background
+
+`/canceled-orders` was admin-only in the original Phase 1/2 access matrix (`ROLE_ACCESS` table in `menu-component.js`). The CRM operations lead requested visibility into their team's canceled bookings for follow-up workflow purposes; the same ask came from Telesales for self-audit.
+
+### Decision
+
+Open `/canceled-orders` to `ts` and `crm` roles. The page reuses the exact same client-side scoping pattern that `/sales-report-by-seller` already uses:
+
+| Element | Admin | ts / crm |
+|---|---|---|
+| Menu visibility | ✅ | ✅ (added 2026-05-05) |
+| ตำแหน่ง dropdown | Active picker (ts/crm/admin) | Disabled button locked to own role + nickname |
+| เซลล์ผู้จอง dropdown | Searchable picker | Disabled button locked to own seller id + nickname |
+| Seller summary section (Telesales + CRM ranking) | Removed 2026-05-05 — page no longer renders it for any role | Removed 2026-05-05 (was hidden anyway) |
+| KPI / main table | Full team data via commission-plus | Own-seller scope (frontend filter `seller_agency_member_id === effectiveUserId`) |
+| Export PDF / CSV | Own-data-only (matches table) | Own-data-only |
+
+The seller summary section was dropped from `/canceled-orders` in the same edit pass. This page is for canceled-order audit/follow-up workflows, not for ranking analytics — the section was admin-only, never used in practice on this page, and keeping it would have forced us to re-implement the trophies-vs-numbering / CRM-team-suffix logic from `/sales-report-by-seller` for a redundant use case.
+
+The backend `commission-plus` route already accepts `['admin', 'ts', 'crm']` (set during the Phase 2 PDF revision documented in test-strategy TC-20), so no backend RBAC change was needed — only the frontend `ROLE_ACCESS` flip.
+
+### Boundary cases
+
+- **PDF export endpoint** (`/api/reports/commission-plus/pdf`) — already roles `['admin', 'ts', 'crm']`. Same scoping rules apply: ts/crm get role-wide rows back, frontend renders own-data-only.
+- **Other admin-only pages** (`/sales-report`, `/work-list`, etc.) remain admin-only — this addendum is scoped strictly to `/canceled-orders`.
+
+### Implication for view-as parity verification
+
+`/canceled-orders` is now subject to the SOP in `view-as-parity-sop.md` Section 2a. Any future change to that page must include a field-by-field parity verification between real ts/crm sessions and admin id=555 viewing-as. The parity audit doc (`test/qa/view-as-fidelity-audit.md`) test 7.22 was updated from "redirected to /403" → "renders page" to reflect the new expected behavior.
+
+### Implication for Story 1.2
+
+Story 1.2 ("ts/crm blocked from admin-only endpoints") is unaffected. `/canceled-orders` is no longer "admin-only", so it is no longer in the set of endpoints Story 1.2 polices. The success metric "ts/crm users receiving another seller's rows from the API" still holds: the frontend's `seller_agency_member_id === effectiveUserId` scoping on `/canceled-orders` mirrors `/sales-report-by-seller`'s behavior — peer rows arrive in the API response (role-wide, by design — see Section 7) but never reach the user's screen for the main table or KPI cards.
+
+_End of PRD v1.3 — Addendum B added 2026-05-05 alongside the /canceled-orders access expansion._

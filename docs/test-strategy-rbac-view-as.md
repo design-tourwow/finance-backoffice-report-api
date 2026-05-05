@@ -281,7 +281,7 @@ test/qa/view-as-field-parity-audit.md
 
 ### Regression gate for future changes
 
-Any PR that touches `/sales-report-by-seller`, `/dashboard`, shared components (`menu-component.js`, `shared-http.js`, `lib/auth.ts`, `lib/api-guard.ts`), or any API endpoint accessible to ts/crm **must** include a completed parity table (see SOP). The PR is not mergeable until all rows show PASS or an intentional difference is explicitly approved.
+Any PR that touches `/sales-report-by-seller`, `/dashboard`, `/canceled-orders` (added to ts/crm scope 2026-05-05), shared components (`menu-component.js`, `shared-http.js`, `lib/auth.ts`, `lib/api-guard.ts`), or any API endpoint accessible to ts/crm **must** include a completed parity table (see SOP). The PR is not mergeable until all rows show PASS or an intentional difference is explicitly approved.
 
 ---
 

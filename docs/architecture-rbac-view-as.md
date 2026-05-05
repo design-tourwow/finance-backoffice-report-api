@@ -718,6 +718,8 @@ Three additions:
 
 No change to `ROLE_ACCESS` table itself — menu visibility is determined by the **real** role, not the view-as role. Admin always sees the full menu.
 
+> **2026-05-05 update:** `ROLE_ACCESS` for `/canceled-orders` changed from `false → true` for both `ts` and `crm`. The page reuses the same admin-vs-non-admin client-side scoping pattern that `/sales-report-by-seller` already uses (disabled ตำแหน่ง / เซลล์ผู้จอง dropdowns locked to the user's own seller; main table / KPI scoped via `seller_agency_member_id === effectiveUserId`). The seller summary section was removed entirely from `/canceled-orders` in the same edit — this page does not need ranking analytics, and removing it eliminates the trophies-vs-numbering / mask-or-not branch logic that would otherwise have to be re-implemented here. Backend `commission-plus` already accepted `['admin','ts','crm']`, so no API guard change was required. See PRD Addendum B for the full decision record.
+
 ### 8d. `token-utils.js` (frontend)
 
 No structural changes required. May add helper methods:

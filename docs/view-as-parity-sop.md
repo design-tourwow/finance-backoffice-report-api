@@ -35,6 +35,7 @@ This SOP is **mandatory** for any change that touches any of the following:
 Currently:
 - `/dashboard`
 - `/sales-report-by-seller`
+- `/canceled-orders` (added 2026-05-05; view-as parity verification mandatory before merging any future change to this page)
 
 Any new page granted to ts or crm automatically becomes subject to this SOP from the moment the `ROLE_ACCESS` entry is added in `menu-component.js`.
 
