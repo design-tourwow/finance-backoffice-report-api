@@ -18,13 +18,15 @@ async function getAgencyDb(): Promise<string | null> {
 
 export const GET = withApiGuard('/api/reports/commission-plus', async (request, auth) => {
   const { searchParams } = new URL(request.url)
-  const createdAtFrom = searchParams.get('created_at_from') || ''
-  const createdAtTo   = searchParams.get('created_at_to')   || ''
-  const paidAtFrom    = searchParams.get('paid_at_from')    || ''
-  const paidAtTo      = searchParams.get('paid_at_to')      || ''
-  const jobPosition   = searchParams.get('job_position')    || 'admin'
-  const sellerId      = searchParams.get('seller_id')       || ''
-  const orderStatus   = searchParams.get('order_status')    || 'all'
+  const createdAtFrom  = searchParams.get('created_at_from')  || ''
+  const createdAtTo    = searchParams.get('created_at_to')    || ''
+  const paidAtFrom     = searchParams.get('paid_at_from')     || ''
+  const paidAtTo       = searchParams.get('paid_at_to')       || ''
+  const canceledAtFrom = searchParams.get('canceled_at_from') || ''
+  const canceledAtTo   = searchParams.get('canceled_at_to')   || ''
+  const jobPosition    = searchParams.get('job_position')     || 'admin'
+  const sellerId       = searchParams.get('seller_id')        || ''
+  const orderStatus    = searchParams.get('order_status')     || 'all'
 
   // Effective identity from auth context — derived from JWT (and optionally
   // view-as headers honored only for admin id=555). For ts/crm callers we
@@ -58,6 +60,18 @@ export const GET = withApiGuard('/api/reports/commission-plus', async (request, 
   if (paidAtTo) {
     conditions.push(`DATE(CONVERT_TZ(p.paid_at, '+00:00', '+07:00')) <= ?`)
     params.push(paidAtTo)
+  }
+
+  // canceled_at filter — used by /canceled-orders to scope to a specific
+  // cancellation period. Other pages (sales-report, sales-report-by-seller)
+  // simply omit these params, so this is a no-op for them.
+  if (canceledAtFrom) {
+    conditions.push(`DATE(CONVERT_TZ(o.canceled_at, '+00:00', '+07:00')) >= ?`)
+    params.push(canceledAtFrom)
+  }
+  if (canceledAtTo) {
+    conditions.push(`DATE(CONVERT_TZ(o.canceled_at, '+00:00', '+07:00')) <= ?`)
+    params.push(canceledAtTo)
   }
 
   // job_position / seller scoping.
