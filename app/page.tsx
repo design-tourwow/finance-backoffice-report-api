@@ -2658,7 +2658,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
       id: 'GET-/api/reports/by-country',
       method: 'GET',
       path: '/api/reports/by-country',
-      description: 'รายงานยอดขายแยกตามประเทศปลายทาง (จำนวน orders, ลูกค้า, ยอดรวม)',
+      description: 'รายงานยอดจองแยกตามประเทศปลายทาง (จำนวน orders, ลูกค้า, ยอดรวม)',
       category: 'MySQL Database',
       subCategory: 'reports',
       requiresAuth: true,
@@ -2703,7 +2703,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
       id: 'GET-/api/reports/by-supplier',
       method: 'GET',
       path: '/api/reports/by-supplier',
-      description: 'รายงานยอดขายแยกตาม Supplier/Wholesale (จำนวน orders, ลูกค้า, ยอดรวม)',
+      description: 'รายงานยอดจองแยกตาม Supplier/Wholesale (จำนวน orders, ลูกค้า, ยอดรวม)',
       category: 'MySQL Database',
       subCategory: 'reports',
       requiresAuth: true,
@@ -2806,7 +2806,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
       id: 'GET-/api/reports/wholesale-by-country',
       method: 'GET',
       path: '/api/reports/wholesale-by-country',
-      description: 'ตาราง Pivot — Wholesale x ประเทศ รองรับ 4 modes: sales (ยอดขาย), travelers (จำนวนคน), orders (จำนวนออเดอร์), net_commission (ค่าคอมสุทธิ)',
+      description: 'ตาราง Pivot — Wholesale x ประเทศ รองรับ 4 modes: sales (ยอดจอง), travelers (จำนวนคน), orders (จำนวนออเดอร์), net_commission (ค่าคอมสุทธิ)',
       category: 'MySQL Database',
       subCategory: 'reports',
       requiresAuth: true,
@@ -2855,7 +2855,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
       id: 'GET-/api/reports/by-travel-start-date',
       method: 'GET',
       path: '/api/reports/by-travel-start-date',
-      description: 'รายงานยอดขายรายวัน แยกตามวันเดินทาง (travel start date)',
+      description: 'รายงานยอดจองรายวัน แยกตามวันเดินทาง (travel start date)',
       category: 'MySQL Database',
       subCategory: 'reports',
       requiresAuth: true,
@@ -2893,7 +2893,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
       id: 'GET-/api/reports/by-created-date',
       method: 'GET',
       path: '/api/reports/by-created-date',
-      description: 'รายงานยอดขายรายวัน แยกตามวันจอง (created_at / booking date)',
+      description: 'รายงานยอดจองรายวัน แยกตามวันจอง (created_at / booking date)',
       category: 'MySQL Database',
       subCategory: 'reports',
       requiresAuth: true,
@@ -4090,7 +4090,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                     <span style={{ display: 'inline-block', padding: '0.25rem 0.75rem', background: '#f3f4f6', color: '#374151', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600' }}>PAGE</span>
                   </div>
                   <h1 style={{ margin: '0 0 0.25rem', fontSize: '1.5rem', fontWeight: '700', color: '#111827' }}>/sales-by-country.html</h1>
-                  <p style={{ margin: '0 0 2rem', color: '#6b7280', fontSize: '0.875rem' }}>รายงานยอดขายตามประเทศ - KPI Cards, ตารางประเทศ, ตาราง Supplier</p>
+                  <p style={{ margin: '0 0 2rem', color: '#6b7280', fontSize: '0.875rem' }}>รายงานยอดจองตามประเทศ - KPI Cards, ตารางประเทศ, ตาราง Supplier</p>
 
                   <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem' }}>
                     <div style={{ padding: '1rem 1.5rem', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', fontWeight: '600', fontSize: '0.875rem', color: '#374151' }}>API Endpoints ที่ใช้</div>
@@ -4193,7 +4193,7 @@ curl "${apiUrl}/api/tables/locations/countries?order_by=name_th&limit=20" \\
                           ['booking_date_to', 'วันจองสิ้นสุด (YYYY-MM-DD)'],
                           ['supplier_id', 'ID Wholesale (comma-separated)'],
                           ['country_id', 'ID ประเทศ (comma-separated)'],
-                          ['view_mode', 'sales (ยอดขาย), travelers (จำนวนคน), orders (จำนวนออเดอร์), net_commission (ค่าคอมสุทธิ = supplier_commission - discount)'],
+                          ['view_mode', 'sales (ยอดจอง), travelers (จำนวนคน), orders (จำนวนออเดอร์), net_commission (ค่าคอมสุทธิ = supplier_commission - discount)'],
                         ].map(([param, desc], idx) => (
                           <tr key={idx} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
                             <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f3f4f6', fontFamily: 'Monaco, Consolas, monospace', color: '#374151', fontWeight: '500' }}>{param}</td>

@@ -154,7 +154,7 @@ const adminCards = isAdmin() ? `
   ${discountCard}` : discountCard;
 ```
 
-**Expected (real ts):** 2 cards — "ยอดขายรวม" + "ส่วนลดรวม".
+**Expected (real ts):** 2 cards — "ยอดจองรวม" + "ส่วนลดรวม".
 **Expected (admin view-as-ts):** Same 2 cards.
 **Actual (if BUG-VA-01 active):** 4 cards — admin sees the extra commission cards. ts user never sees these.
 
@@ -727,7 +727,7 @@ Each item: check (A) real ts/<user> vs (B) admin view-as-ts/<user> must produce 
 | 7.03 | Status dropdown default | `.filter-sort-btn-text` text | Both: "ไม่ยกเลิก" | FAIL (secondary of BUG-VA-01) |
 | 7.04 | Excel button | `#crp-btn-export` present in DOM | Both: absent (null) | FAIL (BUG-VA-01) |
 | 7.05 | PDF button | `#crp-btn-pdf` present in DOM | Both: present | PASS |
-| 7.06 | KPI card count | Number of `.dashboard-kpi-card` elements | Both: 2 (ยอดขาย + ส่วนลด) | FAIL (BUG-VA-01) |
+| 7.06 | KPI card count | Number of `.dashboard-kpi-card` elements | Both: 2 (ยอดจอง + ส่วนลด) | FAIL (BUG-VA-01) |
 | 7.07 | Ranking section | `#crp-summary` or `.crp-seller-summary` present | ts: 1 group (Telesales); crm: absent | FAIL (BUG-VA-01) |
 | 7.08 | Table row count | Count of `tbody tr` elements | Both: same count | PASS (backend filters correctly) |
 | 7.09 | Seller column values | Distinct `td:first-child` texts in tbody | Both: only own nick name | PASS (backend filters correctly) |

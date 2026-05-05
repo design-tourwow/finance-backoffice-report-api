@@ -67,7 +67,7 @@ The `sellers` list comes from `/api/reports/commission-plus/sellers`. For ts/crm
 
 | Card | (A) Real ts | (B) Admin view-as ts/N | Conditional | Match? |
 |---|---|---|---|---|
-| ยอดขายรวม (total_net_amount) | sum of ปุ่ย's own orders | same | `currentOwnSummary` derived from `ownOrders` (filtered to `myId = getEffectiveUserId()`) | PASS |
+| ยอดจองรวม (total_net_amount) | sum of ปุ่ย's own orders | same | `currentOwnSummary` derived from `ownOrders` (filtered to `myId = getEffectiveUserId()`) | PASS |
 | Orders count (sub-text) | count of own orders | same | same derivation | PASS |
 | ส่วนลดรวม (total_discount) | sum of own orders | same | same | PASS |
 | คอมรวม card | ABSENT — only shown for `isAdmin()` | ABSENT — `isAdmin()` returns false via `getEffectiveRole()` | `isAdmin()` → `getEffectiveRole()` → `MenuComponent.isImpersonating()` | PASS |
@@ -111,7 +111,7 @@ Both (A) and (B) hit `myRole === 'ts'` because `myRole = getEffectiveRole()`. PA
 | Rank (1, 2, 3…) | real number | same | real number | same |
 | เซลล์ (seller name) | ปุ่ย (real name) | ปุ่ย (real name) | `******` (masked) | `******` (masked) |
 | ออเดอร์ | real count | same | real count | same |
-| ยอดขาย | real total | same | real total | same |
+| ยอดจอง | real total | same | real total | same |
 | ส่วนลด | real total | same | real total | same |
 | คอมสุทธิ | real total | same | real total | same |
 
@@ -139,7 +139,7 @@ const isSelf = isAdmin() || (s.seller_id && s.seller_id === myId);
 | ลูกค้า | own orders | same | PASS |
 | ประเทศ | own orders | same | PASS |
 | เดินทาง | own orders | same | PASS |
-| ยอดขาย | own orders | same | PASS |
+| ยอดจอง | own orders | same | PASS |
 | ผู้เดินทาง | own orders | same | PASS |
 | วันชำระงวด 1 | own orders | same | PASS |
 | คอมรวม | own orders | same | PASS |
@@ -207,7 +207,7 @@ This returns the label from `getEffectiveNickName()` which reads `sessionStorage
 
 | Field | (A) Real ts | (B) Admin view-as ts/N | Match? |
 |---|---|---|---|
-| ยอดขายรวม in footer | sum of own orders | same — `currentOwnSummary.total_net_amount` | PASS |
+| ยอดจองรวม in footer | sum of own orders | same — `currentOwnSummary.total_net_amount` | PASS |
 | คอมรวม in footer | sum of own orders | same | PASS |
 | คอม (หักส่วนลด) in footer | from own orders | same | PASS |
 | ส่วนลดรวม in footer | from own orders | same | PASS |
@@ -335,14 +335,14 @@ Changed `querySelector('td[colspan="4"]')` to `querySelector('td[colspan="6"]')`
 | 7 | Filter | ชื่อผู้จอง disabled + label | PASS | — |
 | 8 | Filter | สถานะ Order | PASS | — |
 | 9 | Filter | Reset restores to own seller | PASS | — |
-| 10 | KPI | ยอดขายรวม (own-orders scope) | PASS | — |
+| 10 | KPI | ยอดจองรวม (own-orders scope) | PASS | — |
 | 11 | KPI | ส่วนลดรวม | PASS | — |
 | 12 | KPI | คอมรวม / คอม(หักส่วนลด) hidden for ts | PASS | — |
 | 13 | Ranking | Telesales group visible for ts | PASS | — |
 | 14 | Ranking | CRM group hidden for ts | PASS | — |
 | 15 | Ranking | Own-row real name shown | PASS | — |
 | 16 | Ranking | Peer rows masked `******` | PASS | — |
-| 17 | Ranking | Numeric cols (orders/ยอดขาย/ส่วนลด/คอม) visible | PASS | — |
+| 17 | Ranking | Numeric cols (orders/ยอดจอง/ส่วนลด/คอม) visible | PASS | — |
 | 18 | Main table | Scoped to own orders only | PASS | — |
 | 19 | Main table | All 12 columns present | PASS | — |
 | 20 | Search | Scoped to own rows | PASS | — |

@@ -358,7 +358,7 @@ curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/count
 
 | view_mode | ค่าที่คำนวณ | สูตร |
 |---|---|---|
-| `sales` | ยอดขายรวม | `SUM(net_amount)` |
+| `sales` | ยอดจองรวม | `SUM(net_amount)` |
 | `travelers` | จำนวนผู้เดินทาง | `SUM(traveler_count)` จาก order_items |
 | `orders` | จำนวนออเดอร์ | `COUNT(DISTINCT order_id)` |
 | `net_commission` | ค่าคอมสุทธิ | `SUM(COALESCE(supplier_commission, 0) - COALESCE(discount, 0))` |
@@ -374,7 +374,7 @@ curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/count
 curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/wholesale-by-country?view_mode=net_commission" \
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
 
-# ดูยอดขาย (default)
+# ดูยอดจอง (default)
 curl "https://staging-finance-backoffice-report-api.vercel.app/api/reports/wholesale-by-country?view_mode=sales" \
   -H "x-api-key: sk_test_4f8b2c9e1a3d5f7b9c0e2a4d6f8b1c3e"
 ```

@@ -15,7 +15,7 @@
 
 ## Frontend Pages & API Mapping
 
-### 1. `/sales-by-country.html` - รายงานยอดขายตามประเทศ
+### 1. `/sales-by-country.html` - รายงานยอดจองตามประเทศ
 
 | API Endpoint | ใช้ทำอะไร |
 |---|---|

@@ -105,7 +105,7 @@ View-as session browser: [browser + tab description — DIFFERENT tab or incogni
 │ เริ่มใหม่ button — resets to         │ own seller (N)       │ own seller (N)       │          │
 ├──────────────────────────────────────┼──────────────────────┼──────────────────────┼──────────┤
 │ KPI CARDS                            │                      │                      │          │
-│ ยอดขายรวม (total_net_amount)         │                      │                      │          │
+│ ยอดจองรวม (total_net_amount)         │                      │                      │          │
 │ ส่วนลดรวม (total_discount)           │                      │                      │          │
 │ Orders count sub-text                │                      │                      │          │
 │ คอมรวม card — visibility             │ ABSENT (ts)          │ ABSENT (ts)          │          │
