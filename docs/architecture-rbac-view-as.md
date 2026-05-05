@@ -160,7 +160,7 @@ route handler (commission-plus — roles: ['admin','ts','crm']):
                                 'X-Effective-Role': 'ts' } }
 ```
 
-**Why role-wide rows?** The page-level ranking summary needs all peers in the role to compute relative rankings. The frontend filters `ownOrders = orders.filter(o => String(o.seller_agency_member_id) === myId)` for KPI cards and the main data table, while the ranking section shows all rows but masks peer seller names as `'******'`. This design was finalized during implementation; the original spec described per-user SQL scoping which was revised. See Section 7 for details.
+**Why role-wide rows?** The page-level ranking summary needs all peers in the role to compute relative rankings. The frontend filters `ownOrders = orders.filter(o => String(o.seller_agency_member_id) === myId)` for KPI cards and the main data table, while the ranking section shows all rows. Peer-name masking is **role-asymmetric** as of 2026-05-05: ts users see peer names as `'******'`, crm users see all team names unmasked (full team visibility per business rule). This design was finalized during implementation; the original spec described per-user SQL scoping which was revised. See Section 7 + Section 7a for details.
 
 ### 3c. Non-admin attempting view-as (blocked)
 
@@ -595,13 +595,15 @@ The original spec described per-user SQL scoping (`seller_agency_member_id = eff
 - The `seller_agency_member_id = effectiveUserId` clause is **NOT applied** for ts/crm effective roles.
 - The backend returns **all rows** for the effective role group.
 - The frontend applies own-row filtering client-side for KPI cards and the main data table.
-- Peer seller names are masked client-side (`'******'`); peer numeric values (orders, sales, commission) remain visible for ranking.
+- Peer-name masking is **role-asymmetric** as of 2026-05-05 (see Section 7a):
+  - **ts** viewing the Telesales group: peer names masked (`'******'`), peer numbers visible.
+  - **crm** viewing the CRM group: peer names **not** masked, full team visibility.
 
 ### Why role-wide rows?
 
 The ranking summary section must show a seller's position relative to all peers in their role group. If the API scoped to own rows only, the ranking would show a single row (rank 1 of 1), which is meaningless. Returning role-wide rows gives the frontend enough data to compute rankings while the frontend enforces data isolation for non-ranking elements.
 
-**Security note:** `seller_nick_name` for peer rows is masked by the frontend, not the backend. The raw API response contains peer names. This is acceptable because: (a) the API endpoint is authenticated and role-gated; (b) peers within the same role group (all ts, or all crm) have no confidentiality expectation toward each other within the company context; (c) the masking is a UX courtesy, not a security boundary.
+**Security note:** `seller_nick_name` for peer rows is masked by the frontend (for ts only — see Section 7a), not the backend. The raw API response contains peer names. This is acceptable because: (a) the API endpoint is authenticated and role-gated; (b) peers within the same role group (all ts, or all crm) have no confidentiality expectation toward each other within the company context; (c) the masking is a UX courtesy, not a security boundary.
 
 ### Column references
 
@@ -621,22 +623,70 @@ The ranking summary section must show a seller's position relative to all peers 
 
 ### Frontend client-side filtering
 
-After receiving role-wide rows, `sales-report-by-seller.js` applies:
+After receiving role-wide rows, `sales-report-by-seller.js` applies (in this order):
 
 ```js
+// 1. Drop 0-traveler orders so KPI / ranking / table / export agree (2026-05-05).
+const orders = rawOrders.filter(o => parseFloat(o.room_quantity || 0) > 0);
+
+// 2. Own-row scoping for KPI / table / exports.
 const myId = getEffectiveUserId();  // sessionStorage.viewAsUserId or currentUser.id
 const ownOrders = isAdmin()
   ? orders
   : orders.filter(o => String(o.seller_agency_member_id || '') === myId);
+
+// 3. Always derive summary from the (filtered) orders — admin used to use the
+//    backend's pre-filter `summary` blob, but that over-counts once the
+//    room_quantity filter lands. Single source of truth post-filter.
+const ownSummary = computeSummary(ownOrders);
 ```
 
-`ownOrders` feeds: KPI cards, main data table, search, row count, PDF export, Excel export.
+`ownOrders` + `ownSummary` feed: KPI cards, main data table, search, row count, PDF export, Excel export.
 
-The full `orders` array feeds: ranking summary builder (`buildSellerAggregate`), which masks peer names but shows peer numbers.
+The full `orders` array feeds: ranking summary builder (`buildSellerAggregate`), which renders per-role visibility rules — see Section 7a.
 
 ### Cache-Control
 
 Every commission-plus response carries `Cache-Control: private, no-store`. This prevents Vercel edge cache or browser back/forward cache from serving one user's role-scoped response to another user.
+
+---
+
+## 7a. Ranking Summary Visibility Matrix (revised 2026-05-05)
+
+The original Phase 2 spec assumed both `ts` and `crm` had the same data-isolation rules. Production has since diverged. CRM is a smaller, collaborative team where ranking-with-real-names is desired, while Telesales remains a larger competitive group where peer redaction is the norm. The current behavior, all driven by the frontend (no backend change):
+
+| Effective Role | Telesales group | CRM group |
+|---|---|---|
+| `admin` (real or any non-555 admin) | Visible. Trophies (gold/silver/bronze) on top 3. Title `Telesales`. All names unmasked. | Visible. **Trophies on top 3 (matches Telesales for visual parity).** Title `CRM`. All names unmasked. |
+| `admin` impersonating ts/N | Same as a real ts user — see below. | Hidden. |
+| `admin` impersonating crm/N | Hidden. | Same as a real crm user — see below. |
+| `ts` (real user) | Visible. Trophies on top 3. Own row unmasked + highlighted. **Peer names masked → `'******'`**, peer numbers visible. | Hidden. |
+| `crm` (real user) | Hidden. | Visible. **Plain rank numbers (no trophies).** Title shows `CRM ทีม X` where X is the viewer's own `seller_team_number`. **All team members shown unmasked** (no `'******'`). |
+
+### Decision logic in `buildGroupTable`
+
+```js
+// Trophies everywhere EXCEPT when a CRM user views their own CRM group.
+const useTrophies = !(myRole === 'crm' && groupClass === 'crm');
+
+// Append "ทีม X" suffix only for crm-viewing-crm.
+const titleSuffix = (myRole === 'crm' && groupClass === 'crm' && myTeamNumber)
+  ? ` ทีม ${myTeamNumber}`
+  : '';
+
+// Mask peer names only when ts views Telesales — admin and crm never mask.
+const shouldMask = !isSelf && myRole === 'ts';
+```
+
+### `seller_team_number` source
+
+Backend `commission-plus` exposes `COALESCE(am.team_number, 0) AS seller_team_number` per row (added 2026-05-05). The frontend resolves the *viewer's* team number by scanning `orders` for the first row where `seller_agency_member_id === myId`, using that order's `seller_team_number`. Falls back to no suffix when the user has no orders in the current period (rare; renders plain `CRM` title). The field is intentionally not displayed per-row — only one team number per CRM viewer is needed for the title.
+
+### Layout note
+
+When only one group renders (ts or crm viewing alone), the box is locked at `flex: 0 1 calc(50% - 8px)` with `min-width: 300px` so it occupies ~half the row aligned-left — the same visual width as the admin's side-by-side pair. Prevents the lone box from stretching to full width and re-flowing the page when role changes.
+
+---
 
 ### commission-plus/sellers filter (unchanged from spec)
 

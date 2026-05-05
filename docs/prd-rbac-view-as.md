@@ -44,7 +44,7 @@ This initiative closes both gaps in three coordinated phases, and adds a control
 | **Admin** | Full-access internal operator. Any admin except id=555. | All endpoints accessible. No view-as capability. |
 | **Admin id=555** | Designated QA/testing admin. Same full access as any admin, plus view-as capability. | Can switch to view-as TS or CRM user; persistent banner; can exit at any time. |
 | **ts (Sales)** | Salesperson. Sees only their own booking/sales data. | Blocked from admin-only endpoints (403). On `sales-report-by-seller`, sees only own rows. |
-| **crm** | CRM operator. Same data isolation rules as `ts`. | Blocked from admin-only endpoints (403). On `sales-report-by-seller`, sees only own rows. |
+| **crm** | CRM operator. Endpoint access rules match `ts`; ranking-summary visibility rules diverged in 2026-05-05 (see Addendum A). | Blocked from admin-only endpoints (403). On `sales-report-by-seller`, sees own rows in the main table; sees the **CRM team ranking unmasked** with title `CRM ทีม X` (X = own team_number). |
 
 ---
 
@@ -102,10 +102,12 @@ Acceptance Criteria:
 **Story 2.1 — ts/crm see only their own data on sales-report-by-seller**  
 _As a ts or crm user, the sales-report-by-seller endpoint returns only rows belonging to me, regardless of what query parameters I send._
 
+> **⚠️ Production deviation (commit `b534c2f`, 2026-04-30):** Backend now returns role-wide rows (all `ts` rows for ts users, all `crm` rows for crm users) so the ranking summary can show relative position. Per-row data isolation for KPI / table / exports is enforced by the frontend via `seller_agency_member_id === effectiveUserId` filtering. See Addendum A and architecture-rbac-view-as Section 7 for the full decision record.
+
 Acceptance Criteria:
-- The SQL query includes a `WHERE seller_id = <authenticated user id>` clause (or equivalent) applied on the server, not filtered post-fetch.
+- The SQL query applies the `is_old_customer` role gate (`= 0` for ts, `= 1` for crm) so peers from the *other* role group never leak.
+- The frontend filters returned rows down to the user's own seller id for the main data table, KPI cards, and exports.
 - Sending another user's `seller_id` in query params does not override the server-enforced filter.
-- Response rows contain no data belonging to other sellers.
 - Admin users are unaffected — they continue to receive all rows.
 
 ---
@@ -366,3 +368,44 @@ slipped through" review so the team can adjust review processes.
 ---
 
 _End of PRD v1.1 — Maintenance Contract section expanded 2026-04-29 alongside SOP publication_
+
+---
+
+## Addendum A — Ranking Summary Visibility for CRM (v1.2, 2026-05-05)
+
+This addendum documents a product decision that diverges from the Phase 2 persona table and Story 2.1 acceptance criteria. It is incorporated into the PRD's standing definition of expected behavior — Section 3 (Personas) and Story 2.1 reference this addendum.
+
+### Background
+
+The original PRD (v1.0, 2026-04-29) treated `ts` and `crm` as having identical data-isolation rules: both should see only their own rows on `sales-report-by-seller`. During Phase 2 implementation that rule was relaxed for ranking purposes — backend now returns role-wide rows so the frontend can compute peer rankings — and the frontend applied uniform `'******'` masking to non-self rows in the ranking section (commit `b534c2f`, 2026-04-30).
+
+In production use, the CRM operations lead requested **full team visibility on the CRM ranking** because:
+
+1. CRM is a smaller team where members coordinate on accounts day-to-day; ranking-with-real-names matches how the team actually talks about workload.
+2. Masking peer names while showing peer numbers is a UX courtesy, not a security boundary (architecture-rbac-view-as Section 7 documents this explicitly).
+3. The Telesales group, being larger and more competitive, retains the masked behavior because its UX requirement is different.
+
+### Decision
+
+| Role + group | Names | Trophies | Title | Source of difference |
+|---|---|---|---|---|
+| Admin viewing Telesales | Unmasked | ✅ Top 3 | `Telesales` | Unchanged |
+| Admin viewing CRM | Unmasked | ✅ Top 3 (added 2026-05-05) | `CRM` | Visual parity with Telesales |
+| `ts` viewing Telesales | Peers `'******'`, own row visible | ✅ Top 3 | `Telesales` | Unchanged |
+| `crm` viewing CRM | **All unmasked** (new) | Plain numbers (no trophies) | `CRM ทีม X` (X = own `team_number`) | Business rule for small-team visibility |
+
+### Boundaries
+
+- **Endpoint access rules are unchanged.** ts and crm remain blocked from admin-only endpoints. The deviation is only in *how peer-row visibility is rendered on the ranking summary* of `sales-report-by-seller`.
+- **Backend SQL is unchanged.** No `crm`-specific code path; the frontend's `buildGroupTable` reads `myRole === 'crm' && groupClass === 'crm'` and renders accordingly.
+- **The `room_quantity = 0` exclusion** added in the same session (orders with no travelers are dropped from KPI / ranking / table / exports) is documented in main planning-artifacts/architecture.md → Phase 6 Retrospective. It is not RBAC-relevant and is referenced here only because the architecture's "Frontend client-side filtering" code block was updated in the same edit pass.
+
+### Implication for Story 2.1 success metric ("ts/crm users receiving another seller's rows from the API")
+
+Still 0 incidents. The metric measures *another role's* data leaking — e.g., a ts user receiving crm rows or vice-versa — which the `is_old_customer` role gate continues to prevent. Peer rows *within the same role group* were never in scope of this metric (architecture Section 7's rationale on "no confidentiality expectation among peers within the company context"); the addendum simply formalises that the masking-vs-not-masking choice is now per-role.
+
+### Future-proofing note
+
+If the CRM team grows large enough that members no longer want full peer visibility, the change is purely frontend: flip `shouldMask = !isSelf && myRole === 'ts'` to `shouldMask = !isSelf && (myRole === 'ts' || myRole === 'crm')` in `sales-report-by-seller.js#buildGroupTable`. No backend or PRD-structure change needed.
+
+_End of PRD v1.2 — Addendum A added 2026-05-05 alongside the CRM ranking visibility shift._
