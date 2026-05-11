@@ -124,6 +124,7 @@ export const GET = withApiGuard('/api/reports/commission-plus', async (request, 
       o.order_code,
       DATE_FORMAT(CONVERT_TZ(o.created_at, '+00:00', '+07:00'), '%Y-%m-%d %H:%i') AS created_at,
       DATE_FORMAT(CONVERT_TZ(o.canceled_at, '+00:00', '+07:00'), '%Y-%m-%d %H:%i') AS canceled_at,
+      o.order_status,
       o.customer_name,
       JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.start_at')) AS period_start_raw,
       JSON_UNQUOTE(JSON_EXTRACT(o.product_period_snapshot, '$.end_at'))   AS period_end_raw,
@@ -155,7 +156,7 @@ export const GET = withApiGuard('/api/reports/commission-plus', async (request, 
     ${amJoin}
     WHERE ${whereClause}
     GROUP BY
-      o.id, o.order_code, o.created_at, o.canceled_at, o.customer_name,
+      o.id, o.order_code, o.created_at, o.canceled_at, o.order_status, o.customer_name,
       o.product_period_snapshot, o.net_amount, o.supplier_commission,
       o.discount, o.seller_agency_member_id, o.is_old_customer,
       seller_nick_name, seller_job_position, seller_team_number
