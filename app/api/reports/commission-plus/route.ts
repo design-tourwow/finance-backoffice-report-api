@@ -105,6 +105,7 @@ export const GET = withApiGuard('/api/reports/commission-plus', async (request, 
     conditions.push(`LOWER(o.order_status) != 'canceled'`)
   } else if (orderStatus === 'canceled') {
     conditions.push(`LOWER(o.order_status) = 'canceled'`)
+    conditions.push(`o.canceled_at IS NOT NULL`)
   }
 
   const whereClause = conditions.join(' AND ')
